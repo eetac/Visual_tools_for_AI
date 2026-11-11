@@ -7,6 +7,7 @@ El funcionament d’un LLM es basa en la generació de text token a token. Un to
 
 ### 1.1. FUNCIONAMENT D’UN LLM
 El següent esquema representa com un LLM processa una pregunta i genera una resposta, des del moment en què l'usuari introdueix el text fins que el model acaba de respondre.
+[](./img/llm_workflow_diagram.png)
 
 **Figura 1. Esquema funcionament LLM**
 
