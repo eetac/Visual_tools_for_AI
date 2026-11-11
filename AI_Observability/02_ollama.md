@@ -115,6 +115,13 @@ ollama ps
 ```
 
 Per terminal apareixerà una mena de taula amb informació rellevant:
+```
+judit@MacBook-Pro-de-Judit ~ % ollama ps
+```
+
+| NAME       | ID           | SIZE   | PROCESSOR | CONTEXT | RUNNER   | UNTIL              |
+| ---------- | ------------ | ------ | --------- | ------- | -------- | ------------------ |
+| qwen3.5:9b | 56671c2ab938 | 7.9 GB | 100% CPU  | 65536   | llamacpp | 4 minutes from now |
 
 **Figura 4. ollama ps**
 
