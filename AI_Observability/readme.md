@@ -7,7 +7,7 @@ Aquest manual presenta els conceptes i les eines utilitzats per construir aplica
 1. [LLM (Large Language Model)](./01_llm.md)
 2. [Ollama: instal·lació i execució local](./02_ollama.md)
 3. [LangChain i LangGraph](./03_langchain_langgraph.md)
-4. [RAG i bases de dades vectorials amb Weaviate](./04_rag.md)
+4. [RAG (Retrieval-Augmented Generation) i bases de dades vectorials](./04_rag.md)
 5. [MCP (Model Context Protocol)](./05_MCP.md)
 6. [Observabilitat amb Opik i exemples d’aplicació](./06_observalility.md)
 7. [Hermes](./07_hermes.md) — document pendent de contingut
