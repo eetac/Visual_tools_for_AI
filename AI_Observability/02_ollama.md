@@ -111,13 +111,10 @@ Llavors, apareixerà >>> i ja es pot iniciar la conersa.
 Per veure quins models estan actualment carrgats i també per mirar si el model és adequat pel nostre mac, en un altre terminal executem: 
 
 ```bash
-ollama ps
+% ollama ps
 ```
 
 Per terminal apareixerà una mena de taula amb informació rellevant:
-```
-judit@MacBook-Pro-de-Judit ~ % ollama ps
-```
 
 | NAME       | ID           | SIZE   | PROCESSOR | CONTEXT | RUNNER   | UNTIL              |
 | ---------- | ------------ | ------ | --------- | ------- | -------- | ------------------ |
