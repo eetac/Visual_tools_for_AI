@@ -85,14 +85,21 @@ Durant la descàrrega es mostrarà el progrés (pulling manifest, pulling …, s
 Es poden instal·lar diversos models. Aquests models queden guardats al disc del Mac. Tenir diversos models instal·lats no significa que tots estiguin ocupant RAM simultàniament. La memòria important es consumeix quan el model està carregat i en execució.
 
 ### 3.5. COMPROVAR MODELS INSTAL·LATS
-Per comprovar els models que es tenen instal·lats: ollama list
+Per comprovar els models que es tenen instal·lats: 
+
+```bash
+ollama list
+```
 
 Exemple:
 
 **Figura 3. Models instal·lats**
 
 ### 3.6. EXECUTAR UN MODEL
-Per executar el model i iniciar una conversa: ollama run qwen3.5:9b
+Per executar el model i iniciar una conversa: 
+```bash
+ollama run qwen3.5:9b
+```
 
 Llavors, apareixerà >>> i ja es pot iniciar la conersa.
 ### 3.7. COMPROVAR MODELS CARREGATS A MEMÒRIA
