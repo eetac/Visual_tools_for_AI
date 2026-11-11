@@ -7,11 +7,29 @@ Un dels principals avantatges d'Ollama és que permet executar models d'intel·l
 ### 3.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
 Abans d’instal·lar Ollama es pot comprovar el processador i la memòria disponible.
 
+| Sistema operativo | Comando |
+|---|---|
+| macOS | `system_profiler SPHardwareDataType` |
+| Linux | `sudo dmidecode -t system` |
+| Windows (PowerShell) | `Get-CimInstance Win32_ComputerSystem` |
+
 Des del Terminal: 
 
 ```bash
+// MacOs
 system_profiler SPHardwareDataType
 ```
+
+```bash
+// Linux
+sudo dmidecode -t system
+```
+
+```bash
+// Windows (PowerShell) 
+Get-CimInstance Win32_ComputerSystem
+```
+
 
 Apareixerà informació similar a:
 
