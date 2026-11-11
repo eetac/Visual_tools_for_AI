@@ -29,9 +29,9 @@ sudo dmidecode -t system
 // Windows (PowerShell) 
 Get-CimInstance Win32_ComputerSystem
 ```
-
-
 Apareixerà informació similar a:
+
+
 ![Hardware overview](./img/hardware_overview.png)
 **Figura 2. Informació del mac**
 
