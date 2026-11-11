@@ -91,7 +91,9 @@ Un cop escollit el model, es descarrega.
 Per descarregar un model (per exemple: qwen3.5:9b): 
 
 ```bash
-ollama pull nom_del_model 
+//ollama pull nom_del_model 
+ollama pull qwen3.5:9b
+
 ````
 
 Durant la descàrrega es mostrarà el progrés (pulling manifest, pulling …, success).
