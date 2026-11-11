@@ -148,6 +148,7 @@ La seva incorporació no modifica les funcionalitats de l'assistent, però perme
 Aquest primer exemple permet comprovar que Python es pot comunicar correctament amb Ollama i generar respostes utilitzant el model Qwen.
 
 **Funcionament del codi:**
+```python
 llm = ChatOllama(    
 model="qwen3.5:9b",    
 temperature=0,
@@ -158,6 +159,7 @@ response = llm.invoke(
 )
 
 print(response.content)
+```
 
 **Intervenció del LLM:**
 El model intervé quan Python executa: response = llm.invoke(...). En aquest moment, LangChain envia la consulta a Ollama, que carrega o utilitza el model i realitza la inferència.
@@ -179,6 +181,8 @@ L'agent disposa d'una eina anomenada get_weather() que retorna informació meteo
 
 **Components del codi:**
 La funció Python és:
+
+```python
 def get_weather(city: str) -> str:
     """Get weather for a given city."""
 
@@ -187,15 +191,18 @@ def get_weather(city: str) -> str:
     )
 
     return f"It's always sunny in {city}!"
+```
 
 Aquesta funció rep el nom d'una ciutat i retorna una resposta fictícia.
 
 Posteriorment, es crea l'agent:
+```python
 agent = create_agent(
     model=llm,
     tools=[get_weather],
     system_prompt="You are a helpful assistant",
 )
+```
 
 Amb tools=[get_weather] s'indica que l'agent pot utilitzar aquesta funció.
 
@@ -247,6 +254,8 @@ El temps de vol es calcula amb la fórmula: tmin=dkmvkm/h60
 Aquest càlcul es realitza directament amb Python. El LLM no calcula el resultat numèric, sinó que interpreta la petició i determina si necessita executar l'eina.
 
 Per permetre que el supervisor utilitzi aquests agents, es defineixen dues funcions intermèdies decorades amb @tool:
+
+```python
 @tool
 def ask_weather_agent(query: str) -> str:
     """Delegate weather-related questions
@@ -259,12 +268,15 @@ def ask_weather_agent(query: str) -> str:
     })
 
     return result["messages"][-1].content
+```
 
 La funció ask_flight_agent() funciona de la mateixa manera, però invoca flight_agent.
 
 Aquestes funcions són importants perquè el supervisor no disposa directament de get_weather() ni de calculate_flight_time(). En canvi, té accés a ask_weather_agent() i ask_flight_agent(), que permeten delegar les tasques als agents especialitzats.
 
 Es crea el supervisor:
+
+```python
 supervisor_agent = create_agent(
     model=llm,
     tools=[
@@ -276,6 +288,7 @@ supervisor_agent = create_agent(
         "that coordinates specialized agents."
     ),
 )
+```
 
 La instrucció system_prompt estableix que el supervisor ha d'identificar les tasques de l'usuari, delegar-les a l'agent corresponent i combinar els resultats.
 
@@ -316,6 +329,8 @@ check_battery(): determina si la bateria disponible és suficient per completar 
 Aquestes funcions estan decorades amb @tool, però són invocades directament pel codi Python, sense que el LLM decideixi quan executar-les.
 
 Per exemple:
+
+```python
 flight_result = calculate_flight_time.invoke({
     "distance_km": state.distance_km,
     "drone_speed_kmh": state.drone_speed_kmh,
@@ -324,6 +339,7 @@ flight_result = calculate_flight_time.invoke({
     "wind_direction_from_deg":
         state.wind_direction_from_deg,
 })
+```
 
 En aquest cas, .invoke() executa una eina de Python, no el model Qwen. La distinció és important perquè el mateix mètode invoke() es pot utilitzar amb diferents components de LangChain.
 
@@ -413,11 +429,14 @@ Undetermined: falta informació o alguna comprovació necessària
 Invalid: s'ha detectat alguna dada o resultat invàlid.
 
 La selecció de la ruta de replanificació es realitza mitjançant una condició Python dins de route_after_evaluation():
+
+```python
 def route_after_evaluation(state):
     if state.get("mission_status") == "NOT FEASIBLE":
         return "replan"
 
     return "report"
+```
 
 Això significa que, quan l'estat és NOT FEASIBLE, LangGraph dirigeix l'execució cap a replanner_node().
 
@@ -489,27 +508,36 @@ La diferència principal respecte a l'exemple anterior és que el LLM no sol·li
 El programa defineix ShoppingState, una estructura que conté la llista de la compra, el missatge de l'usuari, l'últim producte afegit i els camps necessaris per descriure una operació. També utilitza InMemorySaver per conservar l'estat entre les diferents interaccions de la sessió.
 
 El primer node és process_input_node(), que prepara un prompt amb les instruccions del sistema i executa:
+
+```python
 response = llm.invoke([
     ("system", system_prompt),
     ("human", state["user_input"]),
 ])
+```
+
 Aquesta és la crida al LLM. Qwen interpreta la petició i retorna un JSON amb els camps action, products, old_product i new_product.
 
 Per exemple, si l'usuari escriu “añade huevos y harina”, el model pot retornar:
+```json
 {
   "action": "add",
   "products": ["huevos", "harina"],
   "old_product": "",
   "new_product": ""
 }
+```
 
 Python interpreta aquest resultat amb json.loads(), comprova que els camps siguin vàlids i els guarda a l'estat.
 
 A continuació, la funció route_after_input() consulta el valor d'action:
+
+```python
 def route_after_input(state: ShoppingState):
       action = state.get("action", "other")
       print(f"[ROUTER] {action}")
       return action
+```
 
 El router pot seleccionar els nodes add, remove, replace, show o other.
 
@@ -541,6 +569,7 @@ L'aplicació continua permetent gestionar productes, però incorpora la possibil
 
 **Components del codi:**
 El programa utilitza dos objectes ChatOllama amb finalitats diferents:
+```python
 llm = ChatOllama(
     model="qwen3.5:9b",
     temperature=0,
@@ -553,6 +582,8 @@ rag_llm = ChatOllama(
     temperature=0,
     reasoning=False,
 )
+```
+
 
 Tots dos utilitzen el mateix model, però es configuren per a dues tasques diferents.El primer objecte (llm) interpreta les peticions de l'usuari i genera una estructura JSON. El segon (rag_llm) genera explicacions en llenguatge natural a partir de les receptes recuperades.
 
@@ -595,6 +626,8 @@ El funcionament principal de l'assistent es manté com en l'exemple anterior, pe
 El programa incorpora OpikTracer i track_langgraph(), que permeten instrumentar el graf de LangGraph.
 
 També defineix una funció per registrar el consum del model:
+
+```python
 @track(
     name="ollama_tokens",
     type="llm",
@@ -624,7 +657,7 @@ def invoke_with_opik_usage(
         )
 
     return answer
-
+```
 Així, si cliquem una trace al dashboard veurem el següent:
 
 **Figura 19. Consum de tokens**
@@ -633,10 +666,13 @@ Aquesta funció executa el model i recupera les metadades de consum proporcionad
 També s'utilitza la funció weaviate_near_text() per registrar les consultes semàntiques a la base de dades.
 
 La integració amb LangGraph es realitza mitjançant:
+
+```python
 shopping_graph = track_langgraph(
     shopping_graph,
     opik_tracer
 )
+```
 
 Això permet associar les execucions del graf amb les traces registrades a Opik.
 
@@ -671,6 +707,7 @@ Hermes, en canvi, s'integra d'una manera diferent. No es crida mitjançant ChatO
 Els principals paràmetres són:
 COLLECTION = "Recetas"
 
+```python
 MODEL = os.getenv(
     "OLLAMA_MODEL",
     "qwen3.5:9b"
@@ -688,11 +725,14 @@ DAYS = (
 )
 
 MEALS = ("comida", "cena")
+```
 
 HERMES_TIMEOUT estableix el temps màxim que el programa espera una resposta del procés Hermes. Per defecte, aquest límit és de 240 segons. També es defineix un identificador de sessió diferent de l'utilitzat a l'exemple anterior, per evitar que els estats de les dues aplicacions es barregin.
 
 Ampliació de ShoppingState
 L'estat compartit de LangGraph s'amplia amb nous camps:
+
+```python
 class ShoppingState(TypedDict, total=False):
     user_input: str
     shopping_list: list[str]
@@ -712,6 +752,7 @@ class ShoppingState(TypedDict, total=False):
     last_context: str
 
     response: str
+```
 
 Les noves variables són:
 meal_type: indica si es volen planificar únicament dinars (comida), sopars (cena) o tots dos.
@@ -734,6 +775,8 @@ Aquestes accions s'afegeixen a les que ja existien per gestionar productes i bus
 
 Recuperació de receptes amb Weaviate:
 Abans de generar el menú, el programa necessita obtenir les receptes que Hermes podrà seleccionar. Per fer-ho, s'utilitza la funció:
+
+```python
 @track(
     name="weekly_weaviate_candidates",
     type="tool",
@@ -745,6 +788,7 @@ def retrieve_week_candidates(
     max_minutes: int = 0,
     user_input: str = ""
 ) -> list[dict]:
+```
 
 Aquesta funció es connecta a la col·lecció Recetas de Weaviate i executa una cerca semàntica (utilitzant near_text()).
 
@@ -760,6 +804,8 @@ Per exemple, si l'usuari demana «planifica cenas de menos de 20 minutos», Pyth
 
 Planificació setmanal amb Hermes:
 La funció principal encarregada de comunicar-se amb Hermes és:
+
+```python
 @track(
     name="hermes_weekly_planning",
     type="llm",
@@ -771,6 +817,7 @@ def ask_hermes_for_week(
     candidates: list[dict],
     meal_type: str
 ) -> dict:
+```
 
 Aquesta funció rep la petició original de l'usuari, les receptes candidates recuperades de Weaviate i el tipus d'àpats que s'han de planificar.
 
@@ -788,12 +835,15 @@ domingo: cena=R05
 Els identificadors són referències a receptes recuperades prèviament de Weaviate. El prompt també indica a Hermes que ha de prioritzar les categories adequades per a cada àpat i intentar variar els plats sense repetir-los innecessàriament.
 
 Per executar Hermes, Python utilitza subprocess.run():
+```python
 result = subprocess.run(
                 ["hermes", "-z", prompt, "--toolsets", "search",
                  "--usage-file", str(usage_path)],
                 capture_output=True, text=True, timeout=HERMES_TIMEOUT,
                 check=False, env=env,
             )
+```
+
 
 La crida executa Hermes en mode no interactiu amb -z, proporciona el prompt i recupera la resposta generada. El paràmetre --usage-file permet guardar informació del consum de tokens quan Hermes la proporciona.
 
@@ -801,6 +851,8 @@ El programa limita les eines habilitades al conjunt search, excloent els conjunt
 
 Validació del menú amb Python:
 Una vegada Hermes retorna la planificació, el programa executa:
+
+```python
 plan, completed = build_verified_plan(
     raw,
     candidates,
@@ -808,6 +860,7 @@ plan, completed = build_verified_plan(
     minute_limit,
     state["user_input"]
 )
+```
 
 Aquesta funció és important perquè el programa no accepta directament qualsevol recepta proposada per Hermes. Python comprova que les referències retornades corresponguin a receptes reals recuperades de Weaviate i que compleixin els filtres establerts. També comprova que les receptes siguin adequades com a plats principals, que compleixin les restriccions de dieta i temps i que no es repeteixin innecessàriament quan existeixen altres opcions disponibles.
 
@@ -821,6 +874,8 @@ Comprovació dels ingredients del menú:
 Una vegada generat el menú setmanal, el programa pot identificar quins ingredients són necessaris per preparar-lo.
 
 Aquesta operació es realitza amb:
+
+```python
 @track(
     name="calculate_missing_ingredients",
     type="tool",
@@ -831,6 +886,7 @@ def calculate_missing_ingredients(
     plan: dict,
     shopping_list: list[str]
 ) -> dict:
+```
 
 La funció recorre les receptes assignades als diferents dies de la setmana, extreu els seus ingredientesClave i elimina els duplicats. Posteriorment, compara aquests ingredients amb els productes que ja apareixen a shopping_list. Per exemple, si el menú necessita ous, llet, arròs i patates, però la llista de la compra ja conté llet i ous, Python identifica arròs i patates com a productes pendents.
 

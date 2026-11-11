@@ -39,6 +39,7 @@ Un servidor MCP pot proporcionar diferents tipus de funcionalitats. Les tres pri
 Les tools són funcions executables que el servidor posa a disposició dels clients. Permeten realitzar operacions concretes, com consultar una API, executar un càlcul o modificar informació.
 
 Per exemple, un servidor podria exposar la funció següent:
+```python
 @mcp.tool()
 def calculate_flight_time(
     distance_km: float,
@@ -46,6 +47,8 @@ def calculate_flight_time(
 ) -> float:
     """Calculate flight time in minutes."""
     return (distance_km / speed_kmh) * 60
+```
+
 
 Aquesta funció rep una distància i una velocitat, i retorna el temps de vol en minuts. El decorador @mcp.tool() registra la funció com una eina del servidor.
 
@@ -61,6 +64,7 @@ Per exemple, un servidor podria proporcionar el contingut d'un document o inform
 3. Prompts
 Els prompts són plantilles reutilitzables que permeten estructurar les instruccions proporcionades a un model.
 
+```python
 Per exemple:
 @mcp.prompt()
 def explain_code(language: str) -> str:
@@ -69,7 +73,7 @@ def explain_code(language: str) -> str:
         f"Explain how this {language} "
         "code works step by step."
     )
-
+```
 El servidor proporciona la plantilla, però no executa necessàriament cap inferència. El client pot recuperar el prompt i utilitzar-lo posteriorment en una interacció amb un LLM.
 
 ### 6.3. COMUNICACIÓ ENTRE CLIENT I SERVIDOR
@@ -78,6 +82,7 @@ MCP utilitza missatges estructurats basats en JSON-RPC 2.0 per intercanviar sol�
 Per exemple, un client pot sol·licitar la llista d'eines disponibles mitjançant l'operació tools/list. Si vol executar una eina concreta, utilitza tools/call, proporcionant-ne el nom i els arguments.
 
 Una sol·licitud per calcular un temps de vol (amb la tool anteriorment descrita) podria tenir una estructura equivalent a:
+```json
 {
   "jsonrpc": "2.0",
   "id": 1,
@@ -90,6 +95,7 @@ Una sol·licitud per calcular un temps de vol (amb la tool anteriorment descrita
     }
   }
 }
+```
 
 El servidor interpreta la sol·licitud, valida els arguments i executa la funció Python. En aquest cas, el resultat seria un temps de vol de 18 minuts. Posteriorment, el servidor retorna el resultat al client mitjançant una resposta estructurada del protocol.
 
