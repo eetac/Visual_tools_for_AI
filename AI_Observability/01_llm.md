@@ -19,8 +19,8 @@ El següent esquema representa com un LLM processa una pregunta i genera una res
 3. Processament mitjançant LLM: aquesta és la part principal del funcionament. El model rep els tokens i els processa mitjançant la seva xarxa neuronal. 
 
 Durant aquest processament utilitza diferents elements:
-- **Paràmetres*: valors numèrics apresos durant l'entrenament que permeten identificar patrons i relacions entre conceptes.
-- **Context*: informació de la pregunta, de la conversa anterior i dels tokens generats fins al moment.
+- **Paràmetres**: valors numèrics apresos durant l'entrenament que permeten identificar patrons i relacions entre conceptes.
+- **Context**: informació de la pregunta, de la conversa anterior i dels tokens generats fins al moment.
 - **Mecanismes d'atenció**: permeten relacionar diferents parts de la seqüència per interpretar-ne el significat.
 
 Per exemple, quan el model rep la pregunta “Què és la fotosíntesi?”, pot relacionar el concepte de fotosíntesi amb els coneixements apresos durant l'entrenament sobre les plantes, la llum solar i la transformació d'energia.
