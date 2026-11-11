@@ -16,17 +16,17 @@ Abans d’instal·lar Ollama es pot comprovar el processador i la memòria dispo
 Des del Terminal: 
 
 ```bash
-// MacOs
+# MacOs
 system_profiler SPHardwareDataType
 ```
 
 ```bash
-// Linux
+# Linux
 sudo dmidecode -t system
 ```
 
 ```bash
-// Windows (PowerShell) 
+# Windows (PowerShell) 
 Get-CimInstance Win32_ComputerSystem
 ```
 Apareixerà informació similar a:
@@ -91,7 +91,7 @@ Un cop escollit el model, es descarrega.
 Per descarregar un model (per exemple: qwen3.5:9b): 
 
 ```bash
-//ollama pull nom_del_model 
+#ollama pull nom_del_model 
 ollama pull qwen3.5:9b
 
 ````
