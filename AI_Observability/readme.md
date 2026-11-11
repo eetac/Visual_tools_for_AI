@@ -63,9 +63,9 @@ En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot util
 ### 3.2. INSTAL·LAR OLLAMA
 Obrir l’aplicació Terminal i executar: 
 
-'''sh
+```bash
 curl -fsSL https://ollama.com/install.sh | sh
-'''sh
+```
 
 Aquest script descarrega i instal·la Ollama a macOS i afegeix la comanda ollama al sistema.
 
