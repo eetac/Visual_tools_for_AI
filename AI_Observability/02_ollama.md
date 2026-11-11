@@ -7,7 +7,12 @@ Un dels principals avantatges d'Ollama és que permet executar models d'intel·l
 ### 3.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
 Abans d’instal·lar Ollama es pot comprovar el processador i la memòria disponible.
 
-Des del Terminal: system_profiler SPHardwareDataType
+Des del Terminal: 
+
+```bash
+system_profiler SPHardwareDataType
+```
+
 Apareixerà informació similar a:
 
 **Figura 2. Informació del mac**
@@ -23,7 +28,11 @@ curl -fsSL https://ollama.com/install.sh | sh
 
 Aquest script descarrega i instal·la Ollama a macOS i afegeix la comanda ollama al sistema.
 
-En acabar, comprovar que s’ha instal·lat correctament: ollama --version
+En acabar, comprovar que s’ha instal·lat correctament: 
+```bash
+ollama --version
+```
+
 Hauria d’aparèixer una resposta similar a: ollama version X.X.X
 
 Per obrir l’assistent inicial d’Ollama: ollama
