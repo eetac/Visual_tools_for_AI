@@ -33,6 +33,7 @@ Apareixerà informació similar a:
 
 
 ![Hardware overview](./img/hardware_overview.png)
+
 **Figura 2. Informació del mac**
 
 En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot utilitzar la GPU integrada del xip per accelerar l’execució dels models.
