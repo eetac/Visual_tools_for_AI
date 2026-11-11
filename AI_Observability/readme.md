@@ -61,7 +61,12 @@ Apareixerà informació similar a:
 En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot utilitzar la GPU integrada del xip per accelerar l’execució dels models.
 
 ### 3.2. INSTAL·LAR OLLAMA
-Obrir l’aplicació Terminal i executar: curl -fsSL https://ollama.com/install.sh | sh
+Obrir l’aplicació Terminal i executar: 
+
+'''sh
+curl -fsSL https://ollama.com/install.sh | sh
+'''sh
+
 Aquest script descarrega i instal·la Ollama a macOS i afegeix la comanda ollama al sistema.
 
 En acabar, comprovar que s’ha instal·lat correctament: ollama --version
