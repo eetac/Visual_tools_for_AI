@@ -32,8 +32,18 @@ Get-CimInstance Win32_ComputerSystem
 Apareixerà informació similar a:
 
 
-![Hardware overview](./img/hardware_overview.png)
+### Resumen del hardware
 
+| Característica                             | Valor                                            |
+| ------------------------------------------ | ------------------------------------------------ |
+| Nombre del modelo                          | MacBook Pro                                      |
+| Identificador del modelo                   | Mac16,8                                          |
+| Número de modelo                           | MX2J3Y/A                                         |
+| Chip                                       | Apple M4 Pro                                     |
+| CPU                                        | 14 núcleos (10 de rendimiento y 4 de eficiencia) |
+| Memoria RAM                                | 24 GB                                            |
+| Versión del firmware del sistema           | 20457.1.29                                       |
+| Versión del cargador del sistema operativo | 20457.1.29                                       |
 **Figura 2. Informació del mac**
 
 En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot utilitzar la GPU integrada del xip per accelerar l’execució dels models.
