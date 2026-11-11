@@ -66,9 +66,12 @@ Ollama disposa d’una biblioteca de models on es poden consultar les diferents 
 En general, que un model sigui més gran indica més capacitat i més raonament, però també més memòria, més consum i menys velocitat. Un model més gran no és necessàriament sempre millor. També depèn de la seva arquitectura, entrenament i especialització.
 
 Per mirar la mida aproximada de cada model es pot buscar a la biblioteca d’Ollama.  Per exemple, la família Qwen 3.5 disposa actualment de variants com:
-qwen3.5:0.8b → aproximadament 1,2-1,3 GB
-qwen3.5:2b → aproximadament 2,7-3,1 GB
-qwen3.5:4b → aproximadament 3,3-4,0 GB
+
+| Model | Mida aproximada |
+|---|---:|
+| `qwen3.5:0.8b` | 1,2–1,3 GB |
+| `qwen3.5:2b` | 2,7–3,1 GB |
+| `qwen3.5:4b` | 3,3–4,0 GB |
 
 La mida del fitxer no correspon exactament a la memòria total que consumirà durant l’execució. També cal memòria per a context, cache, buffers, sistema operatiu…. Per tant, no és recomanable escollir un model que ocupi pràcticament tota la memòria disponible.
 
