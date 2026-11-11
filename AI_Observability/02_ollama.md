@@ -78,7 +78,11 @@ La mida del fitxer no correspon exactament a la memòria total que consumirà du
 ### 3.4. DESCARREGAR UN MODEL
 Un cop escollit el model, es descarrega.
 
-Per descarregar un model: ollama pull nom_del_model (per exemple: qwen3.5:9b)
+Per descarregar un model (per exemple: qwen3.5:9b): 
+
+```bash
+ollama pull nom_del_model 
+````
 
 Durant la descàrrega es mostrarà el progrés (pulling manifest, pulling …, success).
 
