@@ -1,4 +1,4 @@
-# IA, visualización y observabilidad
+# IA, visualització i observabilitat
 
 Aquest manual presenta els conceptes i les eines utilitzats per construir aplicacions amb models de llenguatge. Els documents segueixen un recorregut des dels fonaments dels LLM fins a la seva execució local, la creació d’agents, la cerca amb RAG, la connexió amb eines mitjançant MCP i l’observabilitat de les aplicacions.
 
