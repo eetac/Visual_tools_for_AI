@@ -1,4 +1,4 @@
-# Manual d’intel·ligència artificial: resum i índex
+# IA, visualización y observabilidad
 
 Aquest manual presenta els conceptes i les eines utilitzats per construir aplicacions amb models de llenguatge. Els documents segueixen un recorregut des dels fonaments dels LLM fins a la seva execució local, la creació d’agents, la cerca amb RAG, la connexió amb eines mitjançant MCP i l’observabilitat de les aplicacions.
 
@@ -32,7 +32,7 @@ Presenta LangChain per connectar LLM amb eines i recursos, i LangGraph per defin
 
 **Document:** [03_langchain_langgraph.md](./03_langchain_langgraph.md)
 
-### 4. RAG i Weaviate
+### 4. RAG (RAG Retrieval-Augmented Generation) 
 
 Explica com RAG recupera informació d’una font externa, l’afegeix al context del model i genera una resposta fonamentada en aquesta informació. També introdueix les cerques semàntiques i l’ús de Weaviate com a base de dades vectorial per recuperar receptes.
 
