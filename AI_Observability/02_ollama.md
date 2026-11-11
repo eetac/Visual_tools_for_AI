@@ -42,14 +42,14 @@ En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot util
 Obrir l’aplicació Terminal i executar: 
 
 ```bash
-curl -fsSL https://ollama.com/install.sh | sh
+% curl -fsSL https://ollama.com/install.sh | sh
 ```
 
 Aquest script descarrega i instal·la Ollama a macOS i afegeix la comanda ollama al sistema.
 
 En acabar, comprovar que s’ha instal·lat correctament: 
 ```bash
-ollama --version
+% ollama --version
 ```
 
 Hauria d’aparèixer una resposta similar a: ollama version X.X.X
@@ -88,7 +88,7 @@ Es poden instal·lar diversos models. Aquests models queden guardats al disc del
 Per comprovar els models que es tenen instal·lats: 
 
 ```bash
-ollama list
+% ollama list
 ```
 Exemple:
 
@@ -103,7 +103,7 @@ Exemple:
 ### 3.6. EXECUTAR UN MODEL
 Per executar el model i iniciar una conversa: 
 ```bash
-ollama run qwen3.5:9b
+% ollama run qwen3.5:9b
 ```
 
 Llavors, apareixerà >>> i ja es pot iniciar la conersa.
@@ -136,7 +136,7 @@ Amb aquesta comanda, aturem el model. És a dir, no s’elimina del disc sinó q
 Per comprovar que s’ha aturat correctament: 
 
 ```bash
-ollama ps 
+% ollama ps 
 ```
 
 (i ha de sortir buit)
