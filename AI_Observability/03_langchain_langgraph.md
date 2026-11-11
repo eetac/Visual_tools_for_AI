@@ -8,17 +8,17 @@ Permet desenvolupar aplicacions en què el model no es limita a respondre pregun
 
 Per exemple, si un usuari pregunta quin temps fa en una ciutat, un LLM sense eines només pot respondre amb els coneixements que té o amb la informació que se li proporciona. En canvi, amb LangChain es pot connectar el model a una funció Python que consulti dades meteorològiques.
 
-Els principals components són:
-LLM: model que interpreta les instruccions i genera respostes. En aquests exemples s'utilitza Qwen, executat localment amb Ollama.
-Tools: funcions o recursos externs que el model pot sol·licitar quan necessita realitzar una operació.
-Agent: sistema que utilitza el LLM per decidir quines eines ha de fer servir per completar una tasca.
-Messages: missatges que representen les instruccions, les preguntes de l'usuari, les respostes del model i els resultats de les eines.
+**Els principals components són:
+- **LLM**: model que interpreta les instruccions i genera respostes. En aquests exemples s'utilitza Qwen, executat localment amb Ollama.
+- **Tools**: funcions o recursos externs que el model pot sol·licitar quan necessita realitzar una operació.
+- **Agent**: sistema que utilitza el LLM per decidir quines eines ha de fer servir per completar una tasca.
+- **Messages**: missatges que representen les instruccions, les preguntes de l'usuari, les respostes del model i els resultats de les eines.
 
 Aplicació en Python
 Per connectar LangChain amb Ollama s'utilitza la classe ChatOllama:
+```python
 from langchain_ollama import ChatOllama
 
-```python
 llm = ChatOllama(
     model="qwen3.5:9b",
     temperature=0,

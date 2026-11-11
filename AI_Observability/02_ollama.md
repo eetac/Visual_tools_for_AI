@@ -74,7 +74,11 @@ Per executar el model i iniciar una conversa: ollama run qwen3.5:9b
 
 Llavors, apareixerà >>> i ja es pot iniciar la conersa.
 ### 3.7. COMPROVAR MODELS CARREGATS A MEMÒRIA
-Per veure quins models estan actualment carrgats i també per mirar si el model és adequat pel nostre mac, en un altre terminal executem: ollama ps
+Per veure quins models estan actualment carrgats i també per mirar si el model és adequat pel nostre mac, en un altre terminal executem: 
+
+```bash
+ollama ps
+```
 
 Per terminal apareixerà una mena de taula amb informació rellevant:
 
@@ -91,4 +95,10 @@ Quan ja no necessitem fer més preguntes a un model, s’escriu: ollama stop qwe
 
 Amb aquesta comanda, aturem el model. És a dir, no s’elimina del disc sinó que es descarrega de memòria, deixa d’utilitzar GPU i allibera recursos.
 
-Per comprovar que s’ha aturat correctament: ollama ps (i ha de sortir buit)
+Per comprovar que s’ha aturat correctament: 
+
+```bash
+ollama ps 
+```
+
+(i ha de sortir buit)
