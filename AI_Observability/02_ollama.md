@@ -90,8 +90,13 @@ Per comprovar els models que es tenen instal·lats:
 ```bash
 ollama list
 ```
-
 Exemple:
+
+| NAME       | ID           | SIZE   | MODIFIED      |
+| ---------- | ------------ | ------ | ------------- |
+| qwen3.5:4b | 7f3251fa6878 | 4.0 GB | 5 minutes ago |
+| gemma3:12b | f4031aab637d | 8.1 GB | 3 weeks ago   |
+| qwen3.5:9b | 56671c2ab938 | 6.6 GB | 3 weeks ago   |
 
 **Figura 3. Models instal·lats**
 
