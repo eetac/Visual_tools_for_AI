@@ -32,8 +32,6 @@ Get-CimInstance Win32_ComputerSystem
 Apareixerà informació similar a:
 
 
-### Resumen del hardware
-
 | Característica                             | Valor                                            |
 | ------------------------------------------ | ------------------------------------------------ |
 | Nombre del modelo                          | MacBook Pro                                      |
