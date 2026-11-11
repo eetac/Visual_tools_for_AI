@@ -150,18 +150,23 @@ Aplicació en Python
 Per connectar LangChain amb Ollama s'utilitza la classe ChatOllama:
 from langchain_ollama import ChatOllama
 
+```python
 llm = ChatOllama(
     model="qwen3.5:9b",
     temperature=0,
 )
+```
 
 Aquest codi crea un objecte que permet comunicar-se amb Qwen mitjançant el servidor local d'Ollama.
 
 Per enviar una consulta:
+
+```python
 response = llm.invoke(
     "Explica què és un LLM"
 )
 print(response.content)
+```
 
 En aquest cas, LangChain envia la pregunta a Ollama, Ollama executa el model i retorna la resposta generada.
 
@@ -195,6 +200,8 @@ En aquest exemple, el LLM interpreta el llenguatge natural i retorna l'acció qu
 
 Creació d'un graf
 En Python, LangGraph permet definir una estructura com aquesta:
+
+```python
 builder = StateGraph(ShoppingState)
 
 builder.add_node(
@@ -211,6 +218,7 @@ builder.add_edge(
     START,
     "process_input"
 )
+```
 
 Amb add_conditional_edges() es poden definir connexions condicionals que determinen quin node s'executa segons el resultat del router.
 
