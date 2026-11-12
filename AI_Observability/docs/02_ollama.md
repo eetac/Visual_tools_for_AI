@@ -4,9 +4,9 @@ Ollama és una eina de codi obert que permet descarregar, gestionar i executar L
 
 Un dels principals avantatges d'Ollama és que permet executar models d'intel·ligència artificial de manera local, mantenint el control sobre les dades i sense costos per consulta. Un cop descarregats, els models es poden utilitzar sense connexió a Internet per realitzar tasques com generar text, respondre preguntes, analitzar codi o processar imatges, segons les capacitats de cada model. A més, Ollama proporciona una API local que facilita la integració dels models amb aplicacions Python, interfícies gràfiques i frameworks com LangChain o LangGraph, permetent desenvolupar aplicacions i agents d'intel·ligència artificial personalitzats.
 
-## 3. INSTAL·LACIÓ I ÚS D’OLLAMA A macOS
+## 2.1. INSTAL·LACIÓ I ÚS D’OLLAMA A macOS
 
-### 3.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
+### 2.1.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
 
 Abans d’instal·lar Ollama es pot comprovar el processador i la memòria disponible.
 
@@ -52,7 +52,7 @@ Apareixerà informació similar a:
 
 En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot utilitzar la GPU integrada del xip per accelerar l’execució dels models.
 
-### 3.2. INSTAL·LAR OLLAMA
+### 2.1.2. INSTAL·LAR OLLAMA
 
 Obrir l’aplicació Terminal i executar:
 
@@ -76,7 +76,7 @@ Per obrir l’assistent inicial d’Ollama:
 ollama
 ```
 
-### 3.3. ESCOLLIR UN MODEL
+### 2.1.3. ESCOLLIR UN MODEL
 
 Abans de descarregar un model és important escollir-ne un que s’adapti als recursos disponibles de l’ordinador. Els principals factors a tenir en compte són la memòria disponible del MAC, la mida del model, el context que es vol utilitzar i el tipus de tasca.
 
@@ -96,7 +96,7 @@ Per mirar la mida aproximada de cada model es pot buscar a la biblioteca d’Oll
 
 La mida del fitxer no correspon exactament a la memòria total que consumirà durant l’execució. També cal memòria per a context, cache, buffers, sistema operatiu…. Per tant, no és recomanable escollir un model que ocupi pràcticament tota la memòria disponible.
 
-### 3.4. DESCARREGAR UN MODEL
+### 2.1.4. DESCARREGAR UN MODEL
 
 Un cop escollit el model, es descarrega.
 
@@ -111,7 +111,7 @@ Durant la descàrrega es mostrarà el progrés (pulling manifest, pulling …, s
 
 Es poden instal·lar diversos models. Aquests models queden guardats al disc del Mac. Tenir diversos models instal·lats no significa que tots estiguin ocupant RAM simultàniament. La memòria important es consumeix quan el model està carregat i en execució.
 
-### 3.5. COMPROVAR MODELS INSTAL·LATS
+### 2.1.5. COMPROVAR MODELS INSTAL·LATS
 
 Per comprovar els models que es tenen instal·lats:
 
@@ -131,7 +131,7 @@ Exemple:
   <sub>Figura 3. Models instal·lats</sub>
 </p>
 
-### 3.6. EXECUTAR UN MODEL
+### 2.1.6. EXECUTAR UN MODEL
 
 Per executar el model i iniciar una conversa:
 
@@ -141,7 +141,7 @@ ollama run qwen3.5:9b
 
 Llavors, apareixerà >>> i ja es pot iniciar la conersa.
 
-### 3.7. COMPROVAR MODELS CARREGATS A MEMÒRIA
+### 2.1.7. COMPROVAR MODELS CARREGATS A MEMÒRIA
 
 Per veure quins models estan actualment carrgats i també per mirar si el model és adequat pel nostre mac, en un altre terminal executem:
 
@@ -165,7 +165,7 @@ També es pot obrir Monitor d’Activitat → Memòria i comprovar la pressió d
 Si la pressió es manté en verd i el sistema continua funcionant amb fluïdesa, el model és adequat.
 Si la pressió de memòria és groga o vermella, el Mac va molt lent o el model tarda excessivament convé utilitzar un model més petit o reduir el context.
 
-### 3.8. PER ATURAR UN MODEL
+### 2.1.8. PER ATURAR UN MODEL
 
 Quan ja no necessitem fer més preguntes a un model, s’escriu: ollama stop qwen3.5:9b
 
