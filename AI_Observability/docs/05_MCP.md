@@ -1,5 +1,5 @@
+## 5. MCP SERVER (MODEL CONTEXT PROTOCOL)
 
-## 6. MCP SERVER (MODEL CONTEXT PROTOCOL)
 MCP (Model Context Protocol) és un protocol obert i estandarditzat que permet connectar aplicacions d'intel·ligència artificial amb eines, fonts de dades i serveis externs. Habitualment, un LLM genera respostes a partir de la informació proporcionada en el prompt i dels coneixements adquirits durant el seu entrenament. Tanmateix, el model no pot accedir directament als fitxers d'un ordinador, consultar una base de dades o executar determinades operacions si l'aplicació no li proporciona els mecanismes necessaris.
 
 MCP facilita aquesta integració mitjançant una arquitectura de comunicació estandarditzada entre aplicacions i servidors que ofereixen diferents funcionalitats.
@@ -13,32 +13,35 @@ Una aplicació que executi funcions Python específiques.
 
 Un dels principals avantatges és que les eines es poden desenvolupar independentment de l'aplicació que utilitza el LLM. D'aquesta manera, un mateix servidor MCP pot ser utilitzat per diferents aplicacions compatibles.
 
-### 6.1. ARQUITECTURA MCP
+### 5.1. ARQUITECTURA MCP
+
 MCP utilitza una arquitectura client-servidor formada per tres components principals:
 MCP Host
 MCP Client
 MCP Server
 
 1. MCP Host
-És l'aplicació principal que necessita accedir a funcionalitats externes. El host gestiona l'experiència de l'usuari, la integració amb els models de llenguatge i les connexions amb els servidors MCP. Per exemple, un editor de codi amb assistent d'intel·ligència artificial pot actuar com a MCP Host.
+   És l'aplicació principal que necessita accedir a funcionalitats externes. El host gestiona l'experiència de l'usuari, la integració amb els models de llenguatge i les connexions amb els servidors MCP. Per exemple, un editor de codi amb assistent d'intel·ligència artificial pot actuar com a MCP Host.
 
 2. MCP Client
-És el component que estableix i gestiona la comunicació amb un servidor MCP. Les seves responsabilitats principals són establir la connexió, descobrir les funcionalitats que ofereix el servidor, enviar sol·licituds i rebre els resultats. Normalment, el host crea un client MCP per a cada connexió amb un servidor.
+   És el component que estableix i gestiona la comunicació amb un servidor MCP. Les seves responsabilitats principals són establir la connexió, descobrir les funcionalitats que ofereix el servidor, enviar sol·licituds i rebre els resultats. Normalment, el host crea un client MCP per a cada connexió amb un servidor.
 
 3. MCP Server
-És el programa que proporciona les funcionalitats a través del protocol. El servidor pot executar funcions Python, consultar bases de dades, accedir a fitxers o comunicar-se amb altres serveis.
+   És el programa que proporciona les funcionalitats a través del protocol. El servidor pot executar funcions Python, consultar bases de dades, accedir a fitxers o comunicar-se amb altres serveis.
 
 El servidor no necessita incorporar un LLM. Pot limitar-se a oferir funcions que posteriorment seran utilitzades per altres aplicacions. Per exemple, un servidor MCP especialitzat en fitxers podria exposar les operacions list_files() i read_file(). Quan el client sol·licita executar list_files(), és el servidor qui executa la funció corresponent i retorna el resultat.
 
 **Figura 5. Arquitectura MCP**
 
-### 6.2. FUNCIONALITATS D'UN MCP SERVER
+### 5.2. FUNCIONALITATS D'UN MCP SERVER
+
 Un servidor MCP pot proporcionar diferents tipus de funcionalitats. Les tres primitives principals són Tools, Resources i Prompts.
 
 1. Tools
-Les tools són funcions executables que el servidor posa a disposició dels clients. Permeten realitzar operacions concretes, com consultar una API, executar un càlcul o modificar informació.
+   Les tools són funcions executables que el servidor posa a disposició dels clients. Permeten realitzar operacions concretes, com consultar una API, executar un càlcul o modificar informació.
 
 Per exemple, un servidor podria exposar la funció següent:
+
 ```python
 @mcp.tool()
 def calculate_flight_time(
@@ -49,7 +52,6 @@ def calculate_flight_time(
     return (distance_km / speed_kmh) * 60
 ```
 
-
 Aquesta funció rep una distància i una velocitat, i retorna el temps de vol en minuts. El decorador @mcp.tool() registra la funció com una eina del servidor.
 
 D'aquesta manera, quan un client MCP consulta les eines disponibles, pot descobrir calculate_flight_time(), els arguments que necessita i la seva descripció. Si posteriorment sol·licita executar-la, el servidor realitza el càlcul amb Python i retorna el resultat.
@@ -57,12 +59,12 @@ D'aquesta manera, quan un client MCP consulta les eines disponibles, pot descobr
 El LLM no executa directament la fórmula. El model pot sol·licitar que s'utilitzi l'eina, però el càlcul real és responsabilitat del servidor.
 
 2. Resources
-Els resources permeten proporcionar informació que una aplicació pot llegir i incorporar al seu context. A diferència de les tools, que representen operacions executables, els resources estan orientats a exposar contingut.
+   Els resources permeten proporcionar informació que una aplicació pot llegir i incorporar al seu context. A diferència de les tools, que representen operacions executables, els resources estan orientats a exposar contingut.
 
 Per exemple, un servidor podria proporcionar el contingut d'un document o informació sobre la configuració d'un sistema.
 
 3. Prompts
-Els prompts són plantilles reutilitzables que permeten estructurar les instruccions proporcionades a un model.
+   Els prompts són plantilles reutilitzables que permeten estructurar les instruccions proporcionades a un model.
 
 ```python
 Per exemple:
@@ -74,14 +76,17 @@ def explain_code(language: str) -> str:
         "code works step by step."
     )
 ```
+
 El servidor proporciona la plantilla, però no executa necessàriament cap inferència. El client pot recuperar el prompt i utilitzar-lo posteriorment en una interacció amb un LLM.
 
-### 6.3. COMUNICACIÓ ENTRE CLIENT I SERVIDOR
+### 5.3. COMUNICACIÓ ENTRE CLIENT I SERVIDOR
+
 MCP utilitza missatges estructurats basats en JSON-RPC 2.0 per intercanviar sol·licituds, respostes i notificacions. El protocol defineix els mecanismes necessaris perquè un client pugui descobrir les capacitats d'un servidor i utilitzar-les.
 
 Per exemple, un client pot sol·licitar la llista d'eines disponibles mitjançant l'operació tools/list. Si vol executar una eina concreta, utilitza tools/call, proporcionant-ne el nom i els arguments.
 
 Una sol·licitud per calcular un temps de vol (amb la tool anteriorment descrita) podria tenir una estructura equivalent a:
+
 ```json
 {
   "jsonrpc": "2.0",
@@ -110,7 +115,8 @@ Permet establir comunicació amb un servidor a través d'HTTP. És especialment 
 
 La selecció del transport no modifica la finalitat de les eines: el servidor continua proporcionant les mateixes operacions, però canvia el mecanisme utilitzat per comunicar-se amb els clients.
 
-### 6.4. FUNCIONAMENT I FLUX D’EXECUCIÓ
+### 5.4. FUNCIONAMENT I FLUX D’EXECUCIÓ
+
 Per entendre com funciona MCP, suposem una aplicació amb un LLM que disposa d'un servidor MCP amb una eina per calcular temps de vol (la que s’ha vist anteriorment).
 
 L'usuari introdueix: “¿Cuánto tardaría un dron en recorrer 12 km a 40 km/h?”
