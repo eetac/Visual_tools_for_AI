@@ -21,6 +21,36 @@ El funcionament d'un sistema RAG es divideix en tres etapes principals: retrieva
 
 El fet d'utilitzar RAG no garanteix automàticament que totes les respostes siguin correctes, però permet reduir la dependència dels coneixements interns del model i fonamentar les respostes en informació concreta.
 
+**Flux general del sistema RAG**
+
+```mermaid
+flowchart LR
+    U["Consulta de l'usuari"] --> R["Retrieval: cerca a Weaviate"]
+    R --> C["Receptes recuperades"]
+    C --> A["Augmentation: prompt amb context"]
+    U --> A
+    A --> G["Generation: inferència del LLM"]
+    G --> F["Resposta basada en dades recuperades"]
+
+    classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
+    classDef retrieval fill:#D5E8E8,stroke:#333333,color:#111111
+    classDef dades fill:#FCE5CD,stroke:#333333,color:#111111
+    classDef augmentacio fill:#D9EAD3,stroke:#333333,color:#111111
+    classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
+    classDef resposta fill:#E4DDF1,stroke:#333333,color:#111111
+
+    class U usuari
+    class R retrieval
+    class C dades
+    class A augmentacio
+    class G llm
+    class F resposta
+```
+
+<p align="center">
+  <sub>Figura 1. Flux general d'un RAG</sub>
+</p>
+
 ### 4.2. BASES DE DADES VECTORIALS: WEAVIATE
 
 En els exemples desenvolupats a continuació, s'utilitza Weaviate Cloud, una base de dades vectorial que permet emmagatzemar informació estructurada i recuperar registres mitjançant cerques semàntiques. A diferència d'una cerca tradicional basada únicament en la coincidència de paraules, una cerca vectorial permet identificar contingut relacionat amb el significat de la consulta. Per fer-ho, la informació emmagatzemada es representa mitjançant vectors i es comparen les representacions de la consulta i dels registres disponibles.
