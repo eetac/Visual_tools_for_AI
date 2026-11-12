@@ -11,6 +11,7 @@ Aquest manual presenta els conceptes i les eines utilitzats per construir aplica
 5. [MCP (Model Context Protocol)](./docs/05_MCP.md)
 6. [Observabilitat amb Opik i exemples d’aplicació](./docs/06_observalility.md)
 7. [Hermes](./docs/07_hermes.md) — document pendent de contingut
+8. [Exemples](./docs/08_examples.md)
 
 ## Resum dels documents
 
@@ -32,7 +33,7 @@ Presenta LangChain per connectar LLM amb eines i recursos, i LangGraph per defin
 
 **Document:** [03_langchain_langgraph.md](./03_langchain_langgraph.md)
 
-### 4. RAG (RAG Retrieval-Augmented Generation) 
+### 4. RAG (RAG Retrieval-Augmented Generation)
 
 Explica com RAG recupera informació d’una font externa, l’afegeix al context del model i genera una resposta fonamentada en aquesta informació. També introdueix les cerques semàntiques i l’ús de Weaviate com a base de dades vectorial per recuperar receptes.
 
@@ -46,7 +47,7 @@ Descriu el protocol MCP i la seva arquitectura client-servidor: host, client i s
 
 ### 6. Observabilitat amb Opik
 
-Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la consulta de logs, dashboards i traces detallades. També recull exemples Python d’agents, LangGraph, Weaviate i una planificació setmanal amb Hermes.
+Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la consulta de logs, dashboards i traces detallades.
 
 **Document:** [06_observalility.md](./06_observalility.md)
 
@@ -55,3 +56,9 @@ Introdueix traces, spans, converses i mètriques com la latència, el consum de 
 El fitxer previst per a aquest tema encara no té contingut. La integració amb Hermes per generar propostes de menús setmanals, validar-les amb Python i utilitzar receptes recuperades de Weaviate es descriu actualment a l’[exemple 10 del document d’observabilitat](./06_observalility.md).
 
 **Document:** [07_hermes.md](./07_hermes.md)
+
+### 8. Exemples
+
+Recull exemples Python d’agents, LangGraph, Weaviate i una planificació setmanal amb Hermes.
+
+**Document:** [08_examples.md](./08_examples.md)
