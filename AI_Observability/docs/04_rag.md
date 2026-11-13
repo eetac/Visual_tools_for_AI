@@ -51,35 +51,25 @@ flowchart LR
   <sub>Figura 1. Flux general d'un RAG</sub>
 </p>
 
-### 4.2. BASES DE DADES VECTORIALS: WEAVIATE
+### 4.2. BASES DE DADES VECTORIALS: WEAVIATE CLOUD
 
 En els exemples desenvolupats a continuació, s'utilitza Weaviate Cloud, una base de dades vectorial que permet emmagatzemar informació estructurada i recuperar registres mitjançant cerques semàntiques. A diferència d'una cerca tradicional basada únicament en la coincidència de paraules, una cerca vectorial permet identificar contingut relacionat amb el significat de la consulta. Per fer-ho, la informació emmagatzemada es representa mitjançant vectors i es comparen les representacions de la consulta i dels registres disponibles.
 
 En aquests exemples (8.7, 8.8, 8.9, 8.10, 8.11) s'utilitza la col·lecció Recetas, que conté informació sobre diferents receptes.
 
 Entre les propietats disponibles es troben:
-Propietat
-Informació
-Propietat
-Informació
-nombre
-Nom de la recepta
-ingredientes
-Ingredients i quantitats
-categoria
-Categoria del plat
-ingredientesClave
-Ingredients principals
-dieta
-Tipus de dieta
-preparacion
-Instruccions de preparació
-tiempoMin
-Temps de preparació en minuts
-descripcion
-Descripció de la recepta
-raciones
-Nombre de racions
+
+| **Propietat**       | **Informació**                |
+| ------------------- | ----------------------------- |
+| `nombre`            | Nom de la recepta             |
+| `categoria`         | Categoria del plat            |
+| `dieta`             | Tipus de dieta                |
+| `tiempoMin`         | Temps de preparació en minuts |
+| `raciones`          | Nombre de racions             |
+| `ingredientes`      | Ingredients i quantitats      |
+| `ingredientesClave` | Ingredients principals        |
+| `preparacion`       | Instruccions de preparació    |
+| `descripcion`       | Descripció de la recepta      |
 
 La cerca semàntica s'executa amb el mètode near_text() del client Python de Weaviate: result = collection.query.near_text(\*\*kwargs). Aquesta instrucció consulta els vectors de la col·lecció per recuperar receptes relacionades amb el text introduït.
 
