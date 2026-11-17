@@ -196,7 +196,7 @@ Aquest exemple mostra com el LLM pren la decisió d'utilitzar una eina, mentre q
 **Snippet:** [Obrir `02_multi_agent_snippet.py`](../code/snippets/02_multi_agent_snippet.py)  
 **Què cal observar al snippet:** es creen `weather_agent` i `flight_agent` amb eines diferents, `ask_flight_agent()` delega una petició a l'especialista i `supervisor_agent` es crea amb les dues eines de delegació. El supervisor s'executa amb `supervisor_agent.invoke()`.
 
-Aquest exemple amplia l'anterior introduint una arquitectura multiagent. El programa utilitza un **supervisor** que coordina dos agents especialitzats: un en meteorologia i un altre en càlculs de temps de vol. Tots tres utilitzen Qwen mitjançant Ollama, però tenen instruccions i eines diferents: **són tres agents, no tres models de llenguatge diferents**.
+Aquest exemple amplia l'anterior introduint una arquitectura multiagent. El programa utilitza un **supervisor** que coordina dos agents especialitzats: un en meteorologia i un altre en càlculs de temps de vol. Tots tres utilitzen Qwen mitjançant Ollama, però tenen instruccions i eines diferents. És a dir, són tres agents, no tres models de llenguatge diferents.
 
 Els tres agents són:
 
@@ -213,7 +213,12 @@ A continuació, es defineixen els agents especialitzats:
 - **weather_agent:** disposa de la funció Python `get_weather(city)`, que retorna informació meteorològica simulada d'una ciutat.
 - **flight_agent:** disposa de la funció `calculate_flight_time(distance_km, speed_kmh)`, que calcula el temps de vol d'un dron a partir de la distància i la velocitat.
 
-El temps de vol es calcula amb la fórmula \(t*{\mathrm{min}}=\frac{d*{\mathrm{km}}}{v\_{\mathrm{km/h}}}\cdot 60\).
+El temps de vol es calcula amb la fórmula:
+
+$$
+t_{\mathrm{min}} = \frac{d_{\mathrm{km}}}{v_{\mathrm{km/h}}} \cdot 60
+$$
+
 Aquest càlcul es realitza directament amb Python. El LLM no calcula el resultat numèric, sinó que interpreta la petició i determina si necessita executar l'eina.
 
 Per permetre que el supervisor utilitzi aquests agents, es defineixen dues funcions intermèdies decorades amb `@tool`:
@@ -221,8 +226,7 @@ Per permetre que el supervisor utilitzi aquests agents, es defineixen dues funci
 ```python
 @tool
 def ask_weather_agent(query: str) -> str:
-    """Delegate weather-related questions
-    to the weather specialist agent."""
+    """Delegate weather-related questions to the weather specialist agent."""
 
     result = weather_agent.invoke({
         "messages": [
@@ -298,7 +302,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 11. Flux d’execució multiagent</sub>
+  <sub>Figura 3. Flux d’execució multiagent</sub>
 </p>
 
 **Execució (des de l’arrel del repositori):**
@@ -307,13 +311,13 @@ flowchart TD
 python AI_Observability/code/src/02_multi_agent.py
 ```
 
-**Què cal comprovar:** les peticions que combinen meteorologia i temps de vol poden provocar la delegació a dos especialistes; el càlcul numèric es realitza amb Python. Les traces del tipus `[SUBAGENT CALLED]` ajuden a identificar la delegació.
+**Què cal comprovar:** les peticions que combinen meteorologia i temps de vol poden provocar la delegació a dos especialistes. A més, el càlcul numèric es realitza amb Python. Les traces del tipus `[SUBAGENT CALLED]` ajuden a identificar la delegació.
 
 ### 8.4. Anàlisi d'una missió de dron — `03_my_drone_mission_agent.py`
 
 **Programa complet:** [Obrir `03_my_drone_mission_agent.py`](../code/src/03_my_drone_mission_agent.py)  
 **Snippet:** [Obrir `03_my_drone_mission_agent_snippet.py`](../code/snippets/03_my_drone_mission_agent_snippet.py)  
-**Què cal observar al snippet:** `check_wind_safety()` aplica una regla de seguretat de Python i `analyse_mission()` la crida directament amb `.invoke()`. El LLM només apareix en la ruta explicativa d'`answer_question()`; **no decideix quan executar les comprovacions**.
+**Què cal observar al snippet:** `check_wind_safety()` aplica una regla de seguretat de Python i `analyse_mission()` la crida directament amb `.invoke()`. El LLM només apareix en la ruta explicativa d'`answer_question()`, no decideix quan executar les comprovacions.
 
 Aquest exemple implementa un assistent capaç d'analitzar la viabilitat d'una missió de dron a partir de diferents paràmetres, com la distància, la velocitat, la direcció del vol, el vent i la bateria disponible.
 
@@ -341,8 +345,7 @@ flight_result = calculate_flight_time.invoke({
     "drone_speed_kmh": state.drone_speed_kmh,
     "wind_speed_kmh": state.wind_speed_kmh,
     "flight_bearing_deg": state.flight_bearing_deg,
-    "wind_direction_from_deg":
-        state.wind_direction_from_deg,
+    "wind_direction_from_deg": state.wind_direction_from_deg,
 })
 ```
 
@@ -390,7 +393,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 12. Flux d’execució de l’agent de missió</sub>
+  <sub>Figura 4. Flux d’execució de l’agent de missió</sub>
 </p>
 
 **Execució (des de l’arrel del repositori):**
@@ -398,8 +401,6 @@ flowchart TD
 ```bash
 python AI_Observability/code/src/03_my_drone_mission_agent.py
 ```
-
-**Què cal comprovar:** les dades de la missió s'actualitzen amb Python; els resultats de vent, vol i bateria es calculen sense Qwen. Només quan es demana una explicació cal una inferència del LLM.
 
 ### 8.5. Missió de dron amb LangGraph — `04_langgraph_drone_mission_agent.py`
 
@@ -474,7 +475,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 13. Flux d’execució amb LangGraph</sub>
+  <sub>Figura 5. Flux d’execució amb LangGraph</sub>
 </p>
 
 Aquest exemple mostra com LangGraph facilita l'organització de processos que disposen de diferents camins d'execució, permetent conservar l'estat i separar les responsabilitats de cada funció.
@@ -485,13 +486,11 @@ Aquest exemple mostra com LangGraph facilita l'organització de processos que di
 python AI_Observability/code/src/04_langgraph_drone_mission_agent.py
 ```
 
-**Què cal comprovar:** LangGraph escull rutes diferents segons si es demana una anàlisi, una traça o una explicació. Un `router` executa condicions Python; no és una nova inferència del LLM.
-
 ### 8.6. Planificació i replanificació — `05_langgraph_autonomous_mission_planner.py`
 
 **Programa complet:** [Obrir `05_langgraph_autonomous_mission_planner.py`](../code/src/05_langgraph_autonomous_mission_planner.py)  
 **Snippet:** [Obrir `05_langgraph_autonomous_mission_planner_snippet.py`](../code/snippets/05_langgraph_autonomous_mission_planner_snippet.py)  
-**Què cal observar al snippet:** `route_after_evaluation()` tria `replan` o `report` segons el resultat de l'avaluació, i `StateGraph` connecta `evaluate_plan` amb `replanner` o `final_report`. El snippet mostra només aquesta part del graf; la resta de transicions són al codi complet.
+**Què cal observar al snippet:** `route_after_evaluation()` tria `replan` o `report` segons el resultat de l'avaluació, i `StateGraph` connecta `evaluate_plan` amb `replanner` o `final_report`. El snippet mostra només aquesta part del graf, la resta de transicions són al codi complet.
 
 Aquest exemple amplia el sistema anterior incorporant la planificació, l'avaluació i la proposta de replanificació d'una missió de dron. L'aplicació no es limita a comprovar si una missió és viable, sinó que també identifica les causes que poden impedir completar-la i prepara possibles accions correctives.
 
@@ -577,7 +576,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 14. Flux d’execució del planificador autònom</sub>
+  <sub>Figura 6. Flux d’execució del planificador autònom</sub>
 </p>
 
 Aquest exemple demostra com construir un procés de planificació amb diferents etapes, condicions i rutes alternatives mitjançant LangGraph.
@@ -587,8 +586,6 @@ Aquest exemple demostra com construir un procés de planificació amb diferents 
 ```bash
 python AI_Observability/code/src/05_langgraph_autonomous_mission_planner.py
 ```
-
-**Què cal comprovar:** quan l'avaluació retorna `NOT FEASIBLE`, la ruta passa per la replanificació; en altres estats, el graf continua cap a l'informe.
 
 ### 8.7. Llista de la compra amb LangChain — `06_shopping_list.py`
 
@@ -662,7 +659,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 15. Flux del gestor de la llista de la compra</sub>
+  <sub>Figura 7. Flux del gestor de la llista de la compra</sub>
 </p>
 
 Aquest exemple introdueix la gestió d'informació modificable mitjançant tool calling. També mostra la importància de conservar l'historial per interpretar referències i correccions de l'usuari.
@@ -673,13 +670,11 @@ Aquest exemple introdueix la gestió d'informació modificable mitjançant tool 
 python AI_Observability/code/src/06_shopping_list.py
 ```
 
-**Prova suggerida:** afegir un producte, tornar-lo a afegir i després corregir-ne el nom. Això permet observar com el LLM interpreta la intenció i com Python comprova duplicats i modifica la llista real.
-
 ### 8.8. Llista de la compra amb LangGraph — `07_shopping_list_langgraph.py`
 
 **Programa complet:** [Obrir `07_shopping_list_langgraph.py`](../code/src/07_shopping_list_langgraph.py)  
 **Snippet:** [Obrir `07_shopping_list_langgraph_snippet.py`](../code/snippets/07_shopping_list_langgraph_snippet.py)  
-**Què cal observar al snippet:** Qwen interpreta la petició en JSON, `route_after_input()` selecciona el camí, `add_node()` executa una eina Python i `StateGraph` connecta, compila i executa el graf. És important diferenciar **la classificació del LLM** de **l'encaminament de LangGraph**.
+**Què cal observar al snippet:** Qwen interpreta la petició en JSON, `route_after_input()` selecciona el camí, `add_node()` executa una eina Python i `StateGraph` connecta, compila i executa el graf. És important diferenciar la classificació del LLM de l'encaminament de LangGraph.
 
 Aquest exemple implementa la mateixa funcionalitat de llista de la compra, però utilitzant LangGraph per organitzar les operacions en nodes.
 
