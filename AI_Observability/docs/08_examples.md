@@ -765,7 +765,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 16. Flux d’execució de la llista amb LangGraph</sub>
+  <sub>Figura 8. Flux d’execució de la llista amb LangGraph</sub>
 </p>
 
 Aquest exemple permet entendre la diferència entre la decisió del model i l'encaminament del graf, així com el paper dels nodes i de l'estat compartit.
@@ -775,8 +775,6 @@ Aquest exemple permet entendre la diferència entre la decisió del model i l'en
 ```bash
 python AI_Observability/code/src/07_shopping_list_langgraph.py
 ```
-
-**Prova suggerida:** escriure «añade huevos y harina» i després «quita harina». Les traces `[ROUTER]` i `[NODE]` permeten distingir la selecció del camí i l'execució de l'operació.
 
 ### 8.9. Cerca de receptes i RAG — `08_shopping_list_weaviate.py`
 
@@ -843,38 +841,67 @@ Així, el primer LLM interpreta les instruccions, Weaviate proporciona les dades
 
 ```mermaid
 flowchart TD
-    U["Usuari: receptes o llista"] --> P["process_input_node()"]
-    P --> L["Qwen: acció i filtres en JSON"]
-    L --> R{"Router LangGraph"}
-    R -->|Buscar receptes| S["search_recipe_node()"]
+    U["Usuari: petició en llenguatge natural"] --> G["LangGraph: invoke()"]
+    G --> P["process_input_node()"]
+    P --> L["Qwen: interpreta la petició i genera JSON"]
+    L --> J["Python: valida el JSON"]
+    J --> R{"route_after_input()"}
+
+    %% FUNCIONALITATS DE LA LLISTA DE COMPRA
+    R -->|add| A["add_node()"]
+    A --> AP["Python: add_products()"]
+
+    R -->|remove| B["remove_node()"]
+    B --> BP["Python: remove_products()"]
+
+    R -->|replace| C["replace_node()"]
+    C --> CP["Python: replace_product()"]
+
+    R -->|show| D["show_node()"]
+    D --> DP["Python: show_products()"]
+
+    R -->|other| O["other_node()"]
+
+    %% NOVA FUNCIONALITAT: CERCA DE RECEPTES
+    R -->|search_recipe| S["search_recipe_node()"]
     S --> W["Weaviate: near_text()"]
-    W --> V["Python: comprova tots els ingredients"]
-    V --> L2["Qwen: resposta RAG"]
-    L2 --> LR["Guardar last_recipes"]
-    R -->|Afegir recepta| AR["add_recipe_node()"]
-    AR --> LS["Reutilitzar last_recipes"]
-    LS --> ADD["Python: add_products()"]
-    R -->|Gestió de compra| C["Nodes Python: llista"]
-    LR --> F["Resposta final"]
+    W --> V["Python: filtra temps i comprova ingredients"]
+    V --> L2["Qwen: genera la resposta RAG"]
+    L2 --> LR["Guardar receptes a last_recipes"]
+
+    %% NOVA FUNCIONALITAT: AFEGIR INGREDIENTS D'UNA RECEPTA
+    R -->|add_recipe| AR["add_recipe_node()"]
+    AR --> LS["Recuperar recepta de last_recipes"]
+    LS --> IN["Python: extreu ingredientesClave"]
+    IN --> ADD["Python: add_products()"]
+
+    %% RESPOSTA FINAL
+    AP --> F["Estat actualitzat i resposta final"]
+    BP --> F
+    CP --> F
+    DP --> F
+    O --> F
+    LR --> F
     ADD --> F
-    C --> F
+
+    %% COLORS
     class U,F entrada
-    class P,S,AR,LS,LR servei
+    class G,P,S,AR,LS,LR servei
     class L,L2 llm
     class R decisio
     class W agent
-    class V,ADD,C python
+    class J,A,B,C,D,O,AP,BP,CP,DP,V,IN,ADD python
+
     classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
     classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
     classDef python fill:#D9EAD3,stroke:#333333,color:#111111
     classDef decisio fill:#F4CCCC,stroke:#333333,color:#111111
     classDef servei fill:#EADCF8,stroke:#333333,color:#111111
     classDef agent fill:#FCE5CD,stroke:#333333,color:#111111
-    classDef opik fill:#F5F5F5,stroke:#333333,color:#111111
 ```
 
 <p align="center">
-  <sub>Figura 17. Flux d’execució amb Weaviate</sub>
+  <sub>Figura 9. Flux d’execució amb Weaviate</sub>
 </p>
 
 Aquest exemple mostra com integrar una base de dades vectorial amb un assistent basat en LLM per respondre consultes utilitzant informació externa al model.
@@ -885,13 +912,11 @@ Aquest exemple mostra com integrar una base de dades vectorial amb un assistent 
 python AI_Observability/code/src/08_shopping_list_weaviate.py
 ```
 
-**Prova suggerida:** buscar receptes amb dos ingredients obligatoris i un temps màxim; després, demanar afegir els ingredients d'una de les receptes mostrades. Així es comprova la recuperació de Weaviate, el filtratge de Python i la memòria `last_recipes`.
-
 ### 8.10. Observabilitat amb Opik — `09_shopping_list_weaviate_opik.py`
 
 **Programa complet:** [Obrir `09_shopping_list_weaviate_opik.py`](../code/src/09_shopping_list_weaviate_opik.py)  
 **Snippet:** [Obrir `09_shopping_list_weaviate_opik_snippet.py`](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)  
-**Què cal observar al snippet:** `invoke_with_opik_usage()` embolcalla la crida al LLM i registra tokens, `weaviate_near_text()` registra les consultes semàntiques i `track_langgraph()` connecta el graf amb `OpikTracer`.
+**Què cal observar al snippet:** `invoke_with_opik_usage()` conté la crida al LLM i registra tokens, `weaviate_near_text()` registra les consultes semàntiques i `track_langgraph()` connecta el graf amb `OpikTracer`.
 
 Aquest exemple incorpora Opik a l'assistent de llista de la compra amb Weaviate. L'objectiu és afegir observabilitat, és a dir, la capacitat de registrar i analitzar les diferents operacions que es produeixen durant una execució.
 
@@ -942,7 +967,7 @@ Així, si cliquem una trace al dashboard veurem el següent:
 </p>
 
 <p align="center">
-  <sub>Figura 18. Consum de tokens</sub>
+  <sub>Figura 10. Consum de tokens</sub>
 </p>
 
 Aquesta funció executa el model i recupera les metadades de consum proporcionades per Ollama. Els tokens es poden diferenciar entre els utilitzats per processar l'entrada i els generats a la sortida.
@@ -976,27 +1001,52 @@ A partir de les traces es pot estudiar, per exemple, si el temps total d'una con
 
 ```mermaid
 flowchart TD
-    U["Usuari"] --> P["LangGraph: process_input_node()"]
+    U["Usuari: petició en llenguatge natural"] --> P["LangGraph: process_input_node()"]
     P --> L["Qwen: invoke_with_opik_usage()"]
-    L --> R{"Router"}
-    R -->|Llista| A["Nodes Python"]
-    R -->|Receptes| W["Weaviate: weaviate_near_text()"]
-    W --> Q["Qwen: generació RAG"]
-    R -->|Afegir recepta| AR["add_recipe_node()"]
-    A --> F["Resposta final"]
-    Q --> F
-    AR --> F
-    OP["Opik: traces, spans i tokens"] -.-> P
-    OP -.-> L
-    OP -.-> W
-    OP -.-> Q
+    L --> J["Python: interpreta i valida el JSON"]
+    J --> R{"route_after_input()"}
+
+    %% GESTIÓ DE LA LLISTA DE COMPRA
+    R -->|add / remove| A["add_node() / remove_node()"]
+    A --> AP["Python: add_products() / remove_products()"]
+
+    R -->|replace / show / other| B["replace_node() / show_node() / other_node()"]
+    B --> BP["Python: substituir, mostrar o informar"]
+
+    %% CERCA DE RECEPTES AMB RAG
+    R -->|search_recipe| S["search_recipe_node()"]
+    S --> W["Weaviate: weaviate_near_text()"]
+    W --> V["Python: comprova ingredients obligatoris"]
+    V --> Q["Qwen: resposta RAG amb invoke_with_opik_usage()"]
+    Q --> LR["Guardar resultats a last_recipes"]
+
+    %% AFEGIR INGREDIENTS D'UNA RECEPTA
+    R -->|add_recipe| AR["add_recipe_node()"]
+    AR --> LS["Recuperar recepta de last_recipes"]
+    LS --> ADD["Python: add_products()"]
+
+    %% RESPOSTA FINAL
+    AP --> F["Estat actualitzat i resposta final"]
+    BP --> F
+    LR --> F
+    ADD --> F
+
+    %% OBSERVABILITAT
+    OP["Opik: traces, spans, latència i tokens"]
+    P -.-> OP
+    L -.-> OP
+    W -.-> OP
+    Q -.-> OP
+
+    %% COLORS
     class U,F entrada
-    class P servei
+    class P,S,AR,LS,LR servei
     class L,Q llm
     class R decisio
-    class A,AR python
+    class J,A,B,AP,BP,V,ADD python
     class W agent
     class OP opik
+
     classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
     classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
     classDef python fill:#D9EAD3,stroke:#333333,color:#111111
@@ -1007,7 +1057,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 19. Flux d’execució amb Opik</sub>
+  <sub>Figura 11. Flux d’execució amb Opik</sub>
 </p>
 
 **Execució (des de l’arrel del repositori):**
@@ -1016,9 +1066,7 @@ flowchart TD
 python AI_Observability/code/src/09_shopping_list_weaviate_opik.py
 ```
 
-**Què cal comprovar:** fer una consulta de receptes i obrir el projecte configurat a Opik. S'hi han de poder observar les traces que el programa hagi enviat, incloses les operacions de LLM i Weaviate instrumentades; el consum de tokens apareix quan Ollama en proporciona les metadades.
-
-### 8.11. Menú setmanal amb Hermes — `10_shopping_list_weaviate_opik_hermes.py`
+### 8.11. Integració d'Hermes — `10_shopping_list_weaviate_opik_hermes.py`
 
 **Programa complet:** [Obrir `10_shopping_list_weaviate_opik_hermes.py`](../code/src/10_shopping_list_weaviate_opik_hermes.py)  
 **Snippets destacats (dos fragments diferents):**
@@ -1026,7 +1074,7 @@ python AI_Observability/code/src/09_shopping_list_weaviate_opik.py
 - [`10_shopping_list_weaviate_opik_hermes_snippet.py`](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py): preparació de candidats, execució de Hermes CLI i registre amb Opik.
 - [`10_calculate_missing_ingredients_snippet.py`](../code/snippets/10_calculate_missing_ingredients_snippet.py): comparació dels ingredients del menú amb la llista de la compra, sense intervenció del LLM.
 
-**Què cal observar:** el primer snippet mostra com `plan_week_node()` recupera receptes, invoca Hermes CLI i valida la proposta amb Python; el segon explica com es calculen els ingredients pendents, es guarden a `last_shown_products` i s'afegeixen només quan l'usuari ho demana.
+**Què cal observar:** el primer snippet mostra com `plan_week_node()` recupera receptes, invoca Hermes CLI i valida la proposta amb Python. El segon explica com es calculen els ingredients pendents, es guarden a `last_shown_products` i s'afegeixen només quan l'usuari ho demana.
 
 Aquest exemple amplia l'assistent de llista de la compra desenvolupat anteriorment incorporant Hermes, un assistent d'intel·ligència artificial que s'utilitza per generar una planificació setmanal d'àpats a partir de receptes reals emmagatzemades a Weaviate.
 
@@ -1036,7 +1084,7 @@ En aquest exemple es combinen diferents components amb responsabilitats específ
 
 **Components del codi:**
 
-**Configuració d'Ollama i Hermes**
+**1. Configuració d'Ollama i Hermes**
 
 El programa continua utilitzant dos objectes `ChatOllama`, igual que en l'exemple anterior (llm i rag_llm). El primer LLM interpreta les peticions de l'usuari i determina l'acció que s'ha d'executar. El segon s'utilitza per generar les explicacions de les receptes recuperades mitjançant RAG.
 
@@ -1068,7 +1116,7 @@ MEALS = ("comida", "cena")
 
 `HERMES_TIMEOUT` estableix el temps màxim que el programa espera una resposta del procés Hermes. Per defecte, aquest límit és de 240 segons. També es defineix un identificador de sessió diferent de l'utilitzat a l'exemple anterior, per evitar que els estats de les dues aplicacions es barregin.
 
-**Ampliació de `ShoppingState`**
+**2. Ampliació de `ShoppingState`**
 
 L'estat compartit de LangGraph s'amplia amb nous camps:
 
@@ -1106,7 +1154,7 @@ Aquestes dues últimes variables permeten gestionar millor les referències a mi
 
 El programa continua utilitzant `InMemorySaver` per conservar l'estat entre les interaccions d'una mateixa sessió.
 
-**Nous nodes de LangGraph**
+**3. Nous nodes de LangGraph**
 
 S'incorporen tres accions principals:
 
@@ -1116,7 +1164,7 @@ S'incorporen tres accions principals:
 
 Aquestes accions s'afegeixen a les que ja existien per gestionar productes i buscar receptes. Per tant, LangGraph continua utilitzant el mateix mecanisme de `process_input_node()` i `route_after_input()`, però ara disposa d’aquestes tres noves rutes.
 
-**Recuperació de receptes amb Weaviate**
+**4. Recuperació de receptes amb Weaviate**
 
 Abans de generar el menú, el programa necessita obtenir les receptes que Hermes podrà seleccionar. Per fer-ho, s'utilitza la funció:
 
@@ -1147,7 +1195,7 @@ Assigna identificadors com R01, R02, R03, etc.
 
 Per exemple, si l'usuari demana «planifica cenas de menos de 20 minutos», Python identifica que la condició és estrictament inferior a 20 minuts i estableix `max_minutes=19`. D'aquesta manera, la validació no depèn únicament de la interpretació del LLM.
 
-**Planificació setmanal amb Hermes**
+**5. Planificació setmanal amb Hermes**
 
 La funció principal encarregada de comunicar-se amb Hermes és:
 
@@ -1205,7 +1253,7 @@ La crida executa Hermes en mode no interactiu amb `-z`, proporciona el prompt i 
 
 El programa limita les eines habilitades al conjunt `search`, excloent els conjunts d'eines de terminal, fitxers i MCP. Tot i això, les eines de cerca poden continuar disponibles, i el mode no interactiu pot aprovar automàticament les eines habilitades. Per aquesta raó també s'indica al prompt que no executi eines.
 
-**Validació del menú amb Python**
+**6. Validació del menú amb Python**
 
 Una vegada Hermes retorna la planificació, el programa executa:
 
@@ -1227,7 +1275,7 @@ El programa pot generar un menú alternatiu encara que Hermes falli. Si la invoc
 
 Aquesta separació permet diferenciar dues responsabilitats. Es pot veure clarament que Hermes proposa la planificació, però Python verifica i construeix el resultat definitiu.
 
-**Comprovació dels ingredients del menú**
+**7. Comprovació dels ingredients del menú**
 
 Una vegada generat el menú setmanal, el programa pot identificar quins ingredients són necessaris per preparar-lo.
 
@@ -1274,6 +1322,93 @@ Si posteriorment l'usuari pregunta “¿Qué productos me faltan para preparar e
 
 Finalment, si l'usuari escriu “Añade los ingredientes que faltan a mi lista”, LangGraph executa `add_missing_node()`, que utilitza la funció Python `add_products()`.
 
+**Flux general**
+
+```mermaid
+flowchart TD
+    U["Usuari: petició en llenguatge natural"] --> P["LangGraph: process_input_node()"]
+
+    P --> D{"Acció contextual identificada?"}
+    D -->|Sí| CT["Python: contextual_menu_action()"]
+    D -->|No| L["Qwen: interpreta la petició"]
+
+    CT --> R{"route_after_input()"}
+    L --> J["Python: valida el JSON"]
+    J --> R
+
+    %% GESTIÓ DE LA LLISTA DE COMPRA
+    R -->|add / remove / replace / show / other| A["Nodes de gestió de la llista"]
+    A --> AT["Python: afegir, eliminar, substituir o mostrar"]
+
+    %% CERCA DE RECEPTES AMB RAG
+    R -->|search_recipe| S["search_recipe_node()"]
+    S --> W["Weaviate: cerca semàntica"]
+    W --> V["Python: comprova els filtres"]
+    V --> Q["Qwen: genera la resposta RAG"]
+    Q --> LR["Desar last_recipes"]
+
+    %% AFEGIR INGREDIENTS D'UNA RECEPTA
+    R -->|add_recipe| AR["add_recipe_node()"]
+    AR --> LS["Recuperar recepta de last_recipes"]
+    LS --> ADD["Python: add_products()"]
+
+    %% PLANIFICACIÓ SETMANAL AMB HERMES
+    R -->|plan_week| PW["plan_week_node()"]
+    PW --> WC["Weaviate: retrieve_week_candidates()"]
+    WC --> H["Hermes CLI: proposta de menú"]
+    H --> VP["Python: valida, corregeix o completa el menú"]
+    VP --> WP["Desar weekly_plan"]
+
+    %% CONSULTAR INGREDIENTS PENDENTS
+    R -->|missing_ingredients| MI["missing_ingredients_node()"]
+    MI --> CALC["Python: calculate_missing_ingredients()"]
+    CALC --> SP["Desar last_shown_products"]
+
+    %% AFEGIR INGREDIENTS PENDENTS
+    R -->|add_missing| AM["add_missing_node()"]
+    AM --> REC["Consultar weekly_plan i ingredients pendents"]
+    REC --> AP["Python: add_products()"]
+
+    %% RESPOSTA FINAL
+    AT --> F["Estat actualitzat i resposta final"]
+    LR --> F
+    ADD --> F
+    WP --> F
+    SP --> F
+    AP --> F
+
+    %% OBSERVABILITAT
+    OP["Opik: traces, spans, latència i tokens"]
+    L -.-> OP
+    W -.-> OP
+    Q -.-> OP
+    WC -.-> OP
+    H -.-> OP
+
+    %% COLORS
+    class U,F entrada
+    class P,S,AR,LS,LR,PW,WP,MI,SP,AM,REC servei
+    class L,Q llm
+    class D,R decisio
+    class CT,J,A,AT,V,ADD,VP,CALC,AP python
+    class W,WC,H agent
+    class OP opik
+
+    classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
+    classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
+    classDef python fill:#D9EAD3,stroke:#333333,color:#111111
+    classDef decisio fill:#F4CCCC,stroke:#333333,color:#111111
+    classDef servei fill:#EADCF8,stroke:#333333,color:#111111
+    classDef agent fill:#FCE5CD,stroke:#333333,color:#111111
+    classDef opik fill:#F5F5F5,stroke:#333333,color:#111111
+```
+
+<p align="center">
+  <sub>Figura 12. Flux amb la integració d'Hermes</sub>
+</p>
+
+Si mirem només el cas concret de generació de menus setmanals:
+
 **Flux A — Generació i validació del menú setmanal**
 
 ```mermaid
@@ -1309,7 +1444,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 20. Flux de la planificació setmanal amb Hermes</sub>
+  <sub>Figura 13. Flux de la planificació setmanal amb Hermes</sub>
 </p>
 
 **Flux B — Consultar els ingredients pendents i afegir-los només si l'usuari ho demana**
@@ -1341,7 +1476,7 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 21. Flux de consulta i actualització de la llista de la compra</sub>
+  <sub>Figura 14. Flux de consulta i actualització de la llista de la compra</sub>
 </p>
 
 **Integració amb Opik**
@@ -1363,10 +1498,10 @@ Per registrar el consum de Hermes, el programa utilitza el fitxer JSON de mètri
 python AI_Observability/code/src/10_shopping_list_weaviate_opik_hermes.py
 ```
 
-**Prova suggerida, en aquest ordre:**
+**Prova en aquest ordre:**
 
 1. «Planifica las cenas de esta semana». Es genera o es completa un menú amb les receptes candidates.
 2. «¿Qué ingredientes me faltan?». Es consulta el menú desat i es mostren els ingredients pendents.
 3. «Añade estos productos». Es recupera `last_shown_products` i, si l'acció s'identifica correctament, Python actualitza la llista.
 
-Aquestes tres peticions permeten observar la diferència entre **generar el menú**, **consultar informació** i **modificar la llista**. Si Hermes falla o no retorna una selecció aprofitable, el programa pot utilitzar la selecció de reserva de Python; això no implica que la crida a Hermes hagi funcionat correctament.
+Aquestes tres peticions permeten observar la diferència entre generar el menú, consultar informació i modificar la llista. Si Hermes falla o no retorna una selecció aprofitable, el programa pot utilitzar la selecció de reserva de Python. Això no implica que la crida a Hermes hagi funcionat correctament.

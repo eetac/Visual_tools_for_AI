@@ -47,7 +47,6 @@ def search_recipes(query: str, required_ingredients: list[str], max_minutes: int
             raise RuntimeError(f"No existe la colección '{COLLECTION}' en este cluster.")
         collection = client.collections.use(COLLECTION)
 
-        # El filtro numérico sí se aplica directamente en Weaviate
         filters = Filter.by_property("tiempoMin").less_or_equal(max_minutes) if max_minutes > 0 else None
         kwargs = {"query": query, "limit": 100, "filters": filters}
         target_vector = query_target_vector(collection)
@@ -72,7 +71,7 @@ def search_recipes(query: str, required_ingredients: list[str], max_minutes: int
             "preparacion": str(row.get("preparacion") or ""),
             "descripcion": str(row.get("descripcion") or ""),
         }
-        # AND real: se descartan recetas que no contengan TODOS los ingredientes
+        # AND: se descartan recetas que no contengan TODOS los ingredientes
         # La cerca semàntica no garanteix que hi siguin tots els ingredients.
         if required_ingredients and not has_required_ingredients(recipe, required_ingredients):
             continue
