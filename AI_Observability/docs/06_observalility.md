@@ -1,4 +1,4 @@
-## 6. OBSERVABILITAT (OPIK)
+## 6. OBSERVABILITAT (OPIK I OPENTELEMETRY)
 
 L'observabilitat és la capacitat de monitoritzar, registrar i analitzar el funcionament intern d'una aplicació basada en models de llenguatge.
 
@@ -256,12 +256,44 @@ El registre d'atributs també permet explicar per què una petició és més len
 
 ### 6.8. INSTAL·LACIÓ LOCAL I CONNEXIÓ AMB GRAFANA
 
-Per practicar sense desplegar serveis individuals, es pot utilitzar la imatge de Docker `grafana/otel-lgtm`.
+A diferència d'Opik Cloud, en aquesta pràctica la infraestructura d'observabilitat s'executa **localment** amb Docker. La imatge `grafana/otel-lgtm` inclou una instal·lació de prova amb Grafana, Tempo i el receptor OpenTelemetry. Les traces de l'aplicació Python s'envien per OTLP/HTTP al port 4318 i es consulten des del navegador al port 3000.
 
-S'ha de tenir Docker Desktop descarregat i ja es pot crear el contenidor:
+Els passos següents serveixen per a **macOS, Linux i Windows**. Quan els comandaments són diferents, s'indiquen **dins del mateix pas**, separant **macOS/Linux (Bash/Zsh)** i **Windows (PowerShell)**. Totes les ordres s'executen des de l'**arrel del repositori**, és a dir, la carpeta que conté `AI_Observability/`.
+
+**1. Comprovar els requisits previs**
+
+Abans de començar, cal tenir:
+
+- Docker Desktop instal·lat i obert.
+- Python i les biblioteques de LangChain, LangGraph, Weaviate i OpenTelemetry.
+- Ollama en execució amb el model configurat.
+- Una instància de Weaviate Cloud amb la col·lecció **`Recetas` ja creada i amb dades**, com a l'exemple 8.9.
+- Les variables `WEAVIATE_URL` i `WEAVIATE_API_KEY` al fitxer `.env` del projecte.
+
+Els comandaments següents són per a **macOS i Linux** amb bash/zsh i s'executen des de l'arrel del repositori, la carpeta que conté `AI_Observability/`.
+
+Per comprovar la ubicació del terminal abans de començar:
+
+**2. Crear el contenidor Docker la primera vegada**
+
+Primer, es comprova que Docker està disponible. **Aquestes ordres són iguals als tres sistemes operatius:**
+
+```bash
+docker info
+docker ps -a
+```
+
+`docker ps -a` mostra **tots** els contenidors, fins i tot els aturats. Si la llista ja conté un contenidor amb el nom **`grafana-lgtm`**, no cal tornar-lo a crear. Si ja el tenim creat, s'inicia amb `docker start grafana-lgtm`. Si ja està com a `Up`, no cal fer res.
+
+**Només si el contenidor encara no existeix**, es descarrega la imatge. Aquesta ordre és comuna a tots els sistemes:
 
 ```bash
 docker pull grafana/otel-lgtm:latest
+```
+
+**macOS/Linux (Bash/Zsh):**
+
+```bash
 docker run -d \
   --name grafana-lgtm \
   -p 3000:3000 \
@@ -270,83 +302,394 @@ docker run -d \
   grafana/otel-lgtm:latest
 ```
 
-**El comandament `docker run` només s'ha d'executar quan el contenidor encara no existeix.** Si ja existeix `grafana-lgtm`, s'inicia amb `docker start grafana-lgtm`.
+**Windows (PowerShell):**
 
-Per a l'ús habitual:
-
-```bash
-# Aturar el contenidor:
-docker stop grafana-lgtm
-
-# Tornar-lo a arrencar:
-docker start grafana-lgtm
-
-# Consultar-ne l'estat:
-docker ps -a
+```powershell
+docker run -d --name grafana-lgtm -p 3000:3000 -p 4318:4318 -v grafana-lgtm-data:/data grafana/otel-lgtm:latest
 ```
 
-Els dos ports publicats tenen finalitats diferents:
+La configuració del contenidor és la mateixa en ambdós casos.
 
-- 3000: dona accés a Grafana des del navegador
-- 4318: rep les traces exportades des del programa Python.
+| Paràmetre                    | Funció                                                                        |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| `-d`                         | Executa el contenidor en segon pla.                                           |
+| `--name grafana-lgtm`        | Dona un nom fix al contenidor, en lloc d'un d'aleatori.                       |
+| `-p 3000:3000`               | Permet obrir la interfície web de Grafana a `http://localhost:3000`.          |
+| `-p 4318:4318`               | Publica el receptor OTLP/HTTP, al qual Python envia les traces.               |
+| `-v grafana-lgtm-data:/data` | Crea un volum per conservar dades entre recreacions en una instal·lació nova. |
 
-Amb les dependències instal·lades, l'entorn virtual activat i les credencials de Weaviate al `.env`, es configura OpenTelemetry i s'executa l'exemple des de l'arrel del repositori:
+Per comprovar si ha arrencat, en qualsevol dels tres sistemes:
+
+```bash
+docker ps
+```
+
+Després s'obre **[Grafana](http://localhost:3000)**. En una instal·lació de prova nova, l'usuari i la contrasenya inicials solen ser `admin` / `admin`. Grafana pot demanar canviar la contrasenya.
+
+**3. Com aturar-lo i tornar-lo a arrencar un altre dia**
+
+Aquestes ordres s'utilitzen després d'haver creat el contenidor i són **iguals** a macOS, Linux i Windows (PowerShell):
+
+| Acció                                              | Comandament                          |
+| -------------------------------------------------- | ------------------------------------ |
+| Aturar Grafana quan acabem                         | `docker stop grafana-lgtm`           |
+| Tornar-lo a iniciar després d'obrir Docker Desktop | `docker start grafana-lgtm`          |
+| Reiniciar-lo                                       | `docker restart grafana-lgtm`        |
+| Comprovar si està iniciat                          | `docker ps`                          |
+| Veure'l encara que estigui aturat                  | `docker ps -a`                       |
+| Consultar registres                                | `docker logs --tail 50 grafana-lgtm` |
+
+La diferència és important: **`docker run` crea** un contenidor, **`docker start` inicia** un contenidor existent, **`docker stop` l'atura sense esborrar-lo**. No s'ha de fer servir `docker rm` per tancar, ja que esborraria el contenidor.
+
+**4. Instal·lar les dependències del programa Python**
+
+Si encara no s'ha creat un entorn virtual a l'arrel del projecte, cal seguir l'opció del sistema operatiu corresponent.
+
+**macOS/Linux (Bash/Zsh):**
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows (PowerShell):**
+
+```powershell
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Si Windows no reconeix `python`, però té instal·lat el llançador de Python, es pot utilitzar `py -3 -m venv .venv`.
+
+Amb l'entorn activat, les ordres per instal·lar les dependències són **iguals** en els tres sistemes:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+o bé
+
+```bash
+python -m pip install langchain langgraph langchain-ollama weaviate-client python-dotenv
+python -m pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp-proto-http
+```
+
+Es comprova que Ollama té disponible el model. Les ordres d'Ollama també són iguals a macOS, Linux i Windows:
+
+```bash
+ollama list
+```
+
+Si el model encara no s'ha descarregat i l'ordinador té prou espai i memòria:
+
+```bash
+ollama pull qwen3.5:9b
+```
+
+**5. Configurar Weaviate i l'exportador de traces**
+
+El programa continua utilitzant la mateixa base de dades de receptes. Al fitxer `.env` de l'arrel del repositori cal posar les credencials del teu clúster. Per obrir-lo des del terminal:
+
+- **macOS/Linux (Bash/Zsh):** `nano .env` (o qualsevol editor de text).
+- **Windows (PowerShell):** `notepad .env`. Cal desar-lo com a **`.env`**, no `.env.txt`.
+
+Si el fitxer ja existeix, cal actualitzar o afegir aquestes claus **sense esborrar les altres configuracions**:
+
+```dotenv
+WEAVIATE_URL=https://EL_TEU_CLUSTER.weaviate.network
+WEAVIATE_API_KEY=LA_TEVA_CLAU_REAL
+OLLAMA_MODEL=qwen3.5:9b
+```
+
+Els dos primers valors s'han de substituir pels reals i **no s'ha de publicar `.env` al repositori**. No és necessari crear cap col·lecció a Grafana ni a OpenTelemetry: `Recetas` només pertany a Weaviate.
+
+A continuació, **en el mateix terminal on s'executarà Python**, s'indica el nom del servei i el receptor de les traces.
+
+**macOS/Linux (Bash/Zsh):**
 
 ```bash
 export OTEL_CONSOLE_ONLY=0
 export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
 export OTEL_SERVICE_NAME=shopping-rag-weaviate-otel
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:OTEL_CONSOLE_ONLY = "0"
+$env:OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = "http://localhost:4318/v1/traces"
+$env:OTEL_SERVICE_NAME = "shopping-rag-weaviate-otel"
+```
+
+Aquestes variables només s'apliquen a **la sessió actual del terminal**. Si es tanca la finestra i s'obre una altra, cal definir-les de nou abans d'executar l'exemple.
+
+El valor `OTEL_CONSOLE_ONLY=0` fa que l'SDK exporti els spans a Grafana, en comptes d'imprimir-ne la representació completa per terminal.
+
+**6. Executar el cas pràctic**
+
+Primer s'ha de comprovar que Weaviate està ben configurat i després iniciar l'assistent. Els dos comandaments següents es poden executar en ordre.
+
+**macOS/Linux (Bash/Zsh):**
+
+```bash
 python AI_Observability/code/src/11_shopping_list_weaviate_otel.py --check
 python AI_Observability/code/src/11_shopping_list_weaviate_otel.py
 ```
 
-La instal·lació de Python, el format exacte de `.env`, els passos del dashboard i la resolució d'errors es detallen a la [guia pràctica completa de Grafana i OpenTelemetry](./GRAFANA_OPENTELEMETRY_SETUP.md). El programa s'explica en detall a l'[exemple 8.12](./08_examples.md#812-observabilitat-del-rag-amb-opentelemetry-i-grafana--11_shopping_list_weaviate_otelpy).
+**Windows (PowerShell):**
 
-### 6.9. DASHBOARD DE GRAFANA
+```powershell
+python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py --check
+python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py
+```
 
-Un cop les traces són visibles a **Explore → Tempo**, es crea el dashboard **`RAG recetas`**. La captura següent mostra quatre panels de rendiment:
+**Atenció:** només s'ha d'executar la segona ordre quan la comprovació `--check` indiqui que la col·lecció **`Recetas`** és accessible. Si a Windows no s'ha pogut activar l'entorn, es pot utilitzar `.\.venv\Scripts\python.exe` en lloc de `python` en totes dues ordres.
 
-![Grafana: execucions, durada, Ollama i Weaviate](./img/grafana_dashboard.png)
+Per generar traces de diferents rutes, es poden introduir aquestes peticions:
 
-<p align="center"><sub>Figura 5. Rendiment del RAG de receptes: nombre d'execucions i durada de LangGraph, Ollama i Weaviate.</sub></p>
+1. «Recomiéndame recetas con huevos y patatas en menos de 30 minutos».
+2. «Añade los ingredientes de la segunda receta».
+3. «Muéstrame la lista».
+4. `exit` per acabar.
 
-Els panells utilitzen consultes sobre spans. Per exemple, el nombre d'execucions es calcula a partir de les peticions `langgraph.invoke`:
+Cada missatge genera un span principal `langgraph.invoke`.
+
+**7. Comprovar les traces a Grafana abans de fer el dashboard**
+
+1. Obrir `http://localhost:3000` i entrar a **Explore**.
+2. Seleccionar **Tempo** com a font de dades.
+3. Seleccionar **TraceQL** i escriure:
+
+   ```traceql
+   { resource.service.name = "shopping-rag-weaviate-otel" }
+   ```
+
+4. Escollir un interval que inclogui les peticions acabades de fer (`Last 1 hour`, `Last 6 hours` o un rang absolut).
+5. Prémer **Run query / Refresh**.
+
+Si apareixen traces amb el nom `langgraph.invoke`, la connexió és correcta. Des d'aquesta mateixa pantalla es poden obrir les traces i revisar-ne els spans. **Només quan aquest pas funciona té sentit crear els panels del dashboard.** Aquests passos d'interfície són **els mateixos a macOS, Linux i Windows**.
+
+### 6.9. CREACIÓ I CONFIGURACIÓ DEL DASHBOARD DE GRAFANA
+
+Quan les traces ja arriben a Tempo, es pot construir un **dashboard** que combini el rendiment general de l'aplicació amb l'anàlisi individual de les traces. En aquest cas s'ha creat el dashboard `RAG recetas`.
+
+Per començar:
+
+1. Entrar a **Dashboards → New → New dashboard**.
+2. Assignar-li el nom **RAG recetas**.
+3. Seleccionar **+ Add panel**, que obre l'editor del primer panell.
+4. Configurar **Data source: Tempo** i **Query type: TraceQL**.
+5. Escollir la visualització de cada panell a **All visualizations** i desar els canvis amb **Save**.
+
+Els noms de menús poden variar lleugerament segons la versió de Grafana. A les captures de la pràctica s'utilitza Grafana 13.3.
+
+#### 6.9.1. Gràfics de rendiment
+
+**A. Nombre d'execucions — RAG Executions**
+
+- **Visualització:** `Time series`.
+- **Títol:** `RAG Executions`.
+- **Consulta TraceQL:**
 
 ```traceql
 { resource.service.name = "shopping-rag-weaviate-otel" && span:name = "langgraph.invoke" } | count_over_time()
 ```
 
-La durada mitjana es pot consultar amb `avg_over_time()`. Per estudiar Ollama i Weaviate s'aplica la mateixa funció als spans corresponents. Així es pot distingir el cost temporal de la inferència del temps de cerca vectorial.
+Aquesta consulta compta les execucions de `langgraph.invoke` per interval temporal. En aquest codi, cada petició de l'usuari genera un d'aquests spans. El resultat mostra el **nombre d'execucions per interval**, no la taxa per segon que retornaria `rate()`.
 
-**Taula de traces i graf de nodes:**
+**B. Durada de les execucions — Execution Duration**
 
-![Grafana: taula de traces i graf dels spans](./img/grafana_traces&nodes.png)
+- **Visualització:** `Time series`.
+- **Títol:** `Execution Duration`.
+- **Consulta TraceQL:**
 
-<p align="center"><sub>Figura 6. Taula de traces i visualització dels spans d'una execució seleccionada.</sub></p>
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name = "langgraph.invoke" } | avg_over_time()
+```
 
-La taula Traces es configura amb Tempo, el tipus de consulta **TraceQL** i el panell Table. En seleccionar una petició, es pot veure el seu identificador i analitzar el recorregut al **Node Graph**, representat per cercles units segons les relacions pare-fill dels spans.
+Mostra la durada mitjana de les peticions executades per LangGraph. A les opcions del panell, es pot configurar la unitat de l'eix vertical com a **segons (`s`)**.
 
-El Node Graph està pensat per representar l'execució que ha tingut lloc, no totes les transicions teòriques que LangGraph podria fer. Això és especialment útil per comprovar si el router ha escollit la branca de cerca de receptes o una operació directa sobre la llista de la compra.
+**C. Temps consumit per Ollama — Ollama Duration**
 
-Per llegir el graf més fàcilment s'ha simplificat la visualització amb la transformació **Filter fields by name**, conservant només `id`, `subtitle`, `source` i `target`:
+- **Visualització:** `Time series`.
+- **Títol:** `Ollama Duration`.
+- **Consulta TraceQL:**
 
-![Grafana: Node Graph amb els noms dels nodes](./img/grafana_nodes_LangGraph.png)
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name =~ "ollama.*" } | avg_over_time() by (span.llm.etapa)
+```
 
-<p align="center"><sub>Figura 7. Node Graph.</sub></p>
+El programa diferencia dues etapes: `clasificacion`, que interpreta la petició de l'usuari, i `generacion_rag`, que redacta la resposta amb les receptes trobades. La consulta permet observar la durada de cada etapa per separat. Una petició que només modifica la llista de la compra pot no tenir cap span de `generacion_rag`.
 
-**Consum acumulat de tokens:**
+**D. Cerca semàntica — Weaviate Search Duration (near_text())**
 
-![Grafana: tokens d'entrada, sortida i totals](./img/grafana_tokens_usage.png)
+- **Visualització:** `Time series`.
+- **Títol:** `Weaviate Search Duration (near_text())`.
+- **Consulta TraceQL:**
 
-<p align="center"><sub>Figura 8. Input Tokens, Output Tokens i Total Tokens.</sub></p>
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name = "weaviate_near_text" } | avg_over_time()
+```
 
-La consulta següent suma els tokens totals de les inferències d'Ollama durant el període temporal seleccionat:
+Aquesta consulta mostra quant dura la cerca vectorial amb `near_text()` a la col·lecció `Recetas`. Si l'usuari únicament consulta o modifica una llista existent, pot no aparèixer cap punt nou: això és **normal** perquè no s'ha fet una cerca a Weaviate.
+
+![Dashboard Grafana amb els quatre gràfics de rendiment](./img/grafana_dashboard.png)
+
+<p align="center"><sub>Figura 5. Dashboard RAG recetas: nombre d'execucions, durada total, durada d'Ollama i durada de les cerques a Weaviate.</sub></p>
+
+En comparar aquests gràfics, es pot observar quina part de la petició consumeix més temps. En una cerca RAG, habitualment la inferència del model és més costosa que les operacions Python de gestió de la llista.
+
+#### 6.9.2. Taula de traces
+
+Els gràfics anteriors ofereixen una vista agregada. Per inspeccionar una petició concreta, s'afegeix una taula amb les traces registrades.
+
+1. Des de l'edició del dashboard, seleccionar **+ Add panel**.
+2. Escollir **Data source: Tempo** i **Query type: TraceQL**.
+3. Escriure aquesta consulta:
+
+   ```traceql
+   { resource.service.name = "shopping-rag-weaviate-otel" && span:name = "langgraph.invoke" }
+   ```
+
+4. A **All visualizations**, seleccionar **Table**.
+5. Posar el títol `Traces` i desar el panell.
+
+La taula conté camps com **Trace ID**, **Start time**, **Service**, **Name** i **Duration**. També pot incloure el camp tècnic `nested`, que es pot ocultar si no és necessari. El camp intern `traceID`, en canvi, es necessita per construir l'enllaç al graf.
+
+![Taula de traces del dashboard Grafana](./img/grafana_traces&nodes.png)
+
+<p align="center"><sub>Figura 6. Taula de traces i graf de l'execució seleccionada en el dashboard.</sub></p>
+
+Aquesta informació permet identificar consultes lentes, comparar execucions i seleccionar una trace per analitzar què ha fet LangGraph.
+
+#### 6.9.3. Variable per seleccionar una trace
+
+L'objectiu és que **el graf no estigui associat a un Trace ID fix**. Ha de mostrar la petició que es tria des de la taula.
+
+Per crear el selector:
+
+1. Tornar al dashboard i entrar a **Edit**.
+2. Prémer **+ → Variable** a la barra lateral dreta.
+3. Seleccionar **Textbox**, que permet introduir un identificador de trace.
+4. Configurar la variable:
+
+   | Camp              | Valor                                                        |
+   | ----------------- | ------------------------------------------------------------ |
+   | **Name**          | `TraceId`                                                    |
+   | **Label**         | `Selected Trace`                                             |
+   | **Default value** | Un Trace ID real de Tempo, com els que apareixen a la taula. |
+
+5. Guardar la variable i el dashboard.
+
+A la part superior apareixerà el camp **Selected Trace**.
+
+#### 6.9.4. Graf de nodes d'una trace concreta
+
+Per mostrar el recorregut de la trace seleccionada:
+
+1. Afegir un panell nou.
+2. Escollir **Tempo** com a font de dades.
+3. Seleccionar **Query type: TraceQL** (no `Service Graph`).
+4. Introduir la variable a la consulta:
+
+   ```text
+   ${TraceId}
+   ```
+
+5. Seleccionar **Node Graph** a **All visualizations**.
+6. Escriure el títol `LangGraph - Nodes`.
+7. Provar la visualització amb un Trace ID que existeixi abans de desar el panell.
+
+La consulta és una **plantilla de Grafana**: perquè funcioni, Grafana ha de substituir `${TraceId}` pel valor escollit abans d'enviar la petició a Tempo. El valor final ha de ser un identificador hexadecimal real, no el text literal de la variable.
+
+Per canviar de graf directament des de la taula:
+
+1. Editar el panell `Traces`.
+2. Obrir la configuració del camp **Trace ID → Data links → Add link**.
+3. Escriure el títol **View execution graph**.
+4. Introduir l'URL del mateix dashboard, passant-hi l'identificador de la fila:
+
+   ```text
+   /d/adkxzjf/rag-recetas?var-TraceId=${__data.fields["traceID"]}
+   ```
+
+5. **Substituir el camí `/d/adkxzjf/rag-recetas` pel del propi dashboard** si el seu UID o slug és diferent. Es pot copiar de la barra d'adreces del navegador.
+6. Desar els canvis. En clicar un ID de la taula, seleccionar **View execution graph** i comprovar que `Selected Trace` canvia.
+
+El camp visible `Trace ID` pot tenir el nom intern **`traceID`**. Si l'enllaç no canvia la variable, cal revisar el nom del camp a **Inspect → Data**.
+
+**Què representa el Node Graph?** Cada cercle correspon a un span executat i les fletxes indiquen dependències pare-fill. No és el diagrama estàtic de tots els camins disponibles a LangGraph, sinó el recorregut de **la petició concreta**. Per exemple, una consulta RAG pot mostrar `process_input` → `search_recipe` → `search_recipes` → `weaviate_near_text`, mentre que afegir ingredients d'una recepta ja mostrada pot seguir una ruta diferent.
+
+#### 6.9.5. Personalitzar el graf perquè es vegin només els noms
+
+La visualització inicial pot mostrar durades i percentatges a l'interior dels cercles, que dificulten la lectura. En aquesta pràctica s'ha simplificat perquè quedin visibles els noms de les operacions.
+
+1. Editar el panell **LangGraph - Nodes**.
+2. Obrir **Transformations → Add transformation**.
+3. Escollir **Filter fields by name**.
+4. Al camp **Identifier / Regular expression pattern**, escriure:
+
+   ```regex
+   ^(id|subtitle|source|target)$
+   ```
+
+5. Comprovar que es mantenen els camps `id`, `subtitle`, `source` i `target` i guardar els canvis.
+
+![Node Graph simplificat amb els noms dels spans](./img/grafana_nodes_LangGraph.png)
+
+<p align="center"><sub>Figura 7. Node Graph simplificat: només es mostren els noms de les operacions, sota els cercles, sense durades ni percentatges interns.</sub></p>
+
+#### 6.9.6. Consum de tokens: Input, Output i Total
+
+El programa afegeix atributs numèrics als spans d'Ollama. Aquests atributs permeten construir tres indicadors que mostren els tokens consumits en el període de temps seleccionat.
+
+Per a cada indicador:
+
+1. Seleccionar **+ Add panel**.
+2. Escollir **Tempo → TraceQL**.
+3. Seleccionar la visualització **Stat**.
+4. Configurar **Calculation = Total**, **Decimals = 0** i el títol corresponent.
+5. Introduir la consulta i desar.
+
+**Input Tokens:** suma els tokens que el model rep com a entrada.
+
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name =~ "ollama.*" } | sum_over_time(span.gen_ai.usage.input_tokens)
+```
+
+**Output Tokens:** suma els tokens que el model genera.
+
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name =~ "ollama.*" } | sum_over_time(span.gen_ai.usage.output_tokens)
+```
+
+**Total Tokens:** suma el consum total registrat en el camp propi `rag.tokens.total`.
 
 ```traceql
 { resource.service.name = "shopping-rag-weaviate-otel" && span:name =~ "ollama.*" } | sum_over_time(span.rag.tokens.total)
 ```
 
-La taula de traces i el Node Graph treballen amb traces individuals. Les targetes de tokens i els gràfics temporals resumeixen el període seleccionat. Escollir una trace al selector `Selected Trace` no significa que totes les targetes mostrin únicament els seus tokens.
+![Grafana: consum de tokens d'entrada, sortida i totals](./img/grafana_tokens_usage.png)
+
+<p align="center"><sub>Figura 8. Input Tokens, Output Tokens i Total Tokens.</sub></p>
+
+En aquest cas, es compleix `861 + 42 = 903`. Aquestes xifres són només un exemple: variaran amb el model, el text de les consultes i les respostes generades.
+
+**Important:** els tres indicadors sumen els tokens de totes les inferències dins del rang temporal del dashboard.
+
+#### 6.9.7. Interpretació final del dashboard
+
+Les quatre zones permeten estudiar el comportament de l'assistent des de diferents perspectives:
+
+- Els **gràfics de rendiment** indiquen quan s'han executat peticions i quines parts són més lentes.
+- La **taula de traces** identifica cada consulta amb el seu ID, hora d'inici i durada.
+- El **Node Graph** mostra els nodes, eines i inferències que s'han executat en una petició concreta.
+- Els **panells de tokens** resumeixen el consum del model durant el període triat.
+
+Per comprovar les rutes, es pot comparar una petició per **cercar receptes**, una per **afegir ingredients de la recepta seleccionada** i una tercera per **mostrar la llista de la compra**. Les traces haurien de mostrar seqüències diferents, perquè el router de LangGraph escull accions diferents.
+
+OpenTelemetry registra el comportament de l'aplicació. És a dir, no modifica el resultat de les operacions Python ni les decisions del model. Això fa possible comprendre el flux del RAG i detectar oportunitats d'optimització sense alterar-ne la lògica.
 
 ### 6.10. COMPARACIÓ ENTRE OPIK I OPENTELEMETRY
 
@@ -362,4 +705,12 @@ La taula de traces i el Node Graph treballen amb traces individuals. Les targete
 
 Cap de les alternatives millora automàticament les respostes del model. El seu valor és ajudar a entendre, explicar i optimitzar les execucions. Les diferències de detall, retenció o mètriques disponibles depenen de la configuració de cada projecte.
 
-**Per reproduir la pràctica sencera:** consulta la [guia amb tots els comandaments Docker, consultes TraceQL i captures de pantalla](./GRAFANA_OPENTELEMETRY_SETUP.md), i després executa l'[exemple 11](../code/src/11_shopping_list_weaviate_otel.py) explicat a l'[apartat 8.12](./08_examples.md#812-observabilitat-del-rag-amb-opentelemetry-i-grafana--11_shopping_list_weaviate_otelpy).
+**Relació amb els exemples:** l'explicació detallada del codi i del flux es troba a l'[exemple 8.12](./08_examples.md#812-observabilitat-del-rag-amb-opentelemetry-i-grafana--11_shopping_list_weaviate_otelpy), i el [programa complet](../code/src/11_shopping_list_weaviate_otel.py).
+
+**Referències tècniques:**
+
+- [Grafana Labs: Docker OpenTelemetry LGTM](https://grafana.com/docs/opentelemetry/docker-lgtm/)
+- [Grafana: visualització de traces en dashboards](https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/visualizations/traces/)
+- [Grafana Tempo: funcions de TraceQL metrics](https://grafana.com/docs/tempo/latest/metrics-from-traces/metrics-queries/functions/)
+- [Grafana: Data links i variables](https://grafana.com/docs/grafana/latest/visualizations/panels-visualizations/configure-data-links/)
+- [OpenTelemetry: traces i spans](https://opentelemetry.io/docs/concepts/signals/traces/)
