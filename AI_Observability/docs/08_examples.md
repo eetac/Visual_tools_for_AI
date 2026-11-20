@@ -7,7 +7,7 @@ Aquest apartat reuneix **onze exemples progressius (del `00` al `10`)** per ente
 Cada exemple inclou:
 
 1. **Programa complet:** el fitxer `.py` de [`code/src/`](../code/src/), amb els imports, la configuració i la lògica necessària per executar-lo.
-2. **Snippet:** un fragment de [`code/snippets/`](../code/snippets/) que destaca les peces necessàries per entendre l'exemple: configuració → eina o node → connexió amb l'agent o el graf → execució. Alguns fragments mostren el recorregut complet; d'altres ometen funcions auxiliars o part de les connexions. **Per executar els exemples, cal fer servir els programes de `code/src/`.**
+2. **Snippet:** un fragment de [`code/snippets/`](../code/snippets/) que destaca les peces necessàries per entendre l'exemple: configuració → eina o node → connexió amb l'agent o el graf → execució. Alguns fragments mostren el recorregut complet. Altres ometen funcions auxiliars o part de les connexions. **Per executar els exemples, cal fer servir els programes de `code/src/`.**
 3. **Explicació i flux:** el paper del LLM i de Python, un diagrama del flux d'execució i el comandament d'execució.
 
 > **Com executar-los:** tots els comandaments `python` d'aquest document es llancen **des de l'arrel del repositori `Visual_tools_for_AI`**, amb l'entorn virtual activat i les dependències instal·lades. Cal tenir Ollama disponible i haver descarregat el model que utilitza cada exemple. Els programes que incorporen Weaviate, Opik o Hermes requereixen, a més, la configuració corresponent.
@@ -1505,3 +1505,204 @@ python AI_Observability/code/src/10_shopping_list_weaviate_opik_hermes.py
 3. «Añade estos productos». Es recupera `last_shown_products` i, si l'acció s'identifica correctament, Python actualitza la llista.
 
 Aquestes tres peticions permeten observar la diferència entre generar el menú, consultar informació i modificar la llista. Si Hermes falla o no retorna una selecció aprofitable, el programa pot utilitzar la selecció de reserva de Python. Això no implica que la crida a Hermes hagi funcionat correctament.
+
+### 8.12. Observabilitat del RAG amb OpenTelemetry i Grafana — `11_shopping_list_weaviate_otel.py`
+
+**Programa complet:** [Obrir `11_shopping_list_weaviate_otel.py`](../code/src/11_shopping_list_weaviate_otel.py)  
+**Snippet:** [Obrir `11_shopping_list_weaviate_otel_snippet.py`](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)  
+**Documentació de referència:**
+
+- [Apartats 6.6–6.7 — OpenTelemetry, traces, spans i atributs del RAG](./06_observability.md#otel-fonaments).
+- [Apartat 6.8 — Instal·lació de Docker, configuració d'OpenTelemetry i execució a macOS, Linux i Windows](./06_observability.md#otel-instal-lacio).
+- [Apartat 6.9 — Creació del dashboard `RAG recetas`, taula de traces, Node Graph i mètriques de tokens](./06_observability.md#otel-dashboard).
+
+**Què cal observar al snippet:** la inicialització del `TracerProvider`, la creació de spans per als nodes, el registre del consum de tokens i l'exportació de traces a Grafana mitjançant OTLP/HTTP. El snippet és explicatiu, per executar el cas pràctic s'utilitza el programa complet.
+
+Aquest exemple parteix de l'assistent de receptes de l'apartat 8.9. Continua utilitzant LangGraph, el model Qwen executat amb Ollama i la col·lecció `Recetas` de Weaviate Cloud. El canvi principal és que, en lloc de registrar l'execució amb Opik, utilitza OpenTelemetry i envia les traces a Tempo, que es poden analitzar des de Grafana.
+
+**Components del codi:**
+
+La configuració inicial crea un proveïdor de traces associat a un nom de servei. `BatchSpanProcessor` agrupa i envia els spans al receptor OTLP/HTTP del contenidor de Grafana:
+
+```python
+otel_provider = TracerProvider(
+    resource=Resource.create({
+        "service.name": os.getenv("OTEL_SERVICE_NAME", "shopping-rag-weaviate-otel"),
+        "service.version": "1.0.0",
+    }),
+    sampler=ParentBased(ALWAYS_ON),
+)
+
+otel_provider.add_span_processor(
+    BatchSpanProcessor(
+        OTLPSpanExporter(
+            endpoint=os.getenv(
+                "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT",
+                "http://localhost:4318/v1/traces",
+            ),
+        )
+    )
+)
+
+trace.set_tracer_provider(otel_provider)
+tracer = trace.get_tracer("shopping-rag-weaviate-otel")
+```
+
+L'alternativa `OTEL_CONSOLE_ONLY=1` serveix per inspeccionar els spans per terminal sense Docker. que aparegui al dashboard, utilitzem `OTEL_CONSOLE_ONLY=0`\*\* i enviem les traces a Tempo.
+
+**Nodes de LangGraph:**
+
+El decorador `observed_node()` envolta la funció Python de cada node amb un span `langgraph.node.<nom>`. El programa propaga el valor `traceparent` a través de l'estat de LangGraph perquè tots aquests spans es puguin relacionar amb la mateixa execució.
+
+```python
+with tracer.start_as_current_span(
+    f"langgraph.node.{name}", context=parent_context
+) as span:
+    span.set_attribute("langgraph.node.name", name)
+    result = fn(state)
+    if name == "process_input":
+        span.set_attribute("langgraph.route", str(result.get("action", "other")))
+```
+
+L'atribut `langgraph.route` permet saber quina acció ha classificat el router, mentre que els spans indiquen quins nodes i eines s'han executat. Per exemple, una petició per afegir ingredients d'una recepta ja consultada pot passar per `add_recipe` i `tool.add_products` sense executar `weaviate_near_text` una altra vegada.
+
+**Registre de tokens amb Ollama:**
+
+La funció `invoke_with_otel_usage()` envolta amb un span les dues possibles crides al model: la classificació de la petició (`ollama.clasificacion`) i la generació de la resposta RAG (`ollama.generacion_rag`). Després de `model.invoke()`, llegeix els comptadors de `usage_metadata` o, si no hi són, els de `response_metadata`.
+
+```python
+answer = model.invoke(messages)
+usage = getattr(answer, "usage_metadata", None) or {}
+metadata = getattr(answer, "response_metadata", None) or {}
+
+input_tokens = usage.get("input_tokens")
+output_tokens = usage.get("output_tokens")
+if input_tokens is None:
+    input_tokens = metadata.get("prompt_eval_count")
+if output_tokens is None:
+    output_tokens = metadata.get("eval_count")
+
+if input_tokens is not None:
+    span.set_attribute("gen_ai.usage.input_tokens", int(input_tokens))
+if output_tokens is not None:
+    span.set_attribute("gen_ai.usage.output_tokens", int(output_tokens))
+```
+
+Quan es coneix el total, també es guarden els atributs `gen_ai.usage.total_tokens` i `rag.tokens.total`. Aquest últim s'utilitza en una consulta TraceQL del dashboard. Per facilitar la depuració, el programa continua imprimint el resum:
+
+```text
+[OTEL] Tokens clasificacion: {'input_tokens': ..., 'output_tokens': ..., 'total_tokens': ...}
+```
+
+Els punts suspensius representen valors que canvien a cada inferència.
+
+**Weaviate:**
+
+La funció `weaviate_near_text()` obre un span amb aquest nom al voltant de `collection.query.near_text(...)`, registra la col·lecció i el nombre de candidats recuperats, i permet diferenciar el temps consumit per la cerca vectorial del consumit per Ollama.
+
+**Flux d'execució:**
+
+```mermaid
+flowchart TD
+    U["Usuari: petició sobre receptes"] --> G["LangGraph: langgraph.invoke"]
+    G --> P["process_input: classificació amb Ollama"]
+    P --> R{"Router: acció?"}
+
+    R -->|search_recipe| W["Weaviate: Recetas / near_text"]
+    W --> L["Ollama: resposta RAG"]
+    L --> F["Resposta final"]
+
+    R -->|add_recipe / add / show| T["Python: nodes i eines"]
+    T --> F
+
+    G -. "Traces, spans i atributs" .-> OT["OpenTelemetry / OTLP"]
+    OT --> TP["Tempo"]
+    TP --> GR["Grafana: dashboard i Node Graph"]
+
+    %% ESTILS
+    classDef usuari fill:#E3F2FD,stroke:#1976D2,stroke-width:2px,color:#0D47A1
+    classDef langgraph fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px,color:#4A148C
+    classDef llm fill:#FFF3E0,stroke:#F57C00,stroke-width:2px,color:#E65100
+    classDef router fill:#FFF9C4,stroke:#F9A825,stroke-width:2px,color:#795548
+    classDef weaviate fill:#E8F5E9,stroke:#388E3C,stroke-width:2px,color:#1B5E20
+    classDef python fill:#E0F7FA,stroke:#0097A7,stroke-width:2px,color:#006064
+    classDef resposta fill:#F1F8E9,stroke:#689F38,stroke-width:2px,color:#33691E
+    classDef observabilitat fill:#F3E5F5,stroke:#8E24AA,stroke-width:2px,color:#6A1B9A
+
+    %% ASSIGNACIÓ DE COLORS
+    class U usuari
+    class G langgraph
+    class P,L llm
+    class R router
+    class W weaviate
+    class T python
+    class F resposta
+    class OT,TP,GR observabilitat
+```
+
+<p align="center"><sub>Figura 15. La mateixa aplicació RAG instrumentada amb OpenTelemetry. Les fletxes discontínues representen el flux de dades d'observabilitat.</sub></p>
+
+**Configuració i execució de l'exemple (des de l'arrel del repositori):**
+
+Abans d'executar el programa, cal seguir l'[apartat 6.8 de `06_observability.md`](./06_observability.md#otel-instal-lacio). Allà es detalla, **pas a pas i per a macOS/Linux i Windows**, com comprovar Docker, crear o reprendre el contenidor `grafana-lgtm` sense esborrar-lo, preparar l'entorn virtual, configurar Ollama i Weaviate mitjançant `.env` i definir les variables d'OpenTelemetry. **No cal repetir `docker run` si el contenidor ja existeix.**
+
+Un cop completada aquesta configuració, es comprova l'accés a la col·lecció `Recetas` i després s'executa l'assistent. Si la comprovació `--check` falla, cal solucionar-la abans d'executar la segona ordre.
+
+**macOS/Linux (Bash/Zsh):**
+
+```bash
+python AI_Observability/code/src/11_shopping_list_weaviate_otel.py --check
+python AI_Observability/code/src/11_shopping_list_weaviate_otel.py
+```
+
+**Windows (PowerShell):**
+
+```powershell
+python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py --check
+python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py
+```
+
+La configuració de `OTEL_CONSOLE_ONLY=0` i de l'endpoint `http://localhost:4318/v1/traces` es troba al **pas 5 de l'apartat 6.8**. No s'ha de copiar la sintaxi `export` de macOS/Linux a PowerShell: el manual inclou els comandaments correctes per a cada sistema.
+
+**Prova en aquest ordre:**
+
+1. «Recomiéndame recetas con huevos y patatas en menos de 30 minutos». Comprova la ruta de cerca RAG, `weaviate_near_text` i la generació de text amb Ollama.
+2. «Añade los ingredientes de la segunda receta». Comprova la ruta `add_recipe`, l'eina `add_products()` i la reutilització de l'estat `last_recipes`.
+3. «Muéstrame la lista». Comprova la ruta `show`, sense necessitat de fer una nova consulta vectorial.
+4. Escriu `exit` per tancar el programa. OpenTelemetry buida els spans pendents abans d'acabar.
+
+**Resultats a Grafana:**
+
+Des de `http://localhost:3000` es pot entrar a **Explore → Tempo** i cercar:
+
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" }
+```
+
+El dashboard **`RAG recetas`** organitza la informació en quatre zones. Els **passos per crear tots els panells, les consultes TraceQL, el selector `TraceId` i els enllaços de la taula al graf** estan explicats a l'[apartat 6.9](./06_observability.md#otel-dashboard). Aquí es mostra què permet observar cada resultat:
+
+**1. Rendiment general.** Nombre d'execucions, durada mitjana, temps d'Ollama i temps de la cerca semàntica.
+
+![Dashboard RAG recetas: rendiment de LangGraph, Ollama i Weaviate](./img/grafana_dashboard.png)
+
+<p align="center"><sub>Figura 16. Rendiment de l'assistent a Grafana.</sub></p>
+
+**2. Taula de traces i graf d'una execució.** La taula mostra els identificadors, les hores i les durades. En seleccionar una trace, es pot inspeccionar el graf dels spans executats.
+
+![Taula de traces i Node Graph al dashboard](./img/grafana_traces&nodes.png)
+
+<p align="center"><sub>Figura 17. Taula de peticions i Node Graph del procés.</sub></p>
+
+**3. Consum de tokens.** Els panels `Input Tokens`, `Output Tokens` i `Total Tokens` mostren el consum acumulat del període seleccionat, obtingut a partir dels atributs dels spans d'Ollama amb `sum_over_time()`.
+
+![Consum de tokens al dashboard Grafana](./img/grafana_tokens_usage.png)
+
+<p align="center"><sub>Figura 18. Tokens d'entrada, sortida i totals del rang temporal.</sub></p>
+
+**Interpretació dels resultats:**
+
+Si la traça correspon a una cerca de receptes, han d'aparèixer els spans de cerca i de generació RAG. Si correspon a afegir ingredients d'una recepta prèviament trobada, és normal que no aparegui `weaviate_near_text`: l'estat ja conserva les receptes. Per tant, el graf permet estudiar quina ruta s'ha executat. No pretén representar tots els camins possibles del diagrama de LangGraph.
+
+Les mètriques de tokens del dashboard corresponen al **període temporal triat** i no canvien automàticament en seleccionar una trace. La trace concreta es consulta al Node Graph o al detall de Tempo. A diferència d'Opik, que integra la presentació de traces i mètriques a la mateixa plataforma, aquesta alternativa combina un estàndard obert d'instrumentació (**OpenTelemetry**), un backend de traces (**Tempo**) i una interfície de visualització (**Grafana**).
+
+Finalment, per **aturar i reprendre la pràctica sense perdre el contenidor**, cal utilitzar `docker stop grafana-lgtm` i `docker start grafana-lgtm`, tal com s'explica al **pas 3 de l'[apartat 6.8](./06_observability.md#otel-instal-lacio)**. No s'ha d'executar `docker run` cada dia. Per a la interpretació detallada de les visualitzacions, les limitacions i la comparació amb Opik, vegeu els **apartats 6.9–6.11 de [`06_observability.md`](./06_observability.md#otel-dashboard)**.
