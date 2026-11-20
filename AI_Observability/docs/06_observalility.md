@@ -4,7 +4,7 @@ L'observabilitat és la capacitat de monitoritzar, registrar i analitzar el func
 
 Quan es desenvolupa una aplicació que incorpora LangChain, LangGraph, Ollama, Weaviate o altres eines, no és suficient comprovar que el sistema genera una resposta correcta. També és important conèixer quines funcions s'han executat, quin recorregut ha seguit la petició, quant temps ha necessitat cada operació i quants recursos s'han consumit.
 
-Per obtenir aquesta informació s'utilitza Opik, una plataforma d'observabilitat desenvolupada per Comet que permet registrar les execucions d'aplicacions d'IA, visualitzar les seves operacions internes i analitzar mètriques de rendiment.
+En aquestes pràctiques s'exploren dues alternatives: **Opik**, una plataforma d'observabilitat desenvolupada per Comet que integra el registre i la visualització de les execucions d'IA, i **OpenTelemetry amb Grafana i Tempo**, que separa la instrumentació del programa, l'emmagatzematge de traces i el dashboard.
 
 ### 6.1. CONCEPTES PRINCIPALS
 
@@ -172,3 +172,194 @@ A través de la interfície es poden diferenciar tres nivells d'anàlisi:
 D'aquesta manera, Opik facilita la detecció d'errors, l'anàlisi del rendiment i la comprensió del comportament intern dels sistemes basats en intel·ligència artificial.
 
 La seva incorporació no modifica les funcionalitats de l'assistent, però permet estudiar com es generen les respostes i identificar possibles oportunitats de millora.
+
+### 6.6. OPENTELEMETRY
+
+OpenTelemetry (OTel) és un conjunt d'API, SDK i convencions obertes per instrumentar aplicacions i exportar dades d'observabilitat. Permet descriure operacions amb **traces** i **spans**, afegir atributs i transmetre'ls a altres sistemes. No proporciona, per si sol, un dashboard on consultar aquestes dades.
+
+En l'exemple de receptes utilitzem aquesta arquitectura:
+
+```mermaid
+flowchart TD
+    U["Usuari: receptes i llista de compra"]
+    A["Python: LangGraph + Ollama + Weaviate"]
+    C["OTLP/HTTP: port 4318"]
+    T["Collector i Tempo"]
+    G["Grafana: Explore i dashboard"]
+
+    U --> A
+    A -. "SDK OpenTelemetry: traces i spans" .-> C
+    C --> T
+    T --> G
+
+    class U entrada
+    class A python
+    class C servei
+    class T agent
+    class G llm
+
+    classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
+    classDef python fill:#D9EAD3,stroke:#333333,color:#111111
+    classDef servei fill:#EADCF8,stroke:#333333,color:#111111
+    classDef agent fill:#FCE5CD,stroke:#333333,color:#111111
+    classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
+```
+
+| Component                      | Paper en el sistema                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| **SDK OpenTelemetry (Python)** | Crea spans, els relaciona amb una trace i els afegeix atributs.                                       |
+| **OTLP/HTTP**                  | Transporta les traces del programa al receptor HTTP, en aquest cas `http://localhost:4318/v1/traces`. |
+| **OpenTelemetry Collector**    | Rep i encamina les dades d'observabilitat.                                                            |
+| **Grafana Tempo**              | Emmagatzema les traces i permet cercar-les amb **TraceQL**.                                           |
+| **Grafana**                    | Mostra les traces, els grafs dels spans i els panells del dashboard.                                  |
+
+El programa **continua accedint a les receptes de Weaviate** i utilitza la col·lecció `Recetas`. OTel no substitueix Weaviate: només observa què fa l'aplicació. Tampoc decideix les rutes de LangGraph; les decisions continuen depenent del router i del LLM.
+
+**Diferència entre els senyals d'observabilitat:**
+
+- **Traces:** permeten reconstruir el recorregut d'una petició i la relació entre operacions.
+- **Mètriques:** mostren valors numèrics agregats al llarg del temps, com el nombre de peticions o el consum de tokens.
+- **Logs:** recullen esdeveniments textuals.
+
+En aquest exercici, les dades que el codi exporta són **traces**. Els gràfics i els indicadors de tokens s'obtenen a Grafana mitjançant consultes de mètriques sobre traces amb TraceQL. És diferent de configurar un exportador OTel Metrics propi o de recollir mètriques a Prometheus.
+
+### 6.7. TRACES, SPANS, RELACIONS I ATRIBUTS DEL RAG
+
+Cada missatge de l'usuari crea una trace principal que comença a l'span `langgraph.invoke`. A partir d'aquí, s'instrumenten els nodes i eines que intervenen en la resposta:
+
+| Span o atribut                                   | Què representa?                                               |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| `langgraph.invoke`                               | Execució completa d'una consulta de l'usuari.                 |
+| `langgraph.node.process_input`                   | Node que interpreta la petició i decideix l'acció.            |
+| `langgraph.node.search_recipe`                   | Node que inicia la recuperació de receptes.                   |
+| `langgraph.node.add_recipe`                      | Node que afegeix ingredients d'una recepta ja mostrada.       |
+| `tool.search_recipes`, `tool.add_products`, etc. | Eines Python executades dins dels nodes.                      |
+| `weaviate_near_text`                             | Cerca semàntica a Weaviate.                                   |
+| `ollama.clasificacion`                           | Inferència de Qwen per classificar la intenció.               |
+| `ollama.generacion_rag`                          | Inferència per elaborar la resposta amb el context recuperat. |
+| `langgraph.route`                                | Atribut que registra la decisió del router.                   |
+
+Els spans es relacionen mitjançant un **Trace ID**, un **Span ID** i la relació pare-fill. En el programa s'utilitza la propagació de `traceparent` per conservar el context entre els nodes de LangGraph. Això és important perquè, si es fan operacions sense mantenir el context, el seu registre es podria fragmentar en traces independents i seria més difícil reconstruir l'execució.
+
+El registre d'atributs també permet explicar per què una petició és més lenta que una altra. Per exemple, consultar receptes acostuma a requerir una crida de classificació, una consulta vectorial i una segona inferència de generació RAG. En canvi, afegir un producte a la llista és una acció Python més curta i no necessita consultar Weaviate.
+
+**Atributs de consum de tokens:**
+
+| Atribut del span d'Ollama    | Informació                                                             |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `gen_ai.usage.input_tokens`  | Tokens d'entrada del model.                                            |
+| `gen_ai.usage.output_tokens` | Tokens generats pel model.                                             |
+| `gen_ai.usage.total_tokens`  | Total de tokens, quan les metadades el proporcionen o es pot calcular. |
+| `rag.tokens.total`           | Atribut propi utilitzat a les consultes del dashboard.                 |
+| `gen_ai.request.model`       | Nom del model, com per exemple `qwen3.5:9b`.                           |
+| `llm.etapa`                  | Fase de la inferència: `clasificacion` o `generacion_rag`.             |
+
+### 6.8. INSTAL·LACIÓ LOCAL I CONNEXIÓ AMB GRAFANA
+
+Per practicar sense desplegar serveis individuals, es pot utilitzar la imatge de Docker `grafana/otel-lgtm`.
+
+S'ha de tenir Docker Desktop descarregat i ja es pot crear el contenidor:
+
+```bash
+docker pull grafana/otel-lgtm:latest
+docker run -d \
+  --name grafana-lgtm \
+  -p 3000:3000 \
+  -p 4318:4318 \
+  -v grafana-lgtm-data:/data \
+  grafana/otel-lgtm:latest
+```
+
+**El comandament `docker run` només s'ha d'executar quan el contenidor encara no existeix.** Si ja existeix `grafana-lgtm`, s'inicia amb `docker start grafana-lgtm`.
+
+Per a l'ús habitual:
+
+```bash
+# Aturar el contenidor:
+docker stop grafana-lgtm
+
+# Tornar-lo a arrencar:
+docker start grafana-lgtm
+
+# Consultar-ne l'estat:
+docker ps -a
+```
+
+Els dos ports publicats tenen finalitats diferents:
+
+- 3000: dona accés a Grafana des del navegador
+- 4318: rep les traces exportades des del programa Python.
+
+Amb les dependències instal·lades, l'entorn virtual activat i les credencials de Weaviate al `.env`, es configura OpenTelemetry i s'executa l'exemple des de l'arrel del repositori:
+
+```bash
+export OTEL_CONSOLE_ONLY=0
+export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces
+export OTEL_SERVICE_NAME=shopping-rag-weaviate-otel
+python AI_Observability/code/src/11_shopping_list_weaviate_otel.py --check
+python AI_Observability/code/src/11_shopping_list_weaviate_otel.py
+```
+
+La instal·lació de Python, el format exacte de `.env`, els passos del dashboard i la resolució d'errors es detallen a la [guia pràctica completa de Grafana i OpenTelemetry](./GRAFANA_OPENTELEMETRY_SETUP.md). El programa s'explica en detall a l'[exemple 8.12](./08_examples.md#812-observabilitat-del-rag-amb-opentelemetry-i-grafana--11_shopping_list_weaviate_otelpy).
+
+### 6.9. DASHBOARD DE GRAFANA
+
+Un cop les traces són visibles a **Explore → Tempo**, es crea el dashboard **`RAG recetas`**. La captura següent mostra quatre panels de rendiment:
+
+![Grafana: execucions, durada, Ollama i Weaviate](./img/grafana_dashboard.png)
+
+<p align="center"><sub>Figura 5. Rendiment del RAG de receptes: nombre d'execucions i durada de LangGraph, Ollama i Weaviate.</sub></p>
+
+Els panells utilitzen consultes sobre spans. Per exemple, el nombre d'execucions es calcula a partir de les peticions `langgraph.invoke`:
+
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name = "langgraph.invoke" } | count_over_time()
+```
+
+La durada mitjana es pot consultar amb `avg_over_time()`. Per estudiar Ollama i Weaviate s'aplica la mateixa funció als spans corresponents. Així es pot distingir el cost temporal de la inferència del temps de cerca vectorial.
+
+**Taula de traces i graf de nodes:**
+
+![Grafana: taula de traces i graf dels spans](./img/grafana_traces&nodes.png)
+
+<p align="center"><sub>Figura 6. Taula de traces i visualització dels spans d'una execució seleccionada.</sub></p>
+
+La taula Traces es configura amb Tempo, el tipus de consulta **TraceQL** i el panell Table. En seleccionar una petició, es pot veure el seu identificador i analitzar el recorregut al **Node Graph**, representat per cercles units segons les relacions pare-fill dels spans.
+
+El Node Graph està pensat per representar l'execució que ha tingut lloc, no totes les transicions teòriques que LangGraph podria fer. Això és especialment útil per comprovar si el router ha escollit la branca de cerca de receptes o una operació directa sobre la llista de la compra.
+
+Per llegir el graf més fàcilment s'ha simplificat la visualització amb la transformació **Filter fields by name**, conservant només `id`, `subtitle`, `source` i `target`:
+
+![Grafana: Node Graph amb els noms dels nodes](./img/grafana_nodes_LangGraph.png)
+
+<p align="center"><sub>Figura 7. Node Graph.</sub></p>
+
+**Consum acumulat de tokens:**
+
+![Grafana: tokens d'entrada, sortida i totals](./img/grafana_tokens_usage.png)
+
+<p align="center"><sub>Figura 8. Input Tokens, Output Tokens i Total Tokens.</sub></p>
+
+La consulta següent suma els tokens totals de les inferències d'Ollama durant el període temporal seleccionat:
+
+```traceql
+{ resource.service.name = "shopping-rag-weaviate-otel" && span:name =~ "ollama.*" } | sum_over_time(span.rag.tokens.total)
+```
+
+La taula de traces i el Node Graph treballen amb traces individuals. Les targetes de tokens i els gràfics temporals resumeixen el període seleccionat. Escollir una trace al selector `Selected Trace` no significa que totes les targetes mostrin únicament els seus tokens.
+
+### 6.10. COMPARACIÓ ENTRE OPIK I OPENTELEMETRY
+
+| Aspecte                     | Opik                                                      | OpenTelemetry + Tempo + Grafana                                                                     |
+| --------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Enfocament                  | Plataforma integrada orientada a l'observabilitat de LLM. | Estàndard de codi obert amb components separats.                                                    |
+| Instrumentació Python       | Integració d'Opik, callbacks o spans.                     | API/SDK OTel i spans manuals. Es poden afegir autoinstrumentacions.                                 |
+| Emmagatzematge i interfície | Plataforma Opik.                                          | Tempo emmagatzema traces, Grafana les visualitza.                                                   |
+| Visualització de la ruta    | Detall de traces i visualitzacions de l'aplicació.        | Explore i visualitzacions de spans.                                                                 |
+| Tokens                      | Mètriques de LLM en la interfície, segons la integració.  | Atributs numèrics als spans i consultes TraceQL a Grafana.                                          |
+| Execució local              | Requereix configurar el sistema Opik elegit.              | Es pot iniciar amb un contenidor.                                                                   |
+| Adaptació                   | Centrada en casos d'ús d'IA/LLM.                          | Permet instrumentar també APIs, bases de dades i altres serveis amb el mateix llenguatge de traces. |
+
+Cap de les alternatives millora automàticament les respostes del model. El seu valor és ajudar a entendre, explicar i optimitzar les execucions. Les diferències de detall, retenció o mètriques disponibles depenen de la configuració de cada projecte.
+
+**Per reproduir la pràctica sencera:** consulta la [guia amb tots els comandaments Docker, consultes TraceQL i captures de pantalla](./GRAFANA_OPENTELEMETRY_SETUP.md), i després executa l'[exemple 11](../code/src/11_shopping_list_weaviate_otel.py) explicat a l'[apartat 8.12](./08_examples.md#812-observabilitat-del-rag-amb-opentelemetry-i-grafana--11_shopping_list_weaviate_otelpy).
