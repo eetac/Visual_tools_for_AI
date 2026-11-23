@@ -9,7 +9,7 @@ Aquest manual presenta els conceptes i les eines utilitzats per construir aplica
 3. [LangChain i LangGraph](./docs/03_langchain_langgraph.md)
 4. [RAG (Retrieval-Augmented Generation) i bases de dades vectorials](./docs/04_rag.md)
 5. [MCP (Model Context Protocol)](./docs/05_MCP.md)
-6. [Observabilitat amb Opik i exemples d’aplicació](./docs/06_observalility.md)
+6. [Observabilitat amb Opik i Opentelemetry i exemples d’aplicació](./docs/06_observalility.md)
 7. [Hermes](./docs/07_hermes.md) — document pendent de contingut
 8. [Exemples](./docs/08_examples.md)
 
@@ -45,9 +45,9 @@ Descriu el protocol MCP i la seva arquitectura client-servidor: host, client i s
 
 **Document:** [05_MCP.md](./05_MCP.md)
 
-### 6. Observabilitat amb Opik
+### 6. Observabilitat amb Opik i Opentelemetry
 
-Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la consulta de logs, dashboards i traces detallades.
+Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i configuració d'Opentelemetry (+grafana) i la consulta de logs, dashboards i traces detallades.
 
 **Document:** [06_observalility.md](./06_observalility.md)
 
