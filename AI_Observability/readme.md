@@ -7,11 +7,12 @@ Aquest manual presenta els conceptes i les eines utilitzats per construir aplica
 1. [LLM (Large Language Model)](./docs/01_llm.md)
 2. [Ollama: instal·lació i execució local](./docs/02_ollama.md)
 3. [LangChain i LangGraph](./docs/03_langchain_langgraph.md)
-4. [RAG (Retrieval-Augmented Generation) i bases de dades vectorials](./docs/04_rag.md)
-5. [MCP (Model Context Protocol)](./docs/05_MCP.md)
-6. [Observabilitat amb Opik i Opentelemetry i exemples d’aplicació](./docs/06_observalility.md)
-7. [Hermes](./docs/07_hermes.md) — document pendent de contingut
-8. [Exemples](./docs/08_examples.md)
+4. [RAG (Retrieval-Augmented Generation)](./docs/04_rag.md)
+5. [Bases de dades vectorials](./docs/04.1_vector_databases.md)
+6. [MCP (Model Context Protocol)](./docs/05_MCP.md)
+7. [Observabilitat amb Opik i Opentelemetry i exemples d’aplicació](./docs/06_observalility.md)
+8. [Hermes](./docs/07_hermes.md) — document pendent de contingut
+9. [Exemples](./docs/08_examples.md)
 
 ## Resum dels documents
 
@@ -39,25 +40,31 @@ Explica com RAG recupera informació d’una font externa, l’afegeix al contex
 
 **Document:** [04_rag.md](./04_rag.md)
 
-### 5. MCP (Model Context Protocol)
+### 5. Bases de dades vectorials
+
+Explica què són les bases de dades vectorials, com emmagatzemen informació mitjançant embeddings i com permeten fer cerques per similitud semàntica. Presenta Weaviate com a exemple de base de dades vectorial, les seves principals funcionalitats i les diferències entre l'execució local i Weaviate Cloud.
+
+**Document:** [04.1_vector_databases.md](./docs/04.1_vector_databases.md)
+
+### 6. MCP (Model Context Protocol)
 
 Descriu el protocol MCP i la seva arquitectura client-servidor: host, client i servidor. Resumeix les funcionalitats que pot exposar un servidor —eines, recursos i prompts— i el flux de comunicació entre l’aplicació i el servidor.
 
 **Document:** [05_MCP.md](./05_MCP.md)
 
-### 6. Observabilitat amb Opik i Opentelemetry
+### 7. Observabilitat amb Opik i Opentelemetry
 
-Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i configuració d'Opentelemetry (+grafana) i la consulta de logs, dashboards i traces detallades.
+Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la configuració d'Opentelemetry (+ grafana) i la consulta de logs, dashboards i traces detallades.
 
 **Document:** [06_observalility.md](./06_observalility.md)
 
-### 7. Hermes
+### 8. Hermes
 
 El fitxer previst per a aquest tema encara no té contingut. La integració amb Hermes per generar propostes de menús setmanals, validar-les amb Python i utilitzar receptes recuperades de Weaviate es descriu actualment a l’[exemple 10 del document d’observabilitat](./06_observalility.md).
 
 **Document:** [07_hermes.md](./07_hermes.md)
 
-### 8. Exemples
+### 9. Exemples
 
 Recull exemples Python d’agents, LangGraph, Weaviate i una planificació setmanal amb Hermes.
 
