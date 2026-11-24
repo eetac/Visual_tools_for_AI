@@ -36,18 +36,17 @@ MODEL = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
 THREAD_ID = "shopping-session"
 
 
-# OBSERVABILIDAD: el servicio se registra como 'shopping-rag-weaviate-otel'.
-# Los spans se envían por OTLP/HTTP a Grafana LGTM; no hacen falta claves de Opik.
+# OBSERVABILIDAD: el servicio se registra como 'shopping-rag-weaviate-otel'
+# Los spans se envían por OTLP/HTTP a Grafana
 otel_provider = TracerProvider(
     resource=Resource.create({
         "service.name": os.getenv("OTEL_SERVICE_NAME", "shopping-rag-weaviate-otel"),
         "service.version": "1.0.0",
     }),
-    # En el ejercicio queremos ver todas las consultas, no muestrear solo una parte.
     sampler=ParentBased(ALWAYS_ON),
 )
 if os.getenv("OTEL_CONSOLE_ONLY", "0") == "1":
-    # Para aprender sin Docker: muestra los spans directamente en la terminal.
+    # Para aprender sin Docker: muestra los spans directamente en la terminal
     otel_provider.add_span_processor(SimpleSpanProcessor(ConsoleSpanExporter()))
 else:
     otel_provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(
@@ -76,8 +75,6 @@ def observed_node(name: str, fn):
     """Permite ver los nodos existentes, sin modificar el router ni sus resultados."""
     @wraps(fn)
     def wrapped(state: "ShoppingState"):
-        # LangGraph puede ejecutar cada nodo en contextos diferentes.
-        # La cabecera traceparent mantiene TODAS las etapas en la misma traza.
         traceparent = state.get("otel_traceparent", "")
         parent_context = propagator.extract({"traceparent": traceparent}) if traceparent else None
         with tracer.start_as_current_span(f"langgraph.node.{name}", context=parent_context) as span:
@@ -91,7 +88,7 @@ def observed_node(name: str, fn):
 
 class ShoppingState(TypedDict, total=False):
     user_input: str
-    otel_traceparent: str  # Contexto técnico de observabilidad, no se usa en el RAG.
+    otel_traceparent: str
     shopping_list: list[str]
     last_product: str
     last_recipes: list[dict]
@@ -107,13 +104,13 @@ class ShoppingState(TypedDict, total=False):
     response: str
 
 
-# El primer LLM interpreta instrucciones en JSON; el segundo redacta el RAG.
+# El primer LLM interpreta instrucciones en JSON, el segundo redacta el RAG.
 llm = ChatOllama(model=MODEL, temperature=0, format="json", reasoning=False)
 rag_llm = ChatOllama(model=MODEL, temperature=0, reasoning=False)
 
 
-# OBSERVABILIDAD: envuelve las dos mismas llamadas a Ollama del archivo 08.
-# Los prompts y respuestas no se guardan en las trazas, solo atributos y duraciones.
+# OBSERVABILIDAD: envuelve las dos mismas llamadas a Ollama del archivo 08
+# Los prompts y respuestas no se guardan en las trazas, solo atributos y duraciones
 def invoke_with_otel_usage(model, messages, etapa: str):
     with tracer.start_as_current_span(f"ollama.{etapa}") as span:
         span.set_attribute("gen_ai.provider.name", "ollama")
@@ -123,8 +120,6 @@ def invoke_with_otel_usage(model, messages, etapa: str):
         usage = getattr(answer, "usage_metadata", None) or {}
         metadata = getattr(answer, "response_metadata", None) or {}
 
-        # ChatOllama facilita usage_metadata; algunas versiones solo incluyen
-        # los contadores originales de Ollama en response_metadata.
         input_tokens = usage.get("input_tokens")
         output_tokens = usage.get("output_tokens")
         if input_tokens is None:
@@ -141,11 +136,10 @@ def invoke_with_otel_usage(model, messages, etapa: str):
         if total_tokens is None and input_tokens is not None and output_tokens is not None:
             total_tokens = int(input_tokens) + int(output_tokens)
         if total_tokens is not None:
-            # La métrica propia rag.tokens.total se consulta desde Tempo.
+            # La métrica propia rag.tokens.total se consulta desde Tempo
             span.set_attribute("rag.tokens.total", int(total_tokens))
             span.set_attribute("gen_ai.usage.total_tokens", int(total_tokens))
 
-        # Resumen útil en terminal; los spans completos se envían a Grafana.
         shown_usage = {
             "input_tokens": input_tokens,
             "output_tokens": output_tokens,
@@ -155,7 +149,7 @@ def invoke_with_otel_usage(model, messages, etapa: str):
         return answer
 
 
-# Herramientas para gestionar la lista de la compra.
+# Herramientas para gestionar la lista de la compra
 @tool
 @observed_tool("add_products")
 def add_products(shopping_list: list[str], products: list[str], last_product: str) -> dict:
@@ -229,7 +223,7 @@ def show_products(shopping_list: list[str]) -> str:
     return "Lista de la compra: " + (", ".join(shopping_list) if shopping_list else "vacía")
 
 
-# Conexión Weaviate y funciones de búsqueda.
+# Conexión Weaviate y funciones de búsqueda
 def weaviate_connection():
     url = os.getenv("WEAVIATE_URL", "").strip()
     api_key = os.getenv("WEAVIATE_API_KEY", "").strip()
@@ -272,8 +266,7 @@ def has_required_ingredients(recipe: dict, required: list[str]) -> bool:
     return True
 
 
-# OBSERVABILIDAD: conserva la búsqueda original, añadiendo un span manual.
-# Nunca se registran la conexión a Weaviate ni sus credenciales.
+# OBSERVABILIDAD: conserva la búsqueda original, añadiendo un span manual
 def weaviate_near_text(collection, query: str, max_minutes: int):
     """Consulta vectorial; registra cantidad de candidatos obtenidos."""
     with tracer.start_as_current_span("weaviate_near_text") as span:
@@ -317,7 +310,7 @@ def search_recipes(query: str, required_ingredients: list[str], max_minutes: int
             "preparacion": str(row.get("preparacion") or ""),
             "descripcion": str(row.get("descripcion") or ""),
         }
-        # AND real: se descartan recetas que no contengan TODOS los ingredientes.
+        # AND real: se descartan recetas que no contengan TODOS los ingredientes
         if required_ingredients and not has_required_ingredients(recipe, required_ingredients):
             continue
         matches.append(recipe)
@@ -346,7 +339,7 @@ def check_weaviate() -> None:
             print("[AVISO] La colección existe, pero no contiene objetos.")
 
 
-# Nodos y router LangGraph.
+# Nodos y router LangGraph
 def process_input_node(state: ShoppingState) -> dict:
     print("[NODE] process_input")
     previous = [rec["nombre"] for rec in state.get("last_recipes", [])]
@@ -548,7 +541,7 @@ def other_node(state: ShoppingState) -> dict:
     return {"response": state.get("response") or "Puedo gestionar tu lista, buscar recetas y añadir sus ingredientes."}
 
 
-# Grafo LangGraph.
+# Grafo LangGraph
 builder = StateGraph(ShoppingState)
 for name, handler in {
     "process_input": process_input_node,
@@ -620,7 +613,7 @@ def main() -> None:
         except Exception as exc:
             print(f"[ERROR] {type(exc).__name__}: {exc}\n")
         finally:
-            # Cada consulta queda exportada sin esperar a cerrar el programa.
+            # Cada consulta queda exportada sin esperar a cerrar el programa
             otel_provider.force_flush(timeout_millis=10000)
 
 
@@ -628,5 +621,5 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        # Garantiza el envío y cierre de OpenTelemetry al terminar.
+        # Garantiza el envío y cierre de OpenTelemetry al terminar
         otel_provider.shutdown()
