@@ -1,10 +1,10 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 09 · Observabilitat d'Ollama i Weaviate amb Opik
-# Fitxer original: ../src/09_shopping_list_weaviate_opik.py
-# Què mostra: instrumentar les crides al LLM i connectar Opik amb LangGraph.
-# LLM: s'executa dins de model.invoke(messages).
-# Python: registra consum de tokens i nombre de receptes recuperades.
-# Fragment de lectura: shopping_graph i query_target_vector són al fitxer original.
+# EXAMPLE 09 · Observability of Ollama and Weaviate with Opik
+# Original file: ../src/09_shopping_list_weaviate_opik.py
+# What it shows: Instrument calls to LLM and connect Opik to LangGraph.
+# LLM: Runs inside model.invoke(messages).
+# Python: Log token consumption and number of recipes retrieved.
+# Read fragment: shopping_graph and query_target_vector are in the original file.
 
 import os
 from langchain_ollama import ChatOllama
@@ -13,17 +13,17 @@ from opik.integrations.langchain import OpikTracer, track_langgraph
 from weaviate.classes.query import Filter
 
 
-# 1. MODEL: dos usos de Qwen, que s'observaran per separat.
+# 1. MODEL: Two uses of Qwen, which will be noted separately.
 MODEL = os.getenv("OLLAMA_MODEL", "qwen3.5:9b")
 llm = ChatOllama(model=MODEL, temperature=0, format="json", reasoning=False)
 rag_llm = ChatOllama(model=MODEL, temperature=0, reasoning=False)
 
 
-# 2. SPAN DE LLM: embolcalla model.invoke i desa tokens.
+# 2. LLM SPAN: Wrap model.invoke and save tokens.
 
 @track(name="ollama_tokens", type="llm", capture_input=False, capture_output=False)
 def invoke_with_opik_usage(model, messages, etapa: str):
-    # Punt on s'executa el LLM; després se'n llegeix el consum.
+    # Point where the LLM is executed; then the consumption is read.
     answer = model.invoke(messages)
     usage = answer.usage_metadata or {}
 
@@ -43,14 +43,14 @@ def invoke_with_opik_usage(model, messages, etapa: str):
             model=MODEL, provider="ollama", metadata={"etapa": etapa}
         )
 
-    print(f"[OPIK] Tokens {etapa}: {usage or 'no disponibles'}")
+    print(f"[OPIK] Tokens {etapa}: {usage or 'not available'}")
     return answer
 
 
-# 3. SPAN D'EINA: registra també el nombre de receptes recuperades.
+# 3. TOOL SPAN: Also records the number of recipes retrieved.
 @track(name="weaviate_near_text", type="tool", ignore_arguments=["collection"], capture_output=False)
 def weaviate_near_text(collection, query: str, max_minutes: int):
-    """Consulta vectorial; registra cantidad de candidatos obtenidos."""
+    """Vector query; records the number of candidates obtained."""
     filters = Filter.by_property("tiempoMin").less_or_equal(max_minutes) if max_minutes > 0 else None
     kwargs = {"query": query, "limit": 100, "filters": filters}
     target_vector = query_target_vector(collection)
@@ -62,8 +62,8 @@ def weaviate_near_text(collection, query: str, max_minutes: int):
     return result
 
 
-# 4. INSTRUMENTACIÓ DEL GRAF: aquesta és la nova connexió amb Opik.
-# shopping_graph ja s'ha construït amb StateGraph al programa complet.
+# 4. GRAPH INSTRUMENTATION: This is the new connection to Opik.
+# shopping_graph has already been built with StateGraph in the full program.
 opik_tracer = OpikTracer(
     project_name="shopping-rag-weaviate",
     tags=["ollama", "langgraph", "weaviate", "rag"],
@@ -71,5 +71,5 @@ opik_tracer = OpikTracer(
 )
 shopping_graph = track_langgraph(shopping_graph, opik_tracer)
 
-# A process_input_node() i search_recipe_node() es crida
-# invoke_with_opik_usage(llm, ...) o invoke_with_opik_usage(rag_llm, ...).
+# process_input_node() and search_recipe_node() are called
+# invoke_with_opik_usage(llm, ...) or invoke_with_opik_usage(rag_llm, ...).

@@ -1,46 +1,46 @@
-# 8. EXEMPLES D’ÚS EN PROGRAMES DE PYTHON
+# 8. EXAMPLES OF USE IN PYTHON PROGRAMS
 
-Aquest apartat reuneix **tretze exemples progressius (del `00` al `12`)** per entendre com s'integren Python, Ollama, LangChain, LangGraph, Weaviate, Opik, Hermes, OpenTelemetry amb Grafana i LangSmith. L'objectiu és veure què fa cada programa, en quin punt intervé un LLM, què executa Python i com es connecten els components.
+This section brings together **thirteen progressive examples (from `00` to `12`)** to understand how Python, Ollama, LangChain, LangGraph, Weaviate, Opik, Hermes, OpenTelemetry integrate with Grafana and LangSmith. The goal is to see what each program does, where an LLM comes in, what Python runs, and how the components connect.
 
-## 8.0. Com utilitzar aquests exemples
+## 8.0. How to use these examples
 
-Cada exemple inclou:
+Each example includes:
 
-1. **Programa complet:** el fitxer `.py` de [`code/src/`](../code/src/), amb els imports, la configuració i la lògica necessària per executar-lo.
-2. **Snippet:** un fragment de [`code/snippets/`](../code/snippets/) que destaca les peces necessàries per entendre l'exemple: configuració → eina o node → connexió amb l'agent o el graf → execució. Alguns fragments mostren el recorregut complet. Altres ometen funcions auxiliars o part de les connexions. **Per executar els exemples, cal fer servir els programes de `code/src/`.**
-3. **Explicació i flux:** el paper del LLM i de Python, un diagrama del flux d'execució i el comandament d'execució.
+1. **Full program:** the file `.py` from [`code/src/`](../code/src/), with the amounts, configuration and logic needed to run it.
+2. **Snippet:** a fragment of [`code/snippets/`](../code/snippets/) that highlights the pieces needed to understand the example: configuration → tool or node → connect to agent or graph → run. Some fragments show the complete route. Others omit auxiliary functions or part of the connections. **To run the examples, you must use the programs from `code/src/`.**
+3. **Explanation and Flow:** The role of LLM and Python, a diagram of the execution flow and the execution command.
 
-> **Com executar-los:** tots els comandaments `python` d'aquest document es llancen **des de l'arrel del repositori `Visual_tools_for_AI`**, amb l'entorn virtual activat i les dependències instal·lades. Cal tenir Ollama disponible i haver descarregat el model que utilitza cada exemple. Els programes que incorporen Weaviate, Opik, Hermes, OpenTelemetry amb Grafana o LangSmith requereixen, a més, la configuració corresponent. Les dependències de Python s’instal·len amb `python -m pip install -r requirements.txt`.
+> **How to run them:** all commands `python` of this document are launched **from the root of the repository `Visual_tools_for_AI`**, with the virtual environment enabled and dependencies installed. You must have Ollama available and have downloaded the model used by each example. Programs incorporating Weaviate, Opik, Hermes, OpenTelemetry with Grafana or LangSmith also require the corresponding configuration. Python dependencies are installed with `python -m pip install -r requirements.txt`.
 
-### Accés directe al codi i als snippets
+### Direct access to code and snippets
 
-| Exemple       | Què s'hi aprèn?                            | Programa complet                                                       | Snippet destacat                                                                                                                                              |
+| Example | What do you learn?                            | Full program | Featured Snippet |
 | :------------ | :----------------------------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **8.1 · 00**  | Primera consulta d'Ollama                  | [Codi complet](../code/src/00_test_ollama.py)                          | [Snippet](../code/snippets/00_test_ollama_snippet.py)                                                                                                         |
-| **8.2 · 01**  | Agent amb eina meteorològica               | [Codi complet](../code/src/01_simple_agent.py)                         | [Snippet](../code/snippets/01_simple_agent_snippet.py)                                                                                                        |
-| **8.3 · 02**  | Supervisor i subagents especialitzats      | [Codi complet](../code/src/02_multi_agent.py)                          | [Snippet](../code/snippets/02_multi_agent_snippet.py)                                                                                                         |
-| **8.4 · 03**  | Càlculs deterministes d'una missió de dron | [Codi complet](../code/src/03_my_drone_mission_agent.py)               | [Snippet](../code/snippets/03_my_drone_mission_agent_snippet.py)                                                                                              |
-| **8.5 · 04**  | Flux i routers de LangGraph                | [Codi complet](../code/src/04_langgraph_drone_mission_agent.py)        | [Snippet](../code/snippets/04_langgraph_drone_mission_agent_snippet.py)                                                                                       |
-| **8.6 · 05**  | Avaluació i replanificació de missions     | [Codi complet](../code/src/05_langgraph_autonomous_mission_planner.py) | [Snippet](../code/snippets/05_langgraph_autonomous_mission_planner_snippet.py)                                                                                |
-| **8.7 · 06**  | Llista de compra amb eines LangChain       | [Codi complet](../code/src/06_shopping_list.py)                        | [Snippet](../code/snippets/06_shopping_list_snippet.py)                                                                                                       |
-| **8.8 · 07**  | Llista de compra controlada per LangGraph  | [Codi complet](../code/src/07_shopping_list_langgraph.py)              | [Snippet](../code/snippets/07_shopping_list_langgraph_snippet.py)                                                                                             |
-| **8.9 · 08**  | Cerca semàntica i RAG amb Weaviate         | [Codi complet](../code/src/08_shopping_list_weaviate.py)               | [Snippet](../code/snippets/08_shopping_list_weaviate_snippet.py)                                                                                              |
-| **8.10 · 09** | Traces i tokens amb Opik                   | [Codi complet](../code/src/09_shopping_list_weaviate_opik.py)          | [Snippet](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)                                                                                         |
-| **8.11 · 10** | Integració d'Hermes                        | [Codi complet](../code/src/10_shopping_list_weaviate_opik_hermes.py)   | [Hermes CLI](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py) · [Ingredients](../code/snippets/10_calculate_missing_ingredients_snippet.py) |
-| **8.12 · 11** | Observabilitat amb OpenTelemetry i Grafana | [Codi complet](../code/src/11_shopping_list_weaviate_otel.py)          | [Snippet](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)                                                                                         |
-| **8.13 · 12** | Observabilitat amb LangSmith               | [Codi complet](../code/src/12_shopping_list_weaviate_langsmith.py)     | [Snippet](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)                                                                                    |
+| **8.1 · 00** | Ollama's first consultation | [Full code](../code/src/00_test_ollama.py)                          | [Snippet](../code/snippets/00_test_ollama_snippet.py)                                                                                                         |
+| **8.2 · 01** | Agent with weather tool | [Full code](../code/src/01_simple_agent.py)                         | [Snippet](../code/snippets/01_simple_agent_snippet.py)                                                                                                        |
+| **8.3 · 02** | Supervisor and specialized sub-agents | [Full code](../code/src/02_multi_agent.py)                          | [Snippet](../code/snippets/02_multi_agent_snippet.py)                                                                                                         |
+| **8.4 · 03** | Deterministic calculations of a drone mission | [Full code](../code/src/03_my_drone_mission_agent.py)               | [Snippet](../code/snippets/03_my_drone_mission_agent_snippet.py)                                                                                              |
+| **8.5 · 04** | LangGraph Flow and Routers | [Full code](../code/src/04_langgraph_drone_mission_agent.py)        | [Snippet](../code/snippets/04_langgraph_drone_mission_agent_snippet.py)                                                                                       |
+| **8.6 · 05** | Evaluation and replanning of missions | [Full code](../code/src/05_langgraph_autonomous_mission_planner.py) | [Snippet](../code/snippets/05_langgraph_autonomous_mission_planner_snippet.py)                                                                                |
+| **8.7 · 06** | Shopping List with LangChain Tools | [Full code](../code/src/06_shopping_list.py)                        | [Snippet](../code/snippets/06_shopping_list_snippet.py)                                                                                                       |
+| **8.8 · 07** | Shopping list controlled by LangGraph | [Full code](../code/src/07_shopping_list_langgraph.py)              | [Snippet](../code/snippets/07_shopping_list_langgraph_snippet.py)                                                                                             |
+| **8.9 · 08** | Semantic Search and RAG with Weaviate | [Full code](../code/src/08_shopping_list_weaviate.py)               | [Snippet](../code/snippets/08_shopping_list_weaviate_snippet.py)                                                                                              |
+| **8.10 · 09** | Traces and tokens with Opik | [Full code](../code/src/09_shopping_list_weaviate_opik.py)          | [Snippet](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)                                                                                         |
+| **8.11 · 10** | Integration of Hermes | [Full code](../code/src/10_shopping_list_weaviate_opik_hermes.py)   | [Hermes CLI](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py) · [Ingredients](../code/snippets/10_calculate_missing_ingredients_snippet.py) |
+| **8.12 · 11** | Observability with OpenTelemetry and Grafana | [Full code](../code/src/11_shopping_list_weaviate_opentelemetry.py)          | [Snippet](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)                                                                                         |
+| **8.13 · 12** | Observability with LangSmith | [Full code](../code/src/12_shopping_list_weaviate_langsmith.py)     | [Snippet](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)                                                                                    |
 
 ---
 
-### 8.1. Primera consulta al LLM — `00_test_ollama.py`
+### 8.1. First query to the LLM — `00_test_ollama.py`
 
-**Programa complet:** [Obrir `00_test_ollama.py`](../code/src/00_test_ollama.py)  
-**Snippet:** [Obrir `00_test_ollama_snippet.py`](../code/snippets/00_test_ollama_snippet.py)  
-**Què cal observar al snippet:** la configuració de `ChatOllama` i la primera crida a `llm.invoke()`. En aquest cas, el fragment coincideix amb el programa complet.
+**Full program:** [Open `00_test_ollama.py`](../code/src/00_test_ollama.py)  
+**Snippet:** [Open `00_test_ollama_snippet.py`](../code/snippets/00_test_ollama_snippet.py)  
+**What to note in the snippet:** the configuration of `ChatOllama` and the first call to `llm.invoke()`. In this case, the fragment matches the full program.
 
-Aquest primer exemple permet comprovar que Python es pot comunicar correctament amb Ollama i generar respostes utilitzant el model Qwen.
+This first example allows you to verify that Python can communicate correctly with Ollama and generate responses using the Qwen model.
 
-**Funcionament del codi:**
+**How Code Works:**
 
 ```python
 from langchain_ollama import ChatOllama
@@ -50,26 +50,26 @@ llm = ChatOllama(
     temperature=0,
 )
 
-response = llm.invoke("Explícame qué es LangChain en dos frases.")
+response = llm.invoke("Explain to me what LangChain is in two sentences.")
 
 print(response.content)
 ```
 
-**Intervenció del LLM:**
+**LLM intervention:**
 
-El model intervé quan Python executa `response = llm.invoke(...)`. En aquest moment, LangChain envia la consulta a Ollama, que utilitza el model configurat per generar una resposta.
+The model intervenes when Python executes `response = llm.invoke(...)`. At this point, LangChain sends the query to Ollama, which uses the configured model to generate a response.
 
-**Operacions de Python:**
+**Python Operations:**
 
-Python s'encarrega de preparar la consulta, executar `invoke()`, rebre el resultat i mostrar-lo amb `print()`. En aquest exemple no hi ha eines ni agents. El model únicament genera text.
+Python takes care of preparing the query, execute `invoke()`, receive the result and display it with `print()`. There are no tools or agents in this example. The model only generates text.
 
-**Flux d'execució:**
+**Execution Flow:**
 
 ```mermaid
 flowchart LR
-    U["Python: consulta"] --> C["ChatOllama"]
-    C --> O["Ollama: Qwen"]
-    O --> R["Resposta del LLM"]
+    U["Python: query"] --> C["ChatOllama"]
+    C --> O["Call: Qwen"]
+    O --> R["LLM response"]
     R --> P["Python: print()"]
     class U,P entrada
     class C servei
@@ -85,30 +85,30 @@ flowchart LR
 ```
 
 <p align="center">
-  <sub>Figura 1. Flux d’execució de la prova d’Ollama</sub>
+  <sub>Figure 1. Execution flow of the Ollama test</sub>
 </p>
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/00_test_ollama.py
 ```
 
-Si apareix una resposta, es comprova que la comunicació entre Python, LangChain, Ollama i Qwen funciona correctament.
+If a response appears, it checks that the communication between Python, LangChain, Ollama and Qwen is working properly.
 
-### 8.2. Agent amb una eina — `01_simple_agent.py`
+### 8.2. Agent with a tool — `01_simple_agent.py`
 
-**Programa complet:** [Obrir `01_simple_agent.py`](../code/src/01_simple_agent.py)  
-**Snippet:** [Obrir `01_simple_agent_snippet.py`](../code/snippets/01_simple_agent_snippet.py)  
-**Què cal observar al snippet:** les quatre etapes: configurar `ChatOllama`, definir `get_weather()`, crear l'agent amb `create_agent(tools=[get_weather])` i fer una consulta amb `agent.invoke()`. El LLM pot sol·licitar l'eina, però és Python qui l'executa. Les dades meteorològiques són simulades.
+**Full program:** [Open `01_simple_agent.py`](../code/src/01_simple_agent.py)  
+**Snippet:** [Open `01_simple_agent_snippet.py`](../code/snippets/01_simple_agent_snippet.py)  
+**What to observe in the snippet:** the four stages: configure `ChatOllama`, define `get_weather()`, create the agent with `create_agent(tools=[get_weather])` and make an inquiry with `agent.invoke()`. The LLM can request the tool, but it is Python that runs it. Weather data is simulated.
 
-Aquest exemple introdueix el concepte de tool calling, que permet que el model sol·liciti l'execució de funcions Python.
+This example introduces the concept of tool calling, which allows the model to request the execution of Python functions.
 
-L'agent disposa d'una eina anomenada `get_weather()` que retorna informació meteorològica simulada.
+The agent has a tool named `get_weather()` which returns simulated weather information.
 
-**Components del codi:**
+**Code Components:**
 
-La funció Python és:
+The Python function is:
 
 ```python
 def get_weather(city: str) -> str:
@@ -121,9 +121,9 @@ def get_weather(city: str) -> str:
     return f"It's always sunny in {city}!"
 ```
 
-Aquesta funció rep el nom d'una ciutat i retorna una resposta fictícia.
+This function receives the name of a city and returns a dummy response.
 
-Posteriorment, es crea l'agent:
+Afterwards, the agent is created:
 
 ```python
 agent = create_agent(
@@ -133,36 +133,36 @@ agent = create_agent(
 )
 ```
 
-Amb `tools=[get_weather]` s'indica que l'agent pot utilitzar aquesta funció.
+With `tools=[get_weather]` indicates that the agent can use this function.
 
-**En quin moment intervé el LLM?**
+**At what point does the LLM intervene?**
 
-Quan es crida `result = agent.invoke(...)`.
+When called `result = agent.invoke(...)`.
 
-LangChain envia al LLM la pregunta de l'usuari, les instruccions del sistema i la descripció de les eines disponibles. El model interpreta la pregunta i pot decidir sol·licitar `get_weather()`.
+LangChain sends the user question, system instructions and description of available tools to the LLM. The model interprets the question and can decide to request `get_weather()`.
 
-Per exemple, si l'usuari pregunta _"What's the weather in San Francisco?"_, el model pot demanar:
+For example, if the user asks _"What's the weather in San Francisco?"_, the model might ask:
 
 `get_weather(city="San Francisco")`
 
-**Què fa Python?**
+**What does Python do?**
 
-LangChain rep la sol·licitud del model i executa la funció Python.
+LangChain receives the request from the model and executes the Python function.
 
-La funció retorna el text simulat `It's always sunny in San Francisco!`. Aquest resultat es torna a proporcionar al LLM, que el pot utilitzar per redactar una resposta final.
+The function returns dummy text `It's always sunny in San Francisco!`. This result is fed back to the LLM, who can use it to write a final answer.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-El LLM interpreta la pregunta i, si necessita informació meteorològica, LangChain executa `get_weather()`. Python retorna la dada simulada, que el model pot utilitzar per generar la resposta final.
+The LLM interprets the query, and if it needs weather information, LangChain executes `get_weather()`. Python returns the simulated data, which the model can use to generate the final response.
 
 ```mermaid
 flowchart TD
-    U["Usuari: consulta meteorològica"] --> A["LangChain: agent.invoke()"]
-    A --> L["Qwen: interpreta la petició"]
-    L --> D{"Cal utilitzar l'eina?"}
-    D -->|Sí| T["Python: get_weather()"]
-    T --> L2["Qwen: interpreta el resultat"]
-    D -->|No| F["Resposta final"]
+    U["User: weather query"] --> A["LangChain: agent.invoke()"]
+    A --> L["Qwen: Interpret the request"]
+    L --> D{"Need to use the tool?"}
+    D -->|Yes| T["Python: get_weather()"]
+    T --> L2["Qwen: Interpret the result"]
+    D -->|No| F["Final response"]
     L2 --> F
     class U,F entrada
     class A servei
@@ -179,51 +179,51 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 2. Flux d’execució de l’agent simple</sub>
+  <sub>Figure 2. Execution flow of the simple agent</sub>
 </p>
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/01_simple_agent.py
 ```
 
-La traça [TOOL EXECUTED] permet comprovar que la funció s'ha executat realment.
+The [TOOL EXECUTED] trace allows you to check that the function was actually executed.
 
-Aquest exemple mostra com el LLM pren la decisió d'utilitzar una eina, mentre que Python realitza l'operació.
+This example shows how LLM makes the decision to use a tool, while Python performs the operation.
 
-### 8.3. Supervisor i subagents — `02_multi_agent.py`
+### 8.3. Supervisor and sub-agents — `02_multi_agent.py`
 
-**Programa complet:** [Obrir `02_multi_agent.py`](../code/src/02_multi_agent.py)  
-**Snippet:** [Obrir `02_multi_agent_snippet.py`](../code/snippets/02_multi_agent_snippet.py)  
-**Què cal observar al snippet:** es creen `weather_agent` i `flight_agent` amb eines diferents, `ask_flight_agent()` delega una petició a l'especialista i `supervisor_agent` es crea amb les dues eines de delegació. El supervisor s'executa amb `supervisor_agent.invoke()`.
+**Full program:** [Open `02_multi_agent.py`](../code/src/02_multi_agent.py)  
+**Snippet:** [Open `02_multi_agent_snippet.py`](../code/snippets/02_multi_agent_snippet.py)  
+**What to note in the snippet:** are created `weather_agent` and `flight_agent` with different tools, `ask_flight_agent()` delegates a request to specialist, and `supervisor_agent` is created with both delegation tools. The supervisor runs with `supervisor_agent.invoke()`.
 
-Aquest exemple amplia l'anterior introduint una arquitectura multiagent. El programa utilitza un **supervisor** que coordina dos agents especialitzats: un en meteorologia i un altre en càlculs de temps de vol. Tots tres utilitzen Qwen mitjançant Ollama, però tenen instruccions i eines diferents. És a dir, són tres agents, no tres models de llenguatge diferents.
+This example extends the previous one by introducing a multi-agent architecture. The program uses a **supervisor** who coordinates two specialized agents: one in meteorology and one in flight time calculations. All three use Qwen via Ollama, but have different instructions and tools. In other words, they are three agents, not three different language models.
 
-Els tres agents són:
+The three agents are:
 
-- **Supervisor Agent:** rep la pregunta de l'usuari i decideix a quin agent especialitzat ha de delegar cada tasca.
-- **Weather Agent:** s'encarrega de respondre preguntes meteorològiques mitjançant la funció `get_weather()`.
-- **Flight Agent:** calcula el temps de vol d'un dron mitjançant la funció `calculate_flight_time()`.
+- **Supervisor Agent:** receives the user's question and decides to which specialized agent to delegate each task.
+- **Weather Agent:** is responsible for answering weather questions using the function `get_weather()`.
+- **Flight Agent:** Calculates a drone's flight time using the function `calculate_flight_time()`.
 
-**Components del codi:**
+**Code Components:**
 
-Primer es configura el model mitjançant `ChatOllama`, de la mateixa manera que en l'exemple anterior.
+The model is first configured using `ChatOllama`, in the same way as in the previous example.
 
-A continuació, es defineixen els agents especialitzats:
+The specialized agents are defined below:
 
-- **weather_agent:** disposa de la funció Python `get_weather(city)`, que retorna informació meteorològica simulada d'una ciutat.
-- **flight_agent:** disposa de la funció `calculate_flight_time(distance_km, speed_kmh)`, que calcula el temps de vol d'un dron a partir de la distància i la velocitat.
+- **weather_agent:** has the Python function `get_weather(city)`, which returns simulated weather information for a city.
+- **flight_agent:** has the function `calculate_flight_time(distance_km, speed_kmh)`, which calculates a drone's flight time based on distance and speed.
 
-El temps de vol es calcula amb la fórmula:
+Flight time is calculated using the formula:
 
 $$
 t_{\mathrm{min}} = \frac{d_{\mathrm{km}}}{v_{\mathrm{km/h}}} \cdot 60
 $$
 
-Aquest càlcul es realitza directament amb Python. El LLM no calcula el resultat numèric, sinó que interpreta la petició i determina si necessita executar l'eina.
+This calculation is performed directly with Python. The LLM does not calculate the numerical result, but instead interprets the request and determines whether it needs to run the tool.
 
-Per permetre que el supervisor utilitzi aquests agents, es defineixen dues funcions intermèdies decorades amb `@tool`:
+To allow the supervisor to use these agents, two intermediate functions are defined decorated with `@tool`:
 
 ```python
 @tool
@@ -239,11 +239,11 @@ def ask_weather_agent(query: str) -> str:
     return result["messages"][-1].content
 ```
 
-La funció [`ask_flight_agent()`](../code/snippets/02_multi_agent_snippet.py) funciona de la mateixa manera, però invoca `flight_agent`. Aquest és el fragment seleccionat del repositori.
+The function [`ask_flight_agent()`](../code/snippets/02_multi_agent_snippet.py) works the same way, but invokes `flight_agent`. This is the selected snippet from the repository.
 
-Aquestes funcions són importants perquè el supervisor no disposa directament de `get_weather()` ni de `calculate_flight_time()`. En canvi, té accés a `ask_weather_agent()` i `ask_flight_agent()`, que deleguen les tasques als agents especialitzats.
+These functions are important because the supervisor does not have direct access to `get_weather()` nor of `calculate_flight_time()`. Instead, you have access to `ask_weather_agent()` and `ask_flight_agent()`, which delegate tasks to specialized agents.
 
-Es crea el supervisor:
+Supervisor is created:
 
 ```python
 supervisor_agent = create_agent(
@@ -259,36 +259,36 @@ supervisor_agent = create_agent(
 )
 ```
 
-La instrucció `system_prompt` estableix que el supervisor ha d'identificar les tasques de l'usuari, delegar-les a l'agent corresponent i combinar els resultats.
+The instruction `system_prompt` states that the supervisor must identify user tasks, delegate them to the appropriate agent, and combine the results.
 
-**Flux d’execució:**
+**Execution Flow:**
 
-Suposem que l'usuari introdueix la petició següent: “I want to fly a drone in Barcelona. Tell me the weather and calculate how long it would take to fly 12 km at 40 km/h.”
+Suppose the user enters the following request: "I want to fly a drone in Barcelona. Tell me the weather and calculate how long it would take to fly 12 km at 40 km/h."
 
-El recorregut és el següent:
+The route is as follows:
 
-- **Entrada de l'usuari:** Python envia la petició al supervisor executant `supervisor_agent.invoke()`. Aquesta instrucció inicia una inferència del LLM mitjançant LangChain i Ollama.
-- **Interpretació del supervisor:** Qwen analitza la petició i identifica que conté dues tasques diferents: consultar la meteorologia i calcular el temps de vol. El model pot generar dues sol·licituds d'eina, una per a cada agent especialitzat.
-- **Delegació als agents:** LangChain rep les sol·licituds i executa les funcions Python `ask_weather_agent()` i `ask_flight_agent()`. Aquestes funcions criden els agents corresponents mitjançant `.invoke()`.
-- **Execució dels agents especialitzats:** cada agent realitza una nova inferència amb Qwen. El Weather Agent pot sol·licitar `get_weather(city="Barcelona")`, mentre que el Flight Agent pot sol·licitar `calculate_flight_time(distance_km=12, speed_kmh=40)`.
-- **Execució de les funcions Python:** LangChain executa les eines sol·licitades. `get_weather()` retorna informació meteorològica fictícia i `calculate_flight_time()` calcula un temps de 18 minuts.
-- **Retorn dels resultats:** els resultats de Python es proporcionen als agents especialitzats, que poden utilitzar el LLM per generar una resposta. Les funcions intermèdies retornen aquestes respostes al supervisor.
-- **Resposta final:** el supervisor rep les dues respostes i utilitza novament Qwen per combinar-les en un únic missatge que es mostra a l'usuari.
+- **User input:** Python sends the request to the running supervisor `supervisor_agent.invoke()`. This instruction starts an inference of the LLM using LangChain and Ollama.
+- **Supervisor Interpretation:** Qwen analyzes the request and identifies that it contains two different tasks: query the weather and calculate the flight time. The model can generate two tool requests, one for each specialized agent.
+- **Delegation to agents:** LangChain receives requests and executes Python functions `ask_weather_agent()` and `ask_flight_agent()`. These functions call the corresponding agents using `.invoke()`.
+- **Execution of specialized agents:** each agent performs a new inference with Qwen. The Weather Agent can request `get_weather(city="Barcelona")`, while the Flight Agent may request `calculate_flight_time(distance_km=12, speed_kmh=40)`.
+- **Execution of Python functions:** LangChain executes the requested tools. `get_weather()` returns fictitious weather information and `calculate_flight_time()` calculates a time of 18 minutes.
+- **Results returned:** Python results are provided to specialized agents, which can use the LLM to generate a response. Intermediate functions return these responses to the supervisor.
+- **Final Response:** The supervisor receives both responses and uses Qwen again to combine them into a single message that is displayed to the user.
 
-És important destacar que el LLM intervé tant en el supervisor com en cadascun dels agents especialitzats, mentre que les funcions Python són les encarregades de proporcionar les dades i realitzar els càlculs.
+It is important to note that the LLM intervenes both in the supervisor and in each of the specialized agents, while the Python functions are responsible for providing the data and performing the calculations.
 
 ```mermaid
 flowchart TD
-    U["Usuari: temps i meteorologia"] --> S["Supervisor: Qwen"]
+    U["User: weather and meteorology"] --> S["Supervisor: Qwen"]
     S --> W["ask_weather_agent()"]
     S --> V["ask_flight_agent()"]
     W --> WA["Weather Agent: Qwen"]
     V --> FA["Flight Agent: Qwen"]
     WA --> WT["Python: get_weather()"]
     FA --> FT["Python: calculate_flight_time()"]
-    WT --> RS["Supervisor: integra els resultats"]
+    WT --> RS["Supervisor: integrate results"]
     FT --> RS
-    RS --> F["Resposta final"]
+    RS --> F["Final response"]
     class U,F entrada
     class S,WA,FA llm
     class W,V agent
@@ -304,42 +304,42 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 3. Flux d’execució multiagent</sub>
+  <sub>Figure 3. Multi-agent execution flow</sub>
 </p>
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/02_multi_agent.py
 ```
 
-**Què cal comprovar:** les peticions que combinen meteorologia i temps de vol poden provocar la delegació a dos especialistes. A més, el càlcul numèric es realitza amb Python. Les traces del tipus `[SUBAGENT CALLED]` ajuden a identificar la delegació.
+**What to check:** Requests combining weather and flight time may result in delegation to two specialists. In addition, the numerical calculation is performed with Python. The traces of the type `[SUBAGENT CALLED]` help identify the delegation.
 
-### 8.4. Anàlisi d'una missió de dron — `03_my_drone_mission_agent.py`
+### 8.4. Analysis of a drone mission — `03_my_drone_mission_agent.py`
 
-**Programa complet:** [Obrir `03_my_drone_mission_agent.py`](../code/src/03_my_drone_mission_agent.py)  
-**Snippet:** [Obrir `03_my_drone_mission_agent_snippet.py`](../code/snippets/03_my_drone_mission_agent_snippet.py)  
-**Què cal observar al snippet:** `check_wind_safety()` aplica una regla de seguretat de Python i `analyse_mission()` la crida directament amb `.invoke()`. El LLM només apareix en la ruta explicativa d'`answer_question()`, no decideix quan executar les comprovacions.
+**Full program:** [Open `03_my_drone_mission_agent.py`](../code/src/03_my_drone_mission_agent.py)  
+**Snippet:** [Open `03_my_drone_mission_agent_snippet.py`](../code/snippets/03_my_drone_mission_agent_snippet.py)  
+**What to note in the snippet:** `check_wind_safety()` applies a Python safety rule and `analyse_mission()` calls it directly with `.invoke()`. The LLM only appears in the explanatory route of `answer_question()`, does not decide when to run checks.
 
-Aquest exemple implementa un assistent capaç d'analitzar la viabilitat d'una missió de dron a partir de diferents paràmetres, com la distància, la velocitat, la direcció del vol, el vent i la bateria disponible.
+This example implements an assistant capable of analyzing the feasibility of a drone mission based on different parameters, such as distance, speed, flight direction, wind, and available battery.
 
-A diferència dels exemples anteriors, el programa no utilitza el LLM per decidir quines funcions executar. La lògica principal està programada en Python, mentre que el model s'utilitza per respondre preguntes i explicar els resultats dels càlculs.
+Unlike the previous examples, the program does not use the LLM to decide which functions to run. The main logic is programmed in Python, while the model is used to answer questions and explain the results of calculations.
 
-**Components del codi:**
+**Code Components:**
 
-El programa defineix una estructura `MissionState` que emmagatzema els paràmetres de la missió. Aquesta estructura permet que l'usuari introdueixi la informació progressivament i que el programa conservi els valors entre diferents missatges.
+The program defines a structure `MissionState` which stores the mission parameters. This structure allows the user to enter the information progressively and for the program to preserve the values ​​between different messages.
 
-La funció `update_state()` analitza el text introduït per l'usuari i actualitza els paràmetres corresponents. Per identificar els valors utilitza expressions regulars de Python, mitjançant la biblioteca `re`. Per exemple, si l'usuari introdueix una distància de 10 km i una velocitat de 40 km/h, Python identifica els nombres i les unitats a partir de patrons predefinits. Aquesta extracció no requereix una inferència del LLM.
+The function `update_state()` parses the text entered by the user and updates the corresponding parameters. To identify the values it uses Python regular expressions, using the library `re`. For example, if the user enters a distance of 10 km and a speed of 40 km/h, Python identifies the numbers and units based on predefined patterns. This extraction does not require an inference from the LLM.
 
-Un cop es disposa de la informació necessària, la funció `analyse_mission()` coordina tres eines:
+Once the necessary information is available, the function `analyse_mission()` coordinates three tools:
 
-- **`calculate_flight_time()`:** calcula les components del vent, la velocitat efectiva del dron i el temps de vol.
-- **[`check_wind_safety()`](../code/snippets/03_my_drone_mission_agent_snippet.py):** comprova si les condicions de vent respecten els límits de seguretat. És la funció destacada al snippet.
-- **`check_battery()`:** determina si la bateria disponible és suficient per completar la missió mantenint la reserva exigida.
+- **`calculate_flight_time()`:** calculates wind components, effective drone speed and flight time.
+- **[`check_wind_safety()`](../code/snippets/03_my_drone_mission_agent_snippet.py):** checks if wind conditions respect safety limits. It's the featured feature in the snippet.
+- **`check_battery()`:** determines if the available battery is sufficient to complete the mission while maintaining the required reserve.
 
-Aquestes funcions estan decorades amb `@tool`, però són invocades directament pel codi Python, sense que el LLM decideixi quan executar-les.
+These functions are decorated with `@tool`, but they are invoked directly by the Python code, without the LLM deciding when to execute them.
 
-Per exemple:
+For example:
 
 ```python
 flight_result = calculate_flight_time.invoke({
@@ -351,33 +351,33 @@ flight_result = calculate_flight_time.invoke({
 })
 ```
 
-En aquest cas, `.invoke()` executa una **eina de Python**, no el model Qwen. La distinció és important perquè el mateix mètode `invoke()` es pot utilitzar amb diferents components de LangChain.
+In this case, `.invoke()` runs a **python tool**, not the Qwen model. The distinction is important because the same method `invoke()` can be used with different LangChain components.
 
-**Flux d’execució:**
+**Execution Flow:**
 
-- **Entrada de l'usuari:** l'usuari introdueix una descripció de la missió al terminal. La funció `main()` rep el text i determina com s'ha de processar.
-- **Actualització de l'estat:** si el missatge conté paràmetres, `update_state()` els identifica mitjançant expressions regulars i els guarda a `MissionState`.
-- **Selecció de l'operació:** el programa comprova si l'usuari ha proporcionat dades noves, ha demanat una anàlisi, vol consultar els passos de càlcul o ha formulat una pregunta.
-- **Anàlisi de la missió:** quan correspon realitzar una anàlisi, Python executa `analyse_mission()`. Aquesta funció comprova quines dades estan disponibles i crida les eines de vol, vent i bateria quan disposa dels paràmetres necessaris.
-- **Generació de l'informe:** Python recull els resultats de les comprovacions i construeix un informe. També genera una traça amb les operacions efectuades, que permet consultar posteriorment com s'han obtingut els resultats.
-- **Intervenció del LLM:** si l'usuari formula una pregunta explicativa, com “Why is my mission not feasible?”, el programa executa `answer_question()`. Aquesta funció prepara un prompt amb l'estat de la missió, l'últim informe i la traça dels càlculs, i crida `llm.invoke()`.
-- **Resposta final:** Qwen utilitza la informació proporcionada per generar una explicació en llenguatge natural, sense modificar els paràmetres ni tornar a calcular els resultats de seguretat.
+- **User Input:** The user enters a mission description into the terminal. The function `main()` receives the text and determines how it should be processed.
+- **Status update:** if the message contains parameters, `update_state()` identifies them using regular expressions and saves them to `MissionState`.
+- **Operation selection:** the program checks if the user has provided new data, requested an analysis, wants to see calculation steps, or asked a question.
+- **Mission Analysis:** when it is appropriate to perform an analysis, Python executes `analyse_mission()`. This function checks what data is available and calls the flight, wind and battery tools when it has the necessary parameters.
+- **Generating the report:** Python collects the results of the checks and builds a report. It also generates a trace with the operations carried out, which allows you to check later how the results were obtained.
+- **LLM intervention:** if the user formulates an explanatory question, such as “Why is my mission not feasible?”, the program executes `answer_question()`. This function prepares a prompt with the mission status, the latest report, and the calculation trace, and calls `llm.invoke()`.
+- **Final Response:** Qwen uses the information provided to generate a natural language explanation, without modifying the parameters or recalculating the security results.
 
-Per tant, existeixen dues rutes principals: una ruta de càlcul, executada íntegrament amb Python, i una ruta d'explicació, en què intervé el LLM.
+Therefore, there are two main routes: a calculation route, executed entirely with Python, and an explanation route, in which the LLM intervenes.
 
-Si l'usuari únicament demana visualitzar la traça dels càlculs, tampoc no és necessari executar Qwen, ja que aquesta informació està guardada al programa.
+If the user only asks to view the calculation trace, it is also not necessary to run Qwen, since this information is saved in the program.
 
 ```mermaid
 flowchart TD
-    U["Usuari: missió de dron"] --> P["Python: update_state()"]
-    P --> D{"Tipus de petició?"}
-    D -->|Anàlisi| A["analyse_mission()"]
-    A --> T["Python: vol, vent i bateria"]
-    T --> I["Informe i traça"]
-    D -->|Mostrar traça| TR["Python: traça guardada"]
-    D -->|Explicació| Q["answer_question()"]
-    Q --> L["Qwen: explica els resultats"]
-    I --> F["Sortida al terminal"]
+    U["User: Drone Mission"] --> P["Python: update_state()"]
+    P --> D{"Type of request?"}
+    D -->|Analysis| A["analyse_mission()"]
+    A --> T["Python: Flight, Wind and Drums"]
+    T --> I["Report and trace"]
+    D -->|Show trace| TR["Python: trace saved"]
+    D -->|Explanation| Q["answer_question()"]
+    Q --> L["Qwen: Explain the results"]
+    I --> F["Output to terminal"]
     TR --> F
     L --> F
     class U,F entrada
@@ -395,71 +395,71 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 4. Flux d’execució de l’agent de missió</sub>
+  <sub>Figure 4. Execution flow of the mission agent</sub>
 </p>
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/03_my_drone_mission_agent.py
 ```
 
-### 8.5. Missió de dron amb LangGraph — `04_langgraph_drone_mission_agent.py`
+### 8.5. Drone Mission with LangGraph — `04_langgraph_drone_mission_agent.py`
 
-**Programa complet:** [Obrir `04_langgraph_drone_mission_agent.py`](../code/src/04_langgraph_drone_mission_agent.py)  
-**Snippet:** [Obrir `04_langgraph_drone_mission_agent_snippet.py`](../code/snippets/04_langgraph_drone_mission_agent_snippet.py)  
-**Què cal observar al snippet:** `route_after_input()` decideix el següent node segons l'estat, `StateGraph` connecta els nodes i les transicions, `compile()` prepara el graf i `drone_mission_graph.invoke()` l'executa. El router és codi Python, no un LLM.
+**Full program:** [Open `04_langgraph_drone_mission_agent.py`](../code/src/04_langgraph_drone_mission_agent.py)  
+**Snippet:** [Open `04_langgraph_drone_mission_agent_snippet.py`](../code/snippets/04_langgraph_drone_mission_agent_snippet.py)  
+**What to note in the snippet:** `route_after_input()` decides the next node based on the state, `StateGraph` connects nodes and transitions, `compile()` prepares the graph, and `drone_mission_graph.invoke()` runs it. The router is Python code, not an LLM.
 
-Aquest exemple implementa les funcionalitats de l'assistent de dron anterior, però reorganitza el programa mitjançant LangGraph. La principal diferència és que el flux d'execució es defineix com un graf format per nodes i connexions. Cada node executa una operació concreta i les connexions condicionals determinen quin serà el següent pas.
+This example implements the functionality of the previous drone wizard, but reorganizes the program using LangGraph. The main difference is that the execution flow is defined as a graph consisting of nodes and connections. Each node performs a specific operation and conditional connections determine what the next step will be.
 
-D'aquesta manera, LangGraph permet separar la lògica d'interpretació, els càlculs, la generació d'informes i les respostes del LLM.
+In this way, LangGraph allows separation of interpretation logic, calculations, reporting and LLM responses.
 
-**Components del codi:**
+**Code Components:**
 
-L'estat compartit del graf es defineix mitjançant `DroneMissionState`, que conté els paràmetres de la missió, els resultats de les comprovacions i les variables de control necessàries per seleccionar les operacions.
+The shared state of the graph is defined by `DroneMissionState`, which contains mission parameters, check results, and control variables needed to select operations.
 
-Per conservar la informació entre diferents execucions s'utilitza `InMemorySaver`, un mecanisme de memòria que permet recuperar l'estat associat a una mateixa sessió.
+To preserve information between different executions is used `InMemorySaver`, a memory mechanism that allows recovering the state associated with the same session.
 
-El primer node és `process_input_node()`. Aquest node rep el missatge de l'usuari, executa `extract_updates()` per identificar els paràmetres i actualitza l'estat de la missió. També determina si l'usuari vol iniciar una anàlisi, consultar els passos de càlcul o formular una pregunta.
+The first node is `process_input_node()`. This node receives the message from the user, executes it `extract_updates()` to identify parameters and update mission status. It also determines whether the user wants to start an analysis, consult calculation steps, or ask a question.
 
-Posteriorment, el router `route_after_input()` decideix quin camí seguir. Aquesta funció consulta els valors de l'estat i retorna el nom del següent node.
+Later, the router `route_after_input()` decides which way to go. This function queries the state values ​​and returns the name of the next node.
 
-Els principals nodes disponibles són:
+The main available nodes are:
 
-- **flight_check_node():** executa `calculate_flight_time()`.
-- **wind_check_node():** executa `check_wind_safety()`.
-- **battery_check_node():** executa `check_battery()`.
-- **final_report_node():** prepara l'informe final.
-- **show_trace_node():** mostra els passos dels càlculs.
-- **answer_question_node():** utilitza el LLM per respondre preguntes sobre la missió.
+- **flight_check_node():** run `calculate_flight_time()`.
+- **wind_check_node():** run `check_wind_safety()`.
+- **battery_check_node():** run `check_battery()`.
+- **final_report_node():** prepare final report.
+- **show_trace_node():** shows the calculation steps.
+- **answer_question_node():** use the LLM to answer quest questions.
 
-Els nodes de càlcul utilitzen funcions Python. Només `answer_question_node()` realitza una inferència amb Qwen.
+Compute nodes use Python functions. only `answer_question_node()` performs an inference with Qwen.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-- **Entrada de l'usuari:** la funció `main()` rep el missatge i inicia l'execució del graf mitjançant `drone_mission_graph.invoke()`.
-- **Processament de l'entrada:** LangGraph executa `process_input_node()`. Python interpreta les dades, actualitza l'estat i identifica quines comprovacions s'han de realitzar.
-- **Selecció de la ruta:** LangGraph consulta `route_after_input()`. Aquest router és una funció Python que selecciona el node següent segons les condicions de l'estat. No utilitza el LLM.
-- **Execució dels nodes de càlcul:** si la missió requereix una anàlisi, el graf passa pels nodes corresponents de vol, vent i bateria. Cada node executa la seva eina Python i guarda el resultat a l'estat compartit.
-- **Transicions condicionals:** després de cada comprovació, els routers `route_after_flight()` i `route_after_wind()` determinen si cal executar un altre node o passar directament a l'informe.
-- **Generació de l'informe:** `final_report_node()` recupera els resultats disponibles i construeix la resposta que es mostra al terminal.
-- **Ruta alternativa del LLM:** si l'usuari formula una pregunta, `route_after_input()` selecciona `answer_question_node()`. Aquest node prepara la informació de la missió i executa `llm.invoke()` perquè Qwen generi una explicació.
+- **User input:** the function `main()` receives the message and starts running the graph using `drone_mission_graph.invoke()`.
+- **Input processing:** LangGraph executes `process_input_node()`. Python interprets the data, updates the state, and identifies which checks to perform.
+- **Route selection:** LangGraph query `route_after_input()`. This router is a Python function that selects the next node based on state conditions. It does not use the LLM.
+- **Running calculation nodes:** if the mission requires an analysis, the graph goes through the corresponding flight, wind and battery nodes. Each node runs its Python tool and saves the result in the shared state.
+- **Conditional transitions:** after each check, the routers `route_after_flight()` and `route_after_wind()` determine whether to run another node or jump directly to the report.
+- **Report generation:** `final_report_node()` retrieves the available results and constructs the response displayed in the terminal.
+- **LLM alternative route:** if the user asks a question, `route_after_input()` select `answer_question_node()`. This node prepares mission information and executes `llm.invoke()` for Qwen to generate an explanation.
 
-El programa també pot reutilitzar resultats ja calculats. Quan l'usuari modifica un paràmetre, `process_input_node()` identifica els camps que han canviat i determina quines comprovacions s'han de repetir. D'aquesta manera s'evita executar operacions innecessàries.
+The program can also reuse already calculated results. When the user modifies a parameter, `process_input_node()` identifies the fields that have changed and determines which checks should be repeated. In this way, unnecessary operations are avoided.
 
-És important remarcar que `drone_mission_graph.invoke()` no significa executar directament el LLM. Aquesta instrucció inicia el graf i LangGraph va executant els nodes. Només es realitza una inferència si el recorregut arriba a un node que crida Qwen.
+It is important to note that `drone_mission_graph.invoke()` does not mean to run the LLM directly. This statement starts the graph and LangGraph runs the nodes. An inference is only performed if the path reaches a node that calls Qwen.
 
 ```mermaid
 flowchart TD
-    U["Usuari"] --> G["LangGraph: invoke()"]
+    U["User"] --> G["LangGraph: invoke()"]
     G --> P["process_input_node()"]
     P --> R{"route_after_input()"}
-    R -->|Anàlisi| C["Nodes Python: vol, vent, bateria"]
+    R -->|Analysis| C["Python nodes: flight, wind, battery"]
     C --> I["final_report_node()"]
-    R -->|Traça| T["show_trace_node()"]
-    R -->|Pregunta| Q["answer_question_node()"]
-    Q --> L["Qwen: explicació"]
-    I --> F["Resposta final"]
+    R -->|Trace| T["show_trace_node()"]
+    R -->|Question| Q["answer_question_node()"]
+    Q --> L["Qwen: Explanation"]
+    I --> F["Final response"]
     T --> F
     L --> F
     class U,F entrada
@@ -477,49 +477,49 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 5. Flux d’execució amb LangGraph</sub>
+  <sub>Figure 5. Execution flow with LangGraph</sub>
 </p>
 
-Aquest exemple mostra com LangGraph facilita l'organització de processos que disposen de diferents camins d'execució, permetent conservar l'estat i separar les responsabilitats de cada funció.
+This example shows how LangGraph makes it easy to organize processes that have different execution paths, allowing you to preserve state and separate the responsibilities of each function.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/04_langgraph_drone_mission_agent.py
 ```
 
-### 8.6. Planificació i replanificació — `05_langgraph_autonomous_mission_planner.py`
+### 8.6. Planning and Replanning — `05_langgraph_autonomous_mission_planner.py`
 
-**Programa complet:** [Obrir `05_langgraph_autonomous_mission_planner.py`](../code/src/05_langgraph_autonomous_mission_planner.py)  
-**Snippet:** [Obrir `05_langgraph_autonomous_mission_planner_snippet.py`](../code/snippets/05_langgraph_autonomous_mission_planner_snippet.py)  
-**Què cal observar al snippet:** `route_after_evaluation()` tria `replan` o `report` segons el resultat de l'avaluació, i `StateGraph` connecta `evaluate_plan` amb `replanner` o `final_report`. El snippet mostra només aquesta part del graf, la resta de transicions són al codi complet.
+**Full program:** [Open `05_langgraph_autonomous_mission_planner.py`](../code/src/05_langgraph_autonomous_mission_planner.py)  
+**Snippet:** [Open `05_langgraph_autonomous_mission_planner_snippet.py`](../code/snippets/05_langgraph_autonomous_mission_planner_snippet.py)  
+**What to note in the snippet:** `route_after_evaluation()` choose `replan` or `report` according to the evaluation result, and `StateGraph` connect `evaluate_plan` with `replanner` or `final_report`. The snippet shows only this part of the graph, the rest of the transitions are in the full code.
 
-Aquest exemple amplia el sistema anterior incorporant la planificació, l'avaluació i la proposta de replanificació d'una missió de dron. L'aplicació no es limita a comprovar si una missió és viable, sinó que també identifica les causes que poden impedir completar-la i prepara possibles accions correctives.
+This example extends the previous system by incorporating the planning, evaluation, and proposed replanning of a drone mission. The application does not limit itself to checking whether a mission is feasible, but also identifies the causes that can prevent its completion and prepares possible corrective actions.
 
-El sistema s'organitza mitjançant LangGraph, que controla el recorregut entre les diferents etapes de planificació i validació.
+The system is organized using LangGraph, which controls the route between the different stages of planning and validation.
 
-**Components del codi:**
+**Code Components:**
 
-El programa defineix un estat compartit, `AutonomousMissionState`, que emmagatzema els paràmetres de la missió, el pla actual, la versió del pla, els resultats de les comprovacions i les possibles accions de replanificació.
+The program defines a shared state, `AutonomousMissionState`, which stores mission parameters, current plan, plan version, check results, and possible replanning actions.
 
-El graf incorpora diversos nodes:
+The graph incorporates several nodes:
 
-- **process_input_node():** interpreta les dades de l'usuari i actualitza l'estat.
-- **mission_planner_node():** construeix el pla de missió a partir dels paràmetres disponibles.
-- **flight_check_node(), wind_check_node() i battery_check_node():** executen les comprovacions corresponents.
-- **evaluate_plan_node():** determina l'estat global de la missió.
-- **replanner_node():** proposa accions correctives si la missió no és viable.
-- **final_report_node():** genera l'informe final.
-- **answer_question_node():** utilitza el LLM per explicar els resultats.
+- **process_input_node():** interprets user data and updates status.
+- **mission_planner_node():** builds mission plan from available parameters.
+- **flight_check_node(), wind_check_node() and battery_check_node():** run the corresponding checks.
+- **evaluate_plan_node():** determines the overall mission status.
+- **replanner_node():** proposes corrective actions if the mission is not feasible.
+- **final_report_node():** generates the final report.
+- **answer_question_node():** use the LLM to explain the results.
 
-El node `evaluate_plan_node()` pot classificar la missió amb els estats següents:
+The node `evaluate_plan_node()` can classify the mission with the following statuses:
 
-- **Feasible:** les comprovacions disponibles indiquen que la missió és viable.
-- **Not Feasible:** s'ha detectat alguna condició que impedeix considerar-la viable.
-- **Undetermined:** falta informació o alguna comprovació necessària.
-- **Invalid:** s'ha detectat alguna dada o resultat invàlid.
+- **Feasible:** available checks indicate that the mission is feasible.
+- **Not Feasible:** some condition has been detected that prevents it from being considered feasible.
+- **Undetermined:** missing information or some required check.
+- **Invalid:** Some invalid data or result was detected.
 
-La selecció de la ruta de replanificació es realitza mitjançant una condició Python dins de `route_after_evaluation()`:
+The selection of the replanning path is performed by a Python condition within `route_after_evaluation()`:
 
 ```python
 def route_after_evaluation(
@@ -531,36 +531,36 @@ def route_after_evaluation(
     return "report"
 ```
 
-Això significa que, quan l'estat és NOT FEASIBLE, LangGraph dirigeix l'execució cap a `replanner_node()`.
+This means that when the status is NOT FEASIBLE, LangGraph directs execution to `replanner_node()`.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-- **Entrada i interpretació:** l'usuari introdueix els paràmetres de la missió. Python inicia el graf i `process_input_node()` identifica i actualitza les dades.
-- **Planificació:** el router selecciona `mission_planner_node()`, que construeix una descripció del pla i actualitza la versió quan correspon. Aquesta etapa utilitza funcions Python.
-- **Comprovacions:** LangGraph executa els nodes necessaris per calcular el temps de vol, avaluar el vent i comprovar la bateria. Els càlculs els efectuen les eines Python, no Qwen.
-- **Avaluació:** `evaluate_plan_node()` recupera els resultats, comprova les condicions i determina l'estat global de la missió.
-- **Decisió de replanificació:** `route_after_evaluation()` consulta l'estat obtingut. Si la missió és NOT FEASIBLE, selecciona `replanner_node()`. En els altres casos, el graf continua cap a l'informe.
-- **Proposta d'accions correctives:** `replanner_node()` analitza els problemes detectats i prepara possibles solucions mitjançant regles Python. Per exemple, pot proposar revisar les condicions de vent, augmentar la disponibilitat de bateria o modificar la ruta. Aquestes propostes no s'apliquen automàticament ni impliquen tornar a executar indefinidament els càlculs.
-- **Generació de l'informe:** `final_report_node()` recull el pla, les comprovacions i les possibles accions correctives, i construeix el resultat final.
-- **Explicació mitjançant el LLM:** si posteriorment l'usuari formula una pregunta sobre el pla o els resultats, LangGraph executa `answer_question_node()`, que proporciona aquesta informació a Qwen mitjançant `llm.invoke()`.
+- **Input and Interpretation:** User enters mission parameters. Python initializes the graph and `process_input_node()` identifies and updates the data.
+- **Scheduling:** the router selects `mission_planner_node()`, which builds a plan description and updates the version when appropriate. This stage uses Python functions.
+- **Checks:** LangGraph runs the nodes needed to calculate flight time, evaluate wind, and check battery. The calculations are performed by the Python tools, not Qwen.
+- **Rating:** `evaluate_plan_node()` retrieves results, checks conditions, and determines overall mission status.
+- **Replanning Decision:** `route_after_evaluation()` query the status obtained. If the mission is NOT FEASIBLE, select `replanner_node()`. In other cases, the graph continues to the report.
+- **Proposed Corrective Actions:** `replanner_node()` analyzes detected problems and prepares possible solutions using Python rules. For example, it may suggest checking wind conditions, increasing battery availability, or modifying the route. These proposals are not automatically applied and do not involve re-running the calculations indefinitely.
+- **Report generation:** `final_report_node()` collects the plan, checks and possible corrective actions, and builds the final result.
+- **Explanation vian LLM:** If the user subsequently asks a question about the plan or results, LangGraph executes `answer_question_node()`, which provides this information to Qwen via `llm.invoke()`.
 
-En aquest exemple, la planificació i la replanificació són processos programats en Python. El LLM s'utilitza per respondre preguntes explicatives, no per calcular la viabilitat ni determinar les accions correctives.
+In this example, planning and replanning are programmed processes in Python. The LLM is used to answer explanatory questions, not to calculate feasibility or determine remedial actions.
 
 ```mermaid
 flowchart TD
-    U["Usuari: missió de dron"] --> P["process_input_node()"]
+    U["User: Drone Mission"] --> P["process_input_node()"]
     P --> R{"route_after_input()"}
-    R -->|Planificar| PL["mission_planner_node()"]
-    PL --> C["Python: comprovacions de missió"]
+    R -->|Plan| PL["mission_planner_node()"]
+    PL --> C["Python: Mission checks"]
     C --> EV["evaluate_plan_node()"]
-    EV --> D{"Missió NOT FEASIBLE?"}
-    D -->|Sí| RP["replanner_node()"]
+    EV --> D{"Mission NOT FEASIBLE?"}
+    D -->|Yes| RP["replanner_node()"]
     D -->|No| F1["final_report_node()"]
     RP --> F1
-    R -->|Pregunta| Q["answer_question_node()"]
-    Q --> L["Qwen: explicació"]
-    R -->|Traça| T["show_trace_node()"]
-    F1 --> F["Resposta final"]
+    R -->|Question| Q["answer_question_node()"]
+    Q --> L["Qwen: Explanation"]
+    R -->|Trace| T["show_trace_node()"]
+    F1 --> F["Final response"]
     L --> F
     T --> F
     class U,F entrada
@@ -578,74 +578,74 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 6. Flux d’execució del planificador autònom</sub>
+  <sub>Figure 6. Execution flow of the autonomous scheduler</sub>
 </p>
 
-Aquest exemple demostra com construir un procés de planificació amb diferents etapes, condicions i rutes alternatives mitjançant LangGraph.
+This example demonstrates how to build a planning process with different stages, conditions, and alternative routes using LangGraph.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/05_langgraph_autonomous_mission_planner.py
 ```
 
-### 8.7. Llista de la compra amb LangChain — `06_shopping_list.py`
+### 8.7. Shopping List with LangChain — `06_shopping_list.py`
 
-**Programa complet:** [Obrir `06_shopping_list.py`](../code/src/06_shopping_list.py)  
-**Snippet:** [Obrir `06_shopping_list_snippet.py`](../code/snippets/06_shopping_list_snippet.py)  
-**Què cal observar al snippet:** es configura `ChatOllama`, es defineix l'eina `add_product()`, es crea l'agent amb les quatre eines de la llista i s'executa `agent.invoke()` conservant l'historial de missatges. La llista real la modifica Python.
+**Full program:** [Open `06_shopping_list.py`](../code/src/06_shopping_list.py)  
+**Snippet:** [Open `06_shopping_list_snippet.py`](../code/snippets/06_shopping_list_snippet.py)  
+**What to note in the snippet:** is configured `ChatOllama`, the tool is defined `add_product()`, the agent is created with the four tools in the list and run `agent.invoke()` retaining message history. The actual list is modified by Python.
 
-Aquest exemple implementa un assistent per gestionar una llista de la compra mitjançant llenguatge natural. L'usuari pot afegir, eliminar, substituir o consultar productes sense necessitat d'escriure instruccions amb una sintaxi específica.
+This example implements a wizard to manage a shopping list using natural language. The user can add, remove, replace or query products without the need to write instructions with a specific syntax.
 
-El programa utilitza un agent LangChain que interpreta les peticions amb Qwen i disposa de diferents funcions Python per modificar la llista.
+The program uses a LangChain agent that interprets requests with Qwen and has different Python functions to modify the list.
 
-**Components del codi:**
+**Code Components:**
 
-La llista de la compra es representa mitjançant una variable Python: `shopping_list = []`.
+The shopping list is represented by a Python variable: `shopping_list = []`.
 
-A continuació, es defineixen quatre eines decorades amb `@tool`:
+Four decorated tools are defined below `@tool`:
 
-- **[`add_product()`](../code/snippets/06_shopping_list_snippet.py):** afegeix un producte (funció destacada al snippet).
-- **`remove_product()`:** elimina un producte.
-- **`replace_product()`:** substitueix un producte per un altre.
-- **`show_list()`:** mostra la llista actual.
+- **[`add_product()`](../code/snippets/06_shopping_list_snippet.py):** add a product (feature highlighted in snippet).
+- **`remove_product()`:** remove a product.
+- **`replace_product()`:** replace one product with another.
+- **`show_list()`:** shows the current list.
 
-Aquestes eines realitzen les operacions sobre la variable `shopping_list` utilitzant instruccions Python, com `append()`, `remove()` o l'accés als elements per índex.
+These tools perform operations on the variable `shopping_list` using Python instructions, such as `append()`, `remove()` or access elements by index.
 
-Posteriorment es crea l'agent amb `create_agent()`, proporcionant-li les quatre eines i un `system_prompt` que defineix el comportament de l'assistent.
+The agent is subsequently created with `create_agent()`, providing you with all four tools and one `system_prompt` that defines the behavior of the wizard.
 
-Entre les instruccions s'estableix que els noms dels productes s'han de traduir al castellà abans de cridar les eines, que s'han de conservar els detalls dels productes i que les correccions de l'usuari s'han de gestionar amb `replace_product()`.
+The instructions state that product names must be translated into Spanish before calling the tools, that product details must be preserved, and that user corrections must be handled with `replace_product()`.
 
-El programa també conserva un historial de missatges. Aquest historial permet que el model disposi del context de les interaccions anteriors.
+The program also keeps a message history. This history allows the model to have the context of previous interactions.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-Suposem que l'usuari introdueix: “Add milk”
+Suppose the user enters: “Add milk”
 
-- **Entrada de l'usuari:** Python afegeix el missatge a l'historial i crida `agent.invoke()`.
-- **Interpretació del LLM:** LangChain envia a Qwen el missatge, les instruccions i les descripcions de les eines. El model interpreta que l'usuari vol afegir un producte, el tradueix al castellà i pot generar la sol·licitud d'eina `add_product(product="leche")`.
-- **Execució de Python:** LangChain rep la sol·licitud i executa `add_product()`. La funció normalitza el nom, comprova si el producte ja existeix i l'afegeix amb `shopping_list.append()`.
-- **Retorn del resultat:** la funció retorna un missatge de confirmació. LangChain proporciona aquest resultat al LLM.
-- **Resposta final:** Qwen genera una resposta per a l'usuari i Python actualitza l'historial de missatges.
+- **User input:** Python adds the message to the history and calls `agent.invoke()`.
+- **LLM Interpretation:** LangChain sends Qwen the message, instructions and tool descriptions. The model interprets that the user wants to add a product, translates it into Spanish and can generate the tool request `add_product(product="leche")`.
+- **Python execution:** LangChain receives the request and executes `add_product()`. The function normalizes the name, checks if the product already exists, and adds it with `shopping_list.append()`.
+- **Result Return:** The function returns a confirmation message. LangChain provides this result in the LLM.
+- **Final Response:** Qwen generates a response for the user and Python updates the message history.
 
-Si posteriorment l'usuari escriu “pero quería leche de soja”, el model pot utilitzar el context anterior per interpretar que es tracta d'una correcció. En aquest cas, sol·licita `replace_product()` i Python substitueix el producte original.
+If the user later types “but I wanted soy milk”, the model can use the previous context to interpret this as a correction. In this case, apply `replace_product()` and Python replaces the original product.
 
-El model és qui interpreta la intenció i selecciona la funció, però la llista real només es modifica quan s'executa l'eina Python.
+The model is the one who interprets the intent and selects the function, but the actual list is only modified when the Python tool is run.
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició de compra"] --> A["LangChain: agent.invoke()"]
-    A --> L["Qwen: interpreta i selecciona eina"]
-    L --> D{"Quina eina?"}
-    D -->|Afegir| AD["add_product()"]
-    D -->|Eliminar| RM["remove_product()"]
-    D -->|Substituir| RP["replace_product()"]
-    D -->|Consultar| SH["show_list()"]
-    AD --> P["Python: llista de compra"]
+    U["User: purchase request"] --> A["LangChain: agent.invoke()"]
+    A --> L["Qwen: interpret and select tool"]
+    L --> D{"Which tool?"}
+    D -->|Add| AD["add_product()"]
+    D -->|Delete| RM["remove_product()"]
+    D -->|Replace| RP["replace_product()"]
+    D -->|Consult| SH["show_list()"]
+    AD --> P["Python: shopping list"]
     RM --> P
     RP --> P
     SH --> P
-    P --> F["Confirmació a l'usuari"]
+    P --> F["Confirmation to the user"]
     class U,F entrada
     class A servei
     class L llm
@@ -661,32 +661,32 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 7. Flux del gestor de la llista de la compra</sub>
+  <sub>Figure 7. Shopping list manager flow</sub>
 </p>
 
-Aquest exemple introdueix la gestió d'informació modificable mitjançant tool calling. També mostra la importància de conservar l'historial per interpretar referències i correccions de l'usuari.
+This example introduces the management of modifiable information through tool calling. It also shows the importance of keeping history to interpret user references and corrections.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/06_shopping_list.py
 ```
 
-### 8.8. Llista de la compra amb LangGraph — `07_shopping_list_langgraph.py`
+### 8.8. Shopping List with LangGraph — `07_shopping_list_langgraph.py`
 
-**Programa complet:** [Obrir `07_shopping_list_langgraph.py`](../code/src/07_shopping_list_langgraph.py)  
-**Snippet:** [Obrir `07_shopping_list_langgraph_snippet.py`](../code/snippets/07_shopping_list_langgraph_snippet.py)  
-**Què cal observar al snippet:** Qwen interpreta la petició en JSON, `route_after_input()` selecciona el camí, `add_node()` executa una eina Python i `StateGraph` connecta, compila i executa el graf. És important diferenciar la classificació del LLM de l'encaminament de LangGraph.
+**Full program:** [Open `07_shopping_list_langgraph.py`](../code/src/07_shopping_list_langgraph.py)  
+**Snippet:** [Open `07_shopping_list_langgraph_snippet.py`](../code/snippets/07_shopping_list_langgraph_snippet.py)  
+**What to note in the snippet:** Qwen interprets the request in JSON, `route_after_input()` select path, `add_node()` runs a Python tool and `StateGraph` connects, compiles and runs the graph. It is important to differentiate LLM classification from LangGraph routing.
 
-Aquest exemple implementa la mateixa funcionalitat de llista de la compra, però utilitzant LangGraph per organitzar les operacions en nodes.
+This example implements the same shopping list functionality, but using LangGraph to organize operations into nodes.
 
-La diferència principal respecte a l'exemple anterior és que el LLM no sol·licita directament l'execució de les eines de gestió. En aquest cas, el model interpreta la petició i retorna una estructura JSON amb l'acció que s'ha de realitzar. Posteriorment, un router Python selecciona el node corresponent.
+The main difference from the previous example is that the LLM does not directly request the management tools to run. In this case, the model interprets the request and returns a JSON structure with the action to be performed. Subsequently, a Python router selects the corresponding node.
 
-**Components del codi:**
+**Code Components:**
 
-El programa defineix `ShoppingState`, una estructura que conté la llista de la compra, el missatge de l'usuari, l'últim producte afegit i els camps necessaris per descriure una operació. També utilitza `InMemorySaver` per conservar l'estat entre les diferents interaccions de la sessió.
+The program defines `ShoppingState`, a structure that contains the shopping list, the user's message, the last product added and the fields needed to describe an operation. It also uses `InMemorySaver` to preserve state between different session interactions.
 
-El primer node és `process_input_node()`, que prepara un prompt amb les instruccions del sistema i executa:
+The first node is `process_input_node()`, which prepares a prompt with system instructions and executes:
 
 ```python
 response = llm.invoke([
@@ -695,9 +695,9 @@ response = llm.invoke([
 ])
 ```
 
-Aquesta és la crida al LLM. Qwen interpreta la petició i retorna un JSON amb els camps `action`, `products`, `old_product` i `new_product`.
+This is the call to the LLM. Qwen interprets the request and returns a JSON with the fields `action`, `products`, `old_product` and `new_product`.
 
-Per exemple, si l'usuari escriu “añade huevos y harina”, el model pot retornar:
+For example, if the user types “add eggs and flour”, the model can return:
 
 ```json
 {
@@ -708,9 +708,9 @@ Per exemple, si l'usuari escriu “añade huevos y harina”, el model pot retor
 }
 ```
 
-Python interpreta aquest resultat amb `json.loads()`, comprova que els camps siguin vàlids i els guarda a l'estat.
+Python interprets this result with `json.loads()`, checks that the fields are valid and saves them to the state.
 
-A continuació, la funció `route_after_input()` consulta el valor d'`action`:
+Next, the function `route_after_input()` query the value of`action`:
 
 ```python
 def route_after_input(state: ShoppingState) -> Literal["add", "remove", "replace", "show", "other"]:
@@ -719,36 +719,36 @@ def route_after_input(state: ShoppingState) -> Literal["add", "remove", "replace
     return action
 ```
 
-El router pot seleccionar els nodes `add`, `remove`, `replace`, `show` o `other`.
+The router can select the nodes `add`, `remove`, `replace`, `show` or `other`.
 
-Cada node executa la funció Python corresponent, com `add_products()`, `remove_products()`, `replace_product()` o `show_products()`.
+Each node executes the corresponding Python function, such as `add_products()`, `remove_products()`, `replace_product()` or `show_products()`.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-- **Entrada de l'usuari:** la funció `main()` rep el missatge i inicia el graf amb `shopping_graph.invoke()`.
-- **Interpretació del LLM:** LangGraph executa `process_input_node()`, que crida Qwen mitjançant `llm.invoke()`. El model identifica la intenció de l'usuari i genera una resposta JSON.
-- **Processament del JSON:** Python executa `json.loads()`, valida els camps i actualitza l'estat compartit.
-- **Selecció del node:** LangGraph executa `route_after_input()`, que consulta el camp `action` i retorna el nom del node que s'ha d'executar. Aquesta decisió es basa en el valor del JSON i no requereix una nova inferència.
-- **Execució de l'operació:** el node seleccionat executa una funció Python. Per exemple, `add_node()` invoca `add_products()`, que afegeix els productes a la llista.
-- **Actualització de l'estat:** la funció retorna la llista actualitzada i un missatge de confirmació. LangGraph guarda els resultats a l'estat i finalitza l'execució.
-- **Resposta final:** Python mostra la resposta i el contingut real de la llista al terminal, sense necessitat de tornar a consultar el LLM.
+- **User input:** the function `main()` receives the message and starts the graph with `shopping_graph.invoke()`.
+- **LLM interpretation:** LangGraph runs `process_input_node()`, which calls Qwen via `llm.invoke()`. The model identifies user intent and generates a JSON response.
+- **JSON processing:** Python executes `json.loads()`, validate the fields and update the shared state.
+- **Node Selection:** LangGraph runs `route_after_input()`, which queries the field `action` and returns the name of the node to run. This decision is based on the JSON value and does not require further inference.
+- **Executing Operation:** The selected node executes a Python function. For example, `add_node()` summons `add_products()`, which adds the products to the list.
+- **Status Update:** function returns the updated list and a confirmation message. LangGraph saves the results in state and terminates execution.
+- **Final response:** Python displays the response and the actual contents of the list in the terminal, without the need to re-consult the LLM.
 
-Per tant, en aquest exemple Qwen decideix què vol fer l'usuari, el router determina quin node executar i Python realitza l'operació.
+So, in this example Qwen decides what the user wants to do, the router determines which node to run, and Python performs the operation.
 
-Aquesta arquitectura és diferent de [`06_shopping_list.py`](../code/src/06_shopping_list.py), on el LLM utilitzava directament el mecanisme de _tool calling_ de LangChain. Aquí la intenció es transforma primer en JSON i després és LangGraph qui controla explícitament el recorregut.
+This architecture is different from [`06_shopping_list.py`](../code/src/06_shopping_list.py), where the LLM used LangChain's _tool calling_ mechanism directly. Here the intent is first transformed into JSON and then LangGraph explicitly controls the path.
 
 ```mermaid
 flowchart TD
-    U["Usuari"] --> G["LangGraph: invoke()"]
+    U["User"] --> G["LangGraph: invoke()"]
     G --> P["process_input_node()"]
-    P --> L["Qwen: JSON amb acció i arguments"]
+    P --> L["Qwen: JSON with action and arguments"]
     L --> V["Python: json.loads()"]
     V --> R{"route_after_input()"}
     R -->|add| A["add_node()"]
     R -->|remove| B["remove_node()"]
     R -->|replace| C["replace_node()"]
     R -->|show / other| D["show_node() / other_node()"]
-    A --> F["Python: estat i resposta"]
+    A --> F["Python: status and response"]
     B --> F
     C --> F
     D --> F
@@ -767,30 +767,30 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 8. Flux d’execució de la llista amb LangGraph</sub>
+  <sub>Figure 8. List execution flow with LangGraph</sub>
 </p>
 
-Aquest exemple permet entendre la diferència entre la decisió del model i l'encaminament del graf, així com el paper dels nodes i de l'estat compartit.
+This example helps to understand the difference between model decision and graph routing, as well as the role of nodes and shared state.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/07_shopping_list_langgraph.py
 ```
 
-### 8.9. Cerca de receptes i RAG — `08_shopping_list_weaviate.py`
+### 8.9. Search for recipes and RAG — `08_shopping_list_weaviate.py`
 
-**Programa complet:** [Obrir `08_shopping_list_weaviate.py`](../code/src/08_shopping_list_weaviate.py)  
-**Snippet:** [Obrir `08_shopping_list_weaviate_snippet.py`](../code/snippets/08_shopping_list_weaviate_snippet.py)  
-**Què cal observar al snippet:** el primer `ChatOllama` interpreta la petició, `near_text()` recupera receptes, `has_required_ingredients()` filtra amb Python i el segon `ChatOllama` genera la resposta RAG a partir del context recuperat.
+**Full program:** [Open `08_shopping_list_weaviate.py`](../code/src/08_shopping_list_weaviate.py)  
+**Snippet:** [Open `08_shopping_list_weaviate_snippet.py`](../code/snippets/08_shopping_list_weaviate_snippet.py)  
+**What to observe in the snippet:** the first `ChatOllama` interprets the request, `near_text()` retrieve recipes, `has_required_ingredients()` filters with Python and the second `ChatOllama` generates the RAG response from the retrieved context.
 
-Aquest exemple amplia l'assistent de llista de la compra incorporant una connexió amb Weaviate Cloud, una base de dades vectorial que permet recuperar informació mitjançant cerques semàntiques.
+This example extends the shopping list wizard by incorporating a connection to Weaviate Cloud, a vector database that allows information to be retrieved through semantic searches.
 
-L'aplicació continua permetent gestionar productes, però incorpora la possibilitat de buscar receptes i afegir els seus ingredients a la llista de la compra. La informació es treu de la col·lecció Recetas de Weaviate.
+The application continues to allow you to manage products, but incorporates the ability to search for recipes and add their ingredients to the shopping list. The information is taken from the Weaviate Recipes collection.
 
-**Components del codi:**
+**Code Components:**
 
-El programa utilitza dos objectes `ChatOllama` amb finalitats diferents:
+The program uses two objects `ChatOllama` for different purposes:
 
 ```python
 llm = ChatOllama(
@@ -807,49 +807,49 @@ rag_llm = ChatOllama(
 )
 ```
 
-Tots dos utilitzen el mateix model, però es configuren per a dues tasques diferents. El primer objecte (`llm`) interpreta les peticions de l'usuari i genera una estructura JSON. El segon (`rag_llm`) genera explicacions en llenguatge natural a partir de les receptes recuperades.
+Both use the same model, but are configured for two different tasks. The first object (`llm`) interprets the user's requests and generates a JSON structure. The second (`rag_llm`) generates natural language explanations from the retrieved recipes.
 
-El programa incorpora la funció `weaviate_connection()`, que prepara la connexió amb Weaviate Cloud. Per consultar les receptes, [`search_recipes()`](../code/snippets/08_shopping_list_weaviate_snippet.py) executa la cerca semàntica següent:
+The program incorporates the function `weaviate_connection()`, which prepares the connection to Weaviate Cloud. To consult the recipes, [`search_recipes()`](../code/snippets/08_shopping_list_weaviate_snippet.py) runs the following semantic search:
 
 ```python
 result = collection.query.near_text(**kwargs)
 ```
 
-Aquesta operació permet recuperar receptes relacionades amb el significat de la consulta, encara que no continguin exactament les mateixes paraules.
+This operation allows you to retrieve recipes related to the meaning of the query, even if they do not contain exactly the same words.
 
-El programa també aplica condicions addicionals. Si l'usuari estableix un temps màxim, Weaviate rep un filtre sobre `tiempoMin` (temps en minuts). Posteriorment, Python executa `has_required_ingredients()` per comprovar que les receptes continguin **tots** els ingredients obligatoris. Per tant, es combina una cerca vectorial amb un filtre numèric a Weaviate i una comprovació exacta d'ingredients en Python.
+The program also applies additional conditions. If the user sets a maximum time, Weaviate receives an envelope filter `tiempoMin` (time in minutes). Subsequently, Python executes `has_required_ingredients()` to check that the recipes contain **all** required ingredients. Therefore, a vector search is combined with a numeric filter in Weaviate and an exact ingredient check in Python.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-Suposem que l'usuari introdueix: “Quiero recetas con huevos y patatas que se preparen en menos de 30 minutos.”
+Suppose the user enters: “I want recipes with eggs and potatoes that are prepared in less than 30 minutes.”
 
-El flux seria el següent:
+The flow would be as follows:
 
-- **Entrada de l'usuari:** Python rep el missatge i inicia el graf de LangGraph.
-- **Primera inferència del LLM:** `process_input_node()` envia la petició a Qwen, que identifica l'acció `search_recipe`, genera una consulta semàntica i extreu els filtres. El JSON pot contenir `required_ingredients = ["huevos", "patatas"]` i `max_minutes = 30`.
-- **Selecció de la ruta:** Python interpreta el JSON i el router selecciona `search_recipe_node()`.
-- **Consulta a Weaviate:** el node executa `search_recipes()`. Aquesta funció obre una connexió amb Weaviate Cloud i realitza la cerca amb `near_text()`, aplicant el filtre de temps.
-- **Filtratge amb Python:** el programa examina les receptes recuperades i comprova amb `has_required_ingredients()` que continguin tots els ingredients obligatoris.
-- **Segona inferència del LLM:** si s'han trobat receptes, `search_recipe_node()` prepara un prompt amb la pregunta original i les dades recuperades. Després executa `rag_llm.invoke()` perquè Qwen generi una explicació basada en aquestes receptes.
-- **Resposta final:** LangGraph guarda les receptes a `last_recipes` i Python mostra al terminal els resultats numerats i l'explicació generada.
+- **User input:** Python receives the message and starts the LangGraph graph.
+- **First LLM inference:** `process_input_node()` sends the request to Qwen, which identifies the action `search_recipe`, generates a semantic query, and extracts the filters. The JSON can contain `required_ingredients = ["huevos", "patatas"]` and `max_minutes = 30`.
+- **Route selection:** Python interprets the JSON and the router selects `search_recipe_node()`.
+- **Check Weaviate:** node executes `search_recipes()`. This function opens a connection to Weaviate Cloud and performs the search with `near_text()`, applying the time filter.
+- **Filtering with Python:** the program examines the retrieved recipes and checks with `has_required_ingredients()` that contain all mandatory ingredients.
+- **Second LLM inference:** if recipes were found, `search_recipe_node()` prepares a prompt with the original question and the retrieved data. Then execute `rag_llm.invoke()` for Qwen to generate an explanation based on these recipes.
+- **Final Answer:** LangGraph saves recipes in `last_recipes` and Python displays the numbered results and generated explanation in the terminal.
 
-Aquesta segona inferència és un exemple de RAG (Retrieval-Augmented Generation), ja que el model genera la resposta utilitzant informació recuperada d'una font externa.
+This second inference is an example of Retrieval-Augmented Generation (RAG), since the model generates the answer using information retrieved from an external source.
 
-El procés també permet una altra interacció. Si l'usuari escriu “añade los ingredientes de la segunda receta”, el primer LLM interpreta l'acció `add_recipe` i identifica el número de recepta.
+The process also allows another interaction. If the user writes “add the ingredients of the second recipe”, the first LLM interprets the action `add_recipe` and identifies the recipe number.
 
-En aquest cas, `add_recipe_node()` recupera la segona recepta de `last_recipes`, extreu els ingredients de `ingredientesClave` i executa `add_products()` per actualitzar la llista. No cal repetir la cerca a Weaviate ni executar el segon LLM per generar una nova explicació.
+In this case, `add_recipe_node()` retrieves the second recipe from `last_recipes`, extract the ingredients from `ingredientesClave` and run `add_products()` to update the list. There is no need to repeat the search in Weaviate or run the second LLM to generate a new explanation.
 
-Així, el primer LLM interpreta les instruccions, Weaviate proporciona les dades, Python aplica els filtres i modifica la llista, i el segon LLM explica les receptes recuperades.
+So the first LLM interprets the instructions, Weaviate provides the data, Python applies the filters and modifies the list, and the second LLM explains the retrieved recipes.
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició en llenguatge natural"] --> G["LangGraph: invoke()"]
+    U["User: Natural language request"] --> G["LangGraph: invoke()"]
     G --> P["process_input_node()"]
-    P --> L["Qwen: interpreta la petició i genera JSON"]
-    L --> J["Python: valida el JSON"]
+    P --> L["Qwen: Interpret the request and generate JSON"]
+    L --> J["Python: Validate the JSON"]
     J --> R{"route_after_input()"}
 
-    %% FUNCIONALITATS DE LA LLISTA DE COMPRA
+    %% SHOPPING LIST FEATURES
     R -->|add| A["add_node()"]
     A --> AP["Python: add_products()"]
 
@@ -864,21 +864,21 @@ flowchart TD
 
     R -->|other| O["other_node()"]
 
-    %% NOVA FUNCIONALITAT: CERCA DE RECEPTES
+    %% NEW FEATURE: RECIPE SEARCH
     R -->|search_recipe| S["search_recipe_node()"]
     S --> W["Weaviate: near_text()"]
-    W --> V["Python: filtra temps i comprova ingredients"]
-    V --> L2["Qwen: genera la resposta RAG"]
-    L2 --> LR["Guardar receptes a last_recipes"]
+    W --> V["Python: filter time and check ingredients"]
+    V --> L2["Qwen: Generate the RAG response"]
+    L2 --> LR["Save recipes to last_recipes"]
 
-    %% NOVA FUNCIONALITAT: AFEGIR INGREDIENTS D'UNA RECEPTA
+    %% NEW FEATURE: ADD RECIPE INGREDIENTS
     R -->|add_recipe| AR["add_recipe_node()"]
-    AR --> LS["Recuperar recepta de last_recipes"]
-    LS --> IN["Python: extreu ingredientesClave"]
+    AR --> LS["Retrieve recipe from last_recipes"]
+    LS --> IN["Python: Extract key ingredients"]
     IN --> ADD["Python: add_products()"]
 
-    %% RESPOSTA FINAL
-    AP --> F["Estat actualitzat i resposta final"]
+    %% FINAL RESPONSE
+    AP --> F["Updated status and final response"]
     BP --> F
     CP --> F
     DP --> F
@@ -903,32 +903,32 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 9. Flux d’execució amb Weaviate</sub>
+  <sub>Figure 9. Execution flow with Weaviate</sub>
 </p>
 
-Aquest exemple mostra com integrar una base de dades vectorial amb un assistent basat en LLM per respondre consultes utilitzant informació externa al model.
+This example shows how to integrate a vector database with an LLM-based assistant to answer queries using information external to the model.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/08_shopping_list_weaviate.py
 ```
 
-### 8.10. Observabilitat amb Opik — `09_shopping_list_weaviate_opik.py`
+### 8.10. Observability with Opik — `09_shopping_list_weaviate_opik.py`
 
-**Programa complet:** [Obrir `09_shopping_list_weaviate_opik.py`](../code/src/09_shopping_list_weaviate_opik.py)  
-**Snippet:** [Obrir `09_shopping_list_weaviate_opik_snippet.py`](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)  
-**Què cal observar al snippet:** `invoke_with_opik_usage()` conté la crida al LLM i registra tokens, `weaviate_near_text()` registra les consultes semàntiques i `track_langgraph()` connecta el graf amb `OpikTracer`.
+**Full program:** [Open `09_shopping_list_weaviate_opik.py`](../code/src/09_shopping_list_weaviate_opik.py)  
+**Snippet:** [Open `09_shopping_list_weaviate_opik_snippet.py`](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)  
+**What to note in the snippet:** `invoke_with_opik_usage()` contains the call to the LLM and registers tokens, `weaviate_near_text()` logs semantic queries and `track_langgraph()` connects the graph with `OpikTracer`.
 
-Aquest exemple incorpora Opik a l'assistent de llista de la compra amb Weaviate. L'objectiu és afegir observabilitat, és a dir, la capacitat de registrar i analitzar les diferents operacions que es produeixen durant una execució.
+This example embeds Opik in the shopping list wizard with Weaviate. The goal is to add observability, meaning the ability to record and analyze the various operations that occur during an execution.
 
-El funcionament principal de l'assistent es manté com en l'exemple anterior, però ara és possible observar les crides al LLM, les consultes a Weaviate, els temps d'execució i les mètriques de consum disponibles.
+The main operation of the wizard remains as in the previous example, but it is now possible to observe calls to the LLM, queries to Weaviate, execution times and available consumption metrics.
 
-**Components del codi:**
+**Code Components:**
 
-El programa incorpora `OpikTracer` i `track_langgraph()`, que permeten instrumentar el graf de LangGraph.
+The program incorporates `OpikTracer` and `track_langgraph()`, which allow the LangGraph graph to be instrumented.
 
-També defineix una funció per registrar el consum del model:
+It also defines a function to record the consumption of the model:
 
 ```python
 @track(
@@ -962,21 +962,21 @@ def invoke_with_opik_usage(
     return answer
 ```
 
-Així, si cliquem una trace al dashboard veurem el següent:
+Thus, if we click a trace on the dashboard we will see the following:
 
 <p align="center">
-  <img src="./img/opik_token_usage.png" alt="Consum de tokens registrat amb Opik" width="800">
+  <img src="./img/opik_token_usage.png" alt="Token usage recorded with Opik" width="800">
 </p>
 
 <p align="center">
-  <sub>Figura 10. Consum de tokens</sub>
+  <sub>Figure 10. Token consumption</sub>
 </p>
 
-Aquesta funció executa el model i recupera les metadades de consum proporcionades per Ollama. Els tokens es poden diferenciar entre els utilitzats per processar l'entrada i els generats a la sortida.
+This function runs the model and retrieves the consumption metadata provided by Ollama. Tokens can be differentiated between those used to process input and those generated on output.
 
-També s'utilitza la funció `weaviate_near_text()` per registrar les consultes semàntiques a la base de dades.
+Function is also used `weaviate_near_text()` to register semantic queries in the database.
 
-La integració amb LangGraph es realitza mitjançant:
+The integration with LangGraph is done through:
 
 ```python
 shopping_graph = track_langgraph(
@@ -985,56 +985,56 @@ shopping_graph = track_langgraph(
 )
 ```
 
-Això permet associar les execucions del graf amb les traces registrades a Opik.
+This allows you to associate graph executions with traces recorded in Opik.
 
-**Flux d’execució:**
+**Execution Flow:**
 
-- **Entrada de l'usuari:** Python rep la petició i inicia el graf LangGraph instrumentat amb Opik.
-- **Interpretació del LLM:** `process_input_node()` executa Qwen a través de `invoke_with_opik_usage()`. El model genera el JSON amb l'acció corresponent, mentre que Opik registra les metadades de la invocació.
-- **Selecció del node:** LangGraph utilitza el router per determinar l'operació necessària. Opik permet observar el recorregut del graf i els components instrumentats.
-- **Execució de les eines:** si l'usuari sol·licita receptes, Python executa la consulta a Weaviate. `weaviate_near_text()` permet registrar aquesta operació i el seu temps d'execució.
-- **Generació RAG:** quan hi ha receptes recuperades, el programa executa el segon LLM mitjançant `invoke_with_opik_usage()`, indicant l'etapa generacion_rag.
-- **Resposta final:** Python mostra les receptes i l'explicació generada. Paral·lelament, Opik disposa de les traces que permeten analitzar les operacions registrades.
-- **Finalització:** quan es tanca el programa, `opik_tracer.flush()` envia les traces pendents a Opik i el codi intenta tancar les connexions HTTP d'Ollama.
+- **User input:** Python receives the request and starts the LangGraph instrumented with Opik.
+- **Interpretation of the LLM:** `process_input_node()` runs Qwen through `invoke_with_opik_usage()`. The model generates the JSON with the corresponding action, while Opik records the metadata of the invocation.
+- **Node Selection:** LangGraph uses the router to determine the required operation. Opik allows you to observe the path of the graph and the instrumented components.
+- **Execution of tools:** If the user requests recipes, Python executes the query in Weaviate. `weaviate_near_text()` allows logging of this operation and its execution time.
+- **RAG Generation:** when there are recipes retrieved, the program executes the second LLM via `invoke_with_opik_usage()`, indicating stage generacion_rag.
+- **Final Answer:** Python displays the generated recipes and explanation. At the same time, Opik has the traces that allow the analysis of registered operations.
+- **End:** when the program closes, `opik_tracer.flush()` sends the pending traces to Opik and the code attempts to close Ollama's HTTP connections.
 
-La diferència principal és que Opik no intervé en la interpretació de la pregunta ni en la selecció de les eines. El seu paper és observar i registrar el funcionament de l'aplicació.
+The main difference is that Opik does not intervene in the interpretation of the question or the selection of the tools. Its role is to observe and record the operation of the application.
 
-A partir de les traces es pot estudiar, per exemple, si el temps total d'una consulta prové principalment de la primera inferència de Qwen, de la cerca a Weaviate o de la generació de la resposta RAG. Les mètriques de tokens es registren quan Ollama proporciona les metadades corresponents.
+From the traces it is possible to study, for example, whether the total time of a query comes mainly from the first inference of Qwen, the search in Weaviate or the generation of the RAG response. Token metrics are recorded when Ollama provides the corresponding metadata.
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició en llenguatge natural"] --> P["LangGraph: process_input_node()"]
+    U["User: Natural language request"] --> P["LangGraph: process_input_node()"]
     P --> L["Qwen: invoke_with_opik_usage()"]
-    L --> J["Python: interpreta i valida el JSON"]
+    L --> J["Python: Interpret and validate JSON"]
     J --> R{"route_after_input()"}
 
-    %% GESTIÓ DE LA LLISTA DE COMPRA
+    %% SHOPPING LIST MANAGEMENT
     R -->|add / remove| A["add_node() / remove_node()"]
     A --> AP["Python: add_products() / remove_products()"]
 
     R -->|replace / show / other| B["replace_node() / show_node() / other_node()"]
-    B --> BP["Python: substituir, mostrar o informar"]
+    B --> BP["Python: replace, show or report"]
 
-    %% CERCA DE RECEPTES AMB RAG
+    %% RECIPE SEARCH WITH RAG
     R -->|search_recipe| S["search_recipe_node()"]
     S --> W["Weaviate: weaviate_near_text()"]
-    W --> V["Python: comprova ingredients obligatoris"]
-    V --> Q["Qwen: resposta RAG amb invoke_with_opik_usage()"]
-    Q --> LR["Guardar resultats a last_recipes"]
+    W --> V["Python: Check for required ingredients"]
+    V --> Q["Qwen: RAG response with invoke_with_opik_usage()"]
+    Q --> LR["Save results to last_recipes"]
 
-    %% AFEGIR INGREDIENTS D'UNA RECEPTA
+    %% ADD RECIPE INGREDIENTS
     R -->|add_recipe| AR["add_recipe_node()"]
-    AR --> LS["Recuperar recepta de last_recipes"]
+    AR --> LS["Retrieve recipe from last_recipes"]
     LS --> ADD["Python: add_products()"]
 
-    %% RESPOSTA FINAL
-    AP --> F["Estat actualitzat i resposta final"]
+    %% FINAL RESPONSE
+    AP --> F["Updated status and final response"]
     BP --> F
     LR --> F
     ADD --> F
 
-    %% OBSERVABILITAT
-    OP["Opik: traces, spans, latència i tokens"]
+    %% OBSERVABILITY
+    OP["Opik: traces, spans, latency and tokens"]
     P -.-> OP
     L -.-> OP
     W -.-> OP
@@ -1059,40 +1059,40 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 11. Flux d’execució amb Opik</sub>
+  <sub>Figure 11. Execution flow with Opik</sub>
 </p>
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/09_shopping_list_weaviate_opik.py
 ```
 
-### 8.11. Integració d'Hermes — `10_shopping_list_weaviate_opik_hermes.py`
+### 8.11. Hermes integration — `10_shopping_list_weaviate_opik_hermes.py`
 
-**Programa complet:** [Obrir `10_shopping_list_weaviate_opik_hermes.py`](../code/src/10_shopping_list_weaviate_opik_hermes.py)  
-**Snippets destacats (dos fragments diferents):**
+**Full program:** [Open `10_shopping_list_weaviate_opik_hermes.py`](../code/src/10_shopping_list_weaviate_opik_hermes.py)  
+**Featured Snippets (two different snippets):**
 
-- [`10_shopping_list_weaviate_opik_hermes_snippet.py`](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py): preparació de candidats, execució de Hermes CLI i registre amb Opik.
-- [`10_calculate_missing_ingredients_snippet.py`](../code/snippets/10_calculate_missing_ingredients_snippet.py): comparació dels ingredients del menú amb la llista de la compra, sense intervenció del LLM.
+- [`10_shopping_list_weaviate_opik_hermes_snippet.py`](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py): Preparing candidates, running Hermes CLI and registering with Opik.
+- [`10_calculate_missing_ingredients_snippet.py`](../code/snippets/10_calculate_missing_ingredients_snippet.py): Comparison of menu ingredients with shopping list, without LLM intervention.
 
-**Què cal observar:** el primer snippet mostra com `plan_week_node()` recupera receptes, invoca Hermes CLI i valida la proposta amb Python. El segon explica com es calculen els ingredients pendents, es guarden a `last_shown_products` i s'afegeixen només quan l'usuari ho demana.
+**What to note:** the first snippet shows how `plan_week_node()` retrieves recipes, invokes Hermes CLI and validates the proposal with Python. The second explains how pending ingredients are calculated, stored in `last_shown_products` and are added only when requested by the user.
 
-Aquest exemple amplia l'assistent de llista de la compra desenvolupat anteriorment incorporant Hermes, un assistent d'intel·ligència artificial que s'utilitza per generar una planificació setmanal d'àpats a partir de receptes reals emmagatzemades a Weaviate.
+This example extends the previously developed shopping list assistant by incorporating Hermes, an artificial intelligence assistant that is used to generate a weekly meal plan from real recipes stored in Weaviate.
 
-L'aplicació manté les funcionalitats dels exemples anteriors, com gestionar la llista de la compra, buscar receptes a Weaviate i registrar les execucions amb Opik. La principal novetat és que ara també permet planificar els dinars i sopars de la setmana, identificar els ingredients necessaris i afegir a la llista de la compra els productes que encara no hi apareixen.
+The app maintains the functionality of the previous examples, such as managing the shopping list, searching for recipes in Weaviate, and logging runs with Opik. The main innovation is that it now also allows you to plan lunches and dinners for the week, identify the necessary ingredients and add to the shopping list the products that do not yet appear.
 
-En aquest exemple es combinen diferents components amb responsabilitats específiques. Qwen interpreta les peticions de l'usuari, LangGraph organitza el flux d'execució, Weaviate proporciona les receptes, Hermes proposa la distribució del menú setmanal i Python s'encarrega de validar els resultats i gestionar la llista de la compra. A més, s'incorporen comprovacions Python per interpretar determinades peticions contextuals sense necessitat de consultar sempre el LLM.
+This example combines different components with specific responsibilities. Qwen interprets the user's requests, LangGraph organizes the execution flow, Weaviate provides the recipes, Hermes proposes the distribution of the weekly menu, and Python is responsible for validating the results and managing the shopping list. In addition, Python checks are built in to interpret certain contextual requests without the need to always consult the LLM.
 
-**Components del codi:**
+**Code Components:**
 
-**1. Configuració d'Ollama i Hermes**
+**1. Ollama and Hermes settings**
 
-El programa continua utilitzant dos objectes `ChatOllama`, igual que en l'exemple anterior (llm i rag_llm). El primer LLM interpreta les peticions de l'usuari i determina l'acció que s'ha d'executar. El segon s'utilitza per generar les explicacions de les receptes recuperades mitjançant RAG.
+The program continues to use two objects `ChatOllama`, as in the previous example (llm and rag_llm). The first LLM interprets the user's requests and determines the action to be performed. The second is used to generate the explanations of the recipes retrieved using RAG.
 
-Hermes, en canvi, s'integra d'una manera diferent. No es crida mitjançant `ChatOllama`, sinó que s'executa com un procés extern a través de la seva interfície de línia d'ordres (CLI). Això significa que el model utilitzat internament per Hermes depèn de la seva pròpia configuració i no ha de coincidir necessàriament amb el model Qwen configurat a Ollama.
+Hermes, on the other hand, integrates in a different way. It is not called via `ChatOllama`, but runs as an external process through its command line interface (CLI). This means that the model used internally by Hermes depends on its own configuration and does not necessarily match the Qwen model configured in Ollama.
 
-Els principals paràmetres són:
+The main parameters are:
 
 ```python
 COLLECTION = "Recetas"
@@ -1116,11 +1116,11 @@ DAYS = (
 MEALS = ("comida", "cena")
 ```
 
-`HERMES_TIMEOUT` estableix el temps màxim que el programa espera una resposta del procés Hermes. Per defecte, aquest límit és de 240 segons. També es defineix un identificador de sessió diferent de l'utilitzat a l'exemple anterior, per evitar que els estats de les dues aplicacions es barregin.
+`HERMES_TIMEOUT` sets the maximum time the program waits for a response from the Hermes process. By default, this limit is 240 seconds. A different session ID than the one used in the previous example is also defined, to avoid mixing the states of the two applications.
 
-**2. Ampliació de `ShoppingState`**
+**2. Extension of `ShoppingState`**
 
-L'estat compartit de LangGraph s'amplia amb nous camps:
+LangGraph shared state is extended with new fields:
 
 ```python
 class ShoppingState(TypedDict, total=False):
@@ -1144,31 +1144,31 @@ class ShoppingState(TypedDict, total=False):
     response: str
 ```
 
-Les noves variables són:
+The new variables are:
 
-- **meal_type:** indica si es volen planificar únicament dinars (comida), sopars (cena) o tots dos.
-- **weekly_plan:** emmagatzema el menú setmanal generat.
-- **max_minutes:** permet restringir la planificació a receptes que compleixin un temps màxim de preparació.
-- **last_shown_products:** guarda els ingredients pendents que s'han mostrat a l'usuari.
-- **last_context:** identifica l'últim context de la conversa, com ara el menú setmanal, els ingredients pendents, les receptes o la llista de la compra.
+- **meal_type:** indicates whether to plan only lunches (lunch), dinners (dinner) or both.
+- **weekly_plan:** stores the generated weekly menu.
+- **max_minutes:** allows you to restrict planning to recipes that meet a maximum preparation time.
+- **last_shown_products:** save the pending ingredients that were shown to the user.
+- **last_context:** identifies the last conversation context, such as the weekly menu, pending ingredients, recipes, or shopping list.
 
-Aquestes dues últimes variables permeten gestionar millor les referències a missatges anteriors. Per exemple, si el programa mostra els ingredients que falten per preparar el menú i posteriorment l'usuari escriu “añade estos productos”, Python pot recuperar exactament els ingredients mostrats sense haver de tornar-los a identificar mitjançant el LLM.
+These last two variables allow better management of references to previous messages. For example, if the program displays the missing ingredients to prepare the menu and later the user writes “add these products”, Python can retrieve exactly the displayed ingredients without having to re-identify them through the LLM.
 
-El programa continua utilitzant `InMemorySaver` per conservar l'estat entre les interaccions d'una mateixa sessió.
+The program continues to use `InMemorySaver` to preserve state between interactions in the same session.
 
-**3. Nous nodes de LangGraph**
+**3. New LangGraph nodes**
 
-S'incorporen tres accions principals:
+Three main actions are incorporated:
 
-- **plan_week_node():** genera el menú setmanal utilitzant Weaviate i Hermes.
-- **missing_ingredients_node():** identifica els ingredients del menú que encara no apareixen a la llista de la compra.
-- **add_missing_node():** afegeix els ingredients pendents quan l'usuari ho sol·licita expressament.
+- **plan_week_node():** generate the weekly menu using Weaviate and Hermes.
+- **missing_ingredients_node():** identifies menu ingredients that are not yet listed in the shopping list.
+- **add_missing_node():** adds pending ingredients when explicitly requested by the user.
 
-Aquestes accions s'afegeixen a les que ja existien per gestionar productes i buscar receptes. Per tant, LangGraph continua utilitzant el mateix mecanisme de `process_input_node()` i `route_after_input()`, però ara disposa d’aquestes tres noves rutes.
+These actions are in addition to those that already existed for managing products and searching for recipes. Therefore, LangGraph continues to use the same mechanism of `process_input_node()` and `route_after_input()`, but now has these three new routes.
 
-**4. Recuperació de receptes amb Weaviate**
+**4. Recipe retrieval with Weaviate**
 
-Abans de generar el menú, el programa necessita obtenir les receptes que Hermes podrà seleccionar. Per fer-ho, s'utilitza la funció:
+Before generating the menu, the program needs to obtain the recipes that Hermes can select. To do this, the function is used:
 
 ```python
 @track(
@@ -1182,24 +1182,24 @@ def retrieve_week_candidates(
     max_minutes: int = 0,
     user_input: str = ""
 ) -> list[dict]:
-    ...  # Implementació completa al fitxer de codi font.
+    ...  # Complete implementation in source code file.
 ```
 
-Aquesta funció es connecta a la col·lecció Recetas de Weaviate i executa una cerca semàntica (utilitzant `near_text()`).
+This function connects to the Weaviate Recipes collection and performs a semantic search (using `near_text()`).
 
-A diferència de `search_recipes()`, que retorna com a màxim cinc receptes, aquesta funció també utilitza fetch_objects(limit=100) per recuperar altres receptes de la col·lecció que podrien no aparèixer entre els primers resultats de la cerca semàntica. Posteriorment, Python combina els resultats i prepara fins a 45 receptes candidates vàlides. Això permet disposar de més opcions per construir un menú setmanal de fins a 14 plats (set dinars i set sopars).
+Unlike `search_recipes()`, which returns a maximum of five recipes, this function also uses fetch_objects(limit=100) to retrieve other recipes in the collection that might not appear in the first results of the semantic search. Python then combines the results and prepares up to 45 valid candidate recipes. This allows for more options to build a weekly menu of up to 14 dishes (seven lunches and seven dinners).
 
-Posteriorment, Python aplica diferents comprovacions (utilitzant `eligible_week_recipe()`):
-Descarta receptes que no disposen d'ingredients estructurats a `ingredientesClave`.
-Comprova que compleixin el temps màxim indicat.
-Elimina receptes duplicades.
-Assigna identificadors com R01, R02, R03, etc.
+Afterwards, Python applies different checks (using `eligible_week_recipe()`):
+Discard recipes that do not have structured ingredients a `ingredientesClave`.
+Check that they meet the maximum time indicated.
+Remove duplicate recipes.
+Assign identifiers such as R01, R02, R03, etc.
 
-Per exemple, si l'usuari demana «planifica cenas de menos de 20 minutos», Python identifica que la condició és estrictament inferior a 20 minuts i estableix `max_minutes=19`. D'aquesta manera, la validació no depèn únicament de la interpretació del LLM.
+For example, if the user requests "plan dinners under 20 minutes", Python identifies that the condition is strictly less than 20 minutes and sets `max_minutes=19`. In this way, validation does not depend solely on the interpretation of the LLM.
 
-**5. Planificació setmanal amb Hermes**
+**5. Weekly planning with Hermes**
 
-La funció principal encarregada de comunicar-se amb Hermes és:
+The main function responsible for communicating with Hermes is:
 
 ```python
 @track(
@@ -1213,14 +1213,14 @@ def ask_hermes_for_week(
     candidates: list[dict],
     meal_type: str
 ) -> dict:
-    ...  # Implementació completa al fitxer de codi font.
+    ...  # Complete implementation in source code file.
 ```
 
-Aquesta funció rep la petició original de l'usuari, les receptes candidates recuperades de Weaviate i el tipus d'àpats que s'han de planificar.
+This function receives the original request from the user, the candidate recipes retrieved from Weaviate, and the type of meals to be planned.
 
-Primer es prepara una versió simplificada de les receptes. ​​Aquesta informació s'incorpora al prompt que es proporcionarà a Hermes. El prompt indica que ha de generar un menú de set dies, utilitzant únicament les referències de les receptes proporcionades i sense inventar plats. Hermes ha de retornar preferentment set línies de text, una per cada dia.
+A simplified version of the recipes is prepared first. This information is incorporated into the prompt that will be provided to Hermes. The prompt tells you to generate a seven-day menu, using only the references from the provided recipes and not inventing dishes. Hermes should preferably return seven lines of text, one for each day.
 
-Per exemple, una possible resposta per planificar únicament els sopars seria:
+For example, a possible answer for planning only dinners would be:
 
 ```text
 lunes: cena=R03
@@ -1232,9 +1232,9 @@ sábado: cena=R06
 domingo: cena=R05
 ```
 
-Els identificadors són referències a receptes recuperades prèviament de Weaviate. El prompt també indica a Hermes que ha de prioritzar les categories adequades per a cada àpat i intentar variar els plats sense repetir-los innecessàriament.
+IDs are references to recipes previously retrieved from Weaviate. The prompt also tells Hermes to prioritize the right categories for each meal and try to vary the dishes without repeating them unnecessarily.
 
-Per executar Hermes, Python utilitza `subprocess.run()`. La crida següent està extreta de [`ask_hermes_for_week()`](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py):
+To run Hermes, Python uses `subprocess.run()`. The following call is taken from [`ask_hermes_for_week()`](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py):
 
 ```python
 result = subprocess.run(
@@ -1251,13 +1251,13 @@ result = subprocess.run(
 )
 ```
 
-La crida executa Hermes en mode no interactiu amb `-z`, proporciona el prompt i recupera la resposta generada. El paràmetre `--usage-file` permet guardar informació del consum de tokens quan Hermes la proporciona.
+The call runs Hermes in non-interactive mode with `-z`, provide the prompt and retrieve the generated response. The parameter `--usage-file` allows saving token consumption information when provided by Hermes.
 
-El programa limita les eines habilitades al conjunt `search`, excloent els conjunts d'eines de terminal, fitxers i MCP. Tot i això, les eines de cerca poden continuar disponibles, i el mode no interactiu pot aprovar automàticament les eines habilitades. Per aquesta raó també s'indica al prompt que no executi eines.
+The program limits the tools enabled in the set `search`, excluding terminal, file, and MCP toolkits. However, search tools may still be available, and non-interactive mode may automatically approve enabled tools. For this reason it is also indicated at the prompt not to run tools.
 
-**6. Validació del menú amb Python**
+**6. Menu Validation with Python**
 
-Una vegada Hermes retorna la planificació, el programa executa:
+Once Hermes returns the schedule, the program executes:
 
 ```python
 plan, completed = build_verified_plan(
@@ -1269,19 +1269,19 @@ plan, completed = build_verified_plan(
 )
 ```
 
-Aquesta funció és important perquè el programa no accepta directament qualsevol recepta proposada per Hermes. Python comprova que les referències retornades corresponguin a receptes reals recuperades de Weaviate i que compleixin els filtres establerts. També comprova que les receptes siguin adequades com a plats principals, que compleixin les restriccions de dieta i temps i que no es repeteixin innecessàriament quan existeixen altres opcions disponibles.
+This function is important because the program does not directly accept any recipe proposed by Hermes. Python checks that the references returned correspond to actual recipes retrieved from Weaviate and that they meet the filters set. It also checks that recipes are suitable as main courses, meet dietary and time restrictions, and are not unnecessarily repeated when other options are available.
 
-Si Hermes retorna una referència incorrecta, omet algun dia o no proporciona una selecció vàlida, Python pot completar les posicions del menú utilitzant receptes candidates que sí que han estat validades. D'aquesta manera, el sistema evita incorporar plats inexistents o receptes que no compleixen el límit de temps.
+If Hermes returns an incorrect reference, skips a day, or does not provide a valid selection, Python can complete the menu positions using candidate recipes that have been validated. In this way, the system avoids incorporating non-existent dishes or recipes that do not meet the time limit.
 
-El programa pot generar un menú alternatiu encara que Hermes falli. Si la invocació de Hermes genera un error, supera el temps màxim o no proporciona una resposta aprofitable, Python pot construir la planificació utilitzant directament les receptes vàlides de Weaviate. En aquest cas, el programa mostra un avís indicant que el menú ha estat seleccionat automàticament o corregit per Python. En canvi, si no existeixen receptes candidates que compleixin els requisits de l'usuari, no es pot construir un menú vàlid i el programa informa d'aquesta situació.
+The program can generate an alternate menu even if Hermes fails. If the Hermes invocation fails, times out, or does not provide a usable response, Python can build the scheduler directly using valid Weaviate recipes. In this case, the program displays a warning indicating that the menu has been automatically selected or corrected by Python. However, if there are no candidate recipes that meet the user's requirements, a valid menu cannot be built and the program reports this situation.
 
-Aquesta separació permet diferenciar dues responsabilitats. Es pot veure clarament que Hermes proposa la planificació, però Python verifica i construeix el resultat definitiu.
+This separation makes it possible to differentiate two responsibilities. It can be clearly seen that Hermes proposes the planning, but Python verifies and constructs the final result.
 
-**7. Comprovació dels ingredients del menú**
+**7. Checking menu ingredients**
 
-Una vegada generat el menú setmanal, el programa pot identificar quins ingredients són necessaris per preparar-lo.
+Once the weekly menu is generated, the program can identify which ingredients are needed to prepare it.
 
-Aquesta operació es realitza amb:
+This operation is performed with:
 
 ```python
 @track(
@@ -1294,93 +1294,93 @@ def calculate_missing_ingredients(
     plan: dict,
     shopping_list: list[str]
 ) -> dict:
-    ...  # Implementació completa al fitxer de codi font.
+    ...  # Complete implementation in source code file.
 ```
 
-La funció recorre les receptes assignades als diferents dies de la setmana, extreu els seus `ingredientesClave` i elimina els duplicats. Posteriorment, compara aquests ingredients amb els productes que ja apareixen a `shopping_list`. Per exemple, si el menú necessita ous, llet, arròs i patates, però la llista de la compra ja conté llet i ous, Python identifica arròs i patates com a productes pendents.
+The function loops through the recipes assigned to the different days of the week, extracts its own `ingredientesClave` and remove duplicates. Subsequently, compare these ingredients with the products that already appear in `shopping_list`. For example, if the menu calls for eggs, milk, rice, and potatoes, but the shopping list already contains milk and eggs, Python identifies rice and potatoes as pending items.
 
-És important remarcar que aquesta comprovació no determina quins aliments té realment l'usuari a casa. Únicament compara els ingredients del menú amb els productes que ja estan apuntats a la llista de la compra. Tampoc no calcula les quantitats totals necessàries, ja que treballa amb els ingredients principals de cada recepta.
+It is important to note that this check does not determine what food the user actually has at home. It only compares the menu ingredients with the products that are already on the shopping list. It also doesn't calculate the total amounts needed, as it works with the main ingredients of each recipe.
 
-El node `missing_ingredients_node()` permet consultar aquests productes sense modificar la llista. També guarda els estats per quan l'usuari demana posteriorment “añade estos productos”, el programa pot recuperar exactament els ingredients que acaba de mostrar. En canvi, `add_missing_node()` només executa `add_products()` quan l'usuari demana explícitament afegir-los. Així, consultar els ingredients pendents no provoca automàticament cap modificació de la llista.
+The node `missing_ingredients_node()` allows you to consult these products without modifying the list. It also saves the states so that when the user later asks "add these products", the program can retrieve exactly the ingredients it just displayed. Instead, `add_missing_node()` just run `add_products()` when the user explicitly asks to add them. Thus, checking the pending ingredients does not automatically cause any modification of the list.
 
-**Flux d'execució:**
+**Execution Flow:**
 
-Suposem que l'usuari introdueix: “Planifica las comidas y cenas de esta semana, con recetas de menos de 30 minutos.”
+Suppose the user enters: "Plan this week's meals and dinners, with recipes of less than 30 minutes."
 
-El procés és el següent:
+The process is as follows:
 
-- **Entrada de l'usuari:** Python rep el missatge i inicia el graf amb `shopping_graph.invoke()`.
-- **Interpretació de la petició:** `process_input_node()` comprova primer si existeix una acció contextual identificable amb `contextual_menu_action()`. Si no n'hi ha, envia la petició a Qwen mitjançant `invoke_with_opik_usage()`. El model identifica l'acció plan_week, el tipus d'àpats (ambas), la consulta de receptes i el temps màxim.
-- **Selecció de la ruta:** `route_after_input()` consulta el valor `action` i selecciona `plan_week_node()`. Aquesta operació és una decisió programada en Python.
-- **Recuperació de receptes:** `plan_week_node()` executa `retrieve_week_candidates()`, que consulta Weaviate i prepara fins a 45 receptes candidates, comprovant els filtres de categoria, dieta i temps, i assignant-ne les referències.
-- **Invocació de Hermes:** Python executa `ask_hermes_for_week()`. Aquesta funció construeix el prompt amb les receptes disponibles i inicia Hermes CLI mitjançant subprocess.run().
-- **Generació i interpretació del menú:** Hermes processa les instruccions i retorna una proposta de planificació, preferentment en set línies de text. Posteriorment, `parse_hermes_selection()` interpreta la resposta i la transforma en una estructura que Python pugui utilitzar.
-- **Validació amb Python:** `build_verified_plan()` comprova que totes les seleccions corresponguin a receptes reals i vàlides. Si falten posicions o hi ha seleccions incorrectes, les completa o corregeix amb receptes verificades. Si Hermes falla, també pot construir un menú alternatiu.
-- **Comprovació d'ingredients:** `calculate_missing_ingredients()` recorre el menú i compara els ingredients necessaris amb els productes presents a la llista de la compra.
-- **Generació de l'informe:** `format_week()` prepara el menú setmanal. Python també incorpora un resum del nombre d'ingredients diferents i dels que encara no apareixen a la llista.
-- **Resposta final:** LangGraph guarda el menú a `weekly_plan`, actualitza el context de la conversa i Python mostra el resultat al terminal.
+- **User input:** Python receives the message and starts the graph with `shopping_graph.invoke()`.
+- **Interpretation of the request:** `process_input_node()` first checks if a contextual action exists identifiable with `contextual_menu_action()`. If not, send the request to Qwen via `invoke_with_opik_usage()`. The model identifies the action plan_week, the meal type (both), the recipe query, and the maximum time.
+- **Route selection:** `route_after_input()` query the value `action` and select `plan_week_node()`. This operation is a programmed decision in Python.
+- **Retrieving Recipes:** `plan_week_node()` runs `retrieve_week_candidates()`, which queries Weaviate and prepares up to 45 candidate recipes, checking category, diet and time filters, and assigning their references.
+- **Invocation of Hermes:** Python executes `ask_hermes_for_week()`. This function builds the prompt with the available recipes and starts Hermes CLI using subprocess.run().
+- **Menu generation and interpretation:** Hermes processes the instructions and returns a planning proposal, preferably in seven lines of text. subsequently, `parse_hermes_selection()` interprets the response and transforms it into a structure that Python can use.
+- **Validation with Python:** `build_verified_plan()` checks that all selections correspond to real and valid recipes. If positions are missing or there are incorrect selections, complete or correct them with verified recipes. If Hermes fails, he can also build an alternate menu.
+- **Ingredient Check:** `calculate_missing_ingredients()` goes through the menu and compares the necessary ingredients with the products present on the shopping list.
+- **Report generation:** `format_week()` prepares the weekly menu. Python also includes a summary of the number of different ingredients and those not yet listed.
+- **Final Answer:** LangGraph saves the menu to `weekly_plan`, it updates the conversation context and Python displays the result in the terminal.
 
-Si posteriorment l'usuari pregunta “¿Qué productos me faltan para preparar el menú?”, Qwen interpreta l'acció missing_ingredients i LangGraph selecciona el node corresponent, que calcula els ingredients pendents i els guarda a `last_shown_products`. En aquesta segona petició no cal executar Hermes ni tornar a consultar Weaviate, perquè el menú ja està emmagatzemat a l'estat.
+If the user subsequently asks “What products do I need to prepare the menu?”, Qwen interprets the action missing_ingredients and LangGraph selects the corresponding node, which calculates the pending ingredients and stores them in `last_shown_products`. In this second request there is no need to run Hermes or query Weaviate again, because the menu is already stored in the state.
 
-Finalment, si l'usuari escriu “Añade los ingredientes que faltan a mi lista”, LangGraph executa `add_missing_node()`, que utilitza la funció Python `add_products()`.
+Finally, if the user types “Add the missing ingredients to my list,” LangGraph executes `add_missing_node()`, which uses the Python function `add_products()`.
 
-**Flux general**
+**General Flow**
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició en llenguatge natural"] --> P["LangGraph: process_input_node()"]
+    U["User: Natural language request"] --> P["LangGraph: process_input_node()"]
 
-    P --> D{"Acció contextual identificada?"}
-    D -->|Sí| CT["Python: contextual_menu_action()"]
-    D -->|No| L["Qwen: interpreta la petició"]
+    P --> D{"Context action identified?"}
+    D -->|Yes| CT["Python: contextual_menu_action()"]
+    D -->|No| L["Qwen: Interpret the request"]
 
     CT --> R{"route_after_input()"}
-    L --> J["Python: valida el JSON"]
+    L --> J["Python: Validate the JSON"]
     J --> R
 
-    %% GESTIÓ DE LA LLISTA DE COMPRA
-    R -->|add / remove / replace / show / other| A["Nodes de gestió de la llista"]
-    A --> AT["Python: afegir, eliminar, substituir o mostrar"]
+    %% SHOPPING LIST MANAGEMENT
+    R -->|add / remove / replace / show / other| A["List management nodes"]
+    A --> AT["Python: add, remove, replace or show"]
 
-    %% CERCA DE RECEPTES AMB RAG
+    %% RECIPE SEARCH WITH RAG
     R -->|search_recipe| S["search_recipe_node()"]
-    S --> W["Weaviate: cerca semàntica"]
-    W --> V["Python: comprova els filtres"]
-    V --> Q["Qwen: genera la resposta RAG"]
-    Q --> LR["Desar last_recipes"]
+    S --> W["Weaviate: Semantic Search"]
+    W --> V["Python: Check filters"]
+    V --> Q["Qwen: Generate the RAG response"]
+    Q --> LR["Save last_recipes"]
 
-    %% AFEGIR INGREDIENTS D'UNA RECEPTA
+    %% ADD RECIPE INGREDIENTS
     R -->|add_recipe| AR["add_recipe_node()"]
-    AR --> LS["Recuperar recepta de last_recipes"]
+    AR --> LS["Retrieve recipe from last_recipes"]
     LS --> ADD["Python: add_products()"]
 
-    %% PLANIFICACIÓ SETMANAL AMB HERMES
+    %% WEEKLY PLANNING WITH HERMES
     R -->|plan_week| PW["plan_week_node()"]
     PW --> WC["Weaviate: retrieve_week_candidates()"]
-    WC --> H["Hermes CLI: proposta de menú"]
-    H --> VP["Python: valida, corregeix o completa el menú"]
-    VP --> WP["Desar weekly_plan"]
+    WC --> H["Hermes CLI: menu proposal"]
+    H --> VP["Python: Validate, correct or complete the menu"]
+    VP --> WP["Save weekly_plan"]
 
-    %% CONSULTAR INGREDIENTS PENDENTS
+    %% CHECK MISSING INGREDIENTS
     R -->|missing_ingredients| MI["missing_ingredients_node()"]
     MI --> CALC["Python: calculate_missing_ingredients()"]
-    CALC --> SP["Desar last_shown_products"]
+    CALC --> SP["Save last_shown_products"]
 
-    %% AFEGIR INGREDIENTS PENDENTS
+    %% ADD MISSING INGREDIENTS
     R -->|add_missing| AM["add_missing_node()"]
-    AM --> REC["Consultar weekly_plan i ingredients pendents"]
+    AM --> REC["Consult weekly_plan and pending ingredients"]
     REC --> AP["Python: add_products()"]
 
-    %% RESPOSTA FINAL
-    AT --> F["Estat actualitzat i resposta final"]
+    %% FINAL RESPONSE
+    AT --> F["Updated status and final response"]
     LR --> F
     ADD --> F
     WP --> F
     SP --> F
     AP --> F
 
-    %% OBSERVABILITAT
-    OP["Opik: traces, spans, latència i tokens"]
+    %% OBSERVABILITY
+    OP["Opik: traces, spans, latency and tokens"]
     L -.-> OP
     W -.-> OP
     Q -.-> OP
@@ -1406,27 +1406,27 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 12. Flux amb la integració d'Hermes</sub>
+  <sub>Figure 12. Flow with Hermes integration</sub>
 </p>
 
-Si mirem només el cas concret de generació de menus setmanals:
+If we look only at the specific case of generating weekly menus:
 
-**Flux A — Generació i validació del menú setmanal**
+**Flow A — Weekly menu generation and validation**
 
 ```mermaid
 flowchart TD
-    U["Usuari: planificar la setmana"] --> P["process_input_node()"]
-    P --> D{"Acció contextual identificada?"}
-    D -->|Sí| C["Python: contextual_menu_action()"]
-    D -->|No| L["Qwen: acció i filtres"]
+    U["User: Plan the week"] --> P["process_input_node()"]
+    P --> D{"Context action identified?"}
+    D -->|Yes| C["Python: contextual_menu_action()"]
+    D -->|No| L["Qwen: action and filters"]
     C --> R{"Router LangGraph"}
     L --> R
-    R -->|plan_week| W["Weaviate: receptes candidates"]
-    W --> H["Hermes CLI: proposta de menú"]
+    R -->|plan_week| W["Weaviate: Candidate recipes"]
+    W --> H["Hermes CLI: menu proposal"]
     H --> V["Python: build_verified_plan()"]
-    V --> PL["Desar weekly_plan"]
-    PL --> F["Menú setmanal final"]
-    OP["Opik: traces i tokens"] -.-> W
+    V --> PL["Save weekly_plan"]
+    PL --> F["Final weekly menu"]
+    OP["Opik: traces and tokens"] -.-> W
     OP -.-> H
     OP -.-> V
     class U,F entrada
@@ -1446,24 +1446,24 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 13. Flux de la planificació setmanal amb Hermes</sub>
+  <sub>Figure 13. Weekly planning flow with Hermes</sub>
 </p>
 
-**Flux B — Consultar els ingredients pendents i afegir-los només si l'usuari ho demana**
+**Flow B — Check for pending ingredients and add them only if requested by the user**
 
-Aquest segon flux reutilitza el menú emmagatzemat a `weekly_plan`: **no torna a consultar Weaviate ni a executar Hermes** per respondre una pregunta sobre els ingredients.
+This second flow reuses the menu stored in `weekly_plan`: **does not query Weaviate or run Hermes again** to answer a question about ingredients.
 
 ```mermaid
 flowchart TD
-    U["Usuari: què em falta?"] --> M["missing_ingredients_node()"]
+    U["User: What am I missing?"] --> M["missing_ingredients_node()"]
     M --> C["Python: calculate_missing_ingredients()"]
-    C --> S["Desar last_shown_products"]
-    S --> F["Mostrar ingredients pendents"]
-    A["Usuari: afegeix-los"] --> R{"Router: add_missing"}
-    S -.->|Context desat| R
+    C --> S["Save last_shown_products"]
+    S --> F["Show pending ingredients"]
+    A["User: Add them"] --> R{"Router: add_missing"}
+    S -.->|Context saved| R
     R --> N["add_missing_node()"]
     N --> P["Python: add_products()"]
-    P --> X["Llista actualitzada"]
+    P --> X["List updated"]
     class U,A,F,X entrada
     class M,S,N servei
     class R decisio
@@ -1478,53 +1478,53 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 14. Flux de consulta i actualització de la llista de la compra</sub>
+  <sub>Figure 14. Query flow and update of the shopping list</sub>
 </p>
 
-**Integració amb Opik**
+**Integration with Opik**
 
-El programa manté la integració amb Opik desenvolupada en l'exemple anterior. Les inferències amb Qwen, les consultes a Weaviate i les execucions dels nodes de LangGraph continuen registrant-se mitjançant traces.
+The program maintains the integration with Opik developed in the previous example. Inferences with Qwen, queries to Weaviate, and executions of LangGraph nodes continue to be logged via traces.
 
-A més, s'incorporen spans específics per a les noves funcionalitats:
+In addition, specific spans are incorporated for the new functionalities:
 
-- **weekly_weaviate_candidates:** recuperació de receptes candidates per al menú.
-- **weaviate_near_text:** cerca semàntica a Weaviate.
-- **hermes_weekly_planning:** invocació de Hermes CLI per generar la planificació.
-- **calculate_missing_ingredients:** comparació dels ingredients del menú amb la llista de la compra.
+- **weekly_weaviate_candidates:** retrieval of candidate recipes for the menu.
+- **weaviate_near_text:** Semantic search in Weaviate.
+- **hermes_weekly_planning:** Hermes CLI invocation to generate schedule.
+- **calculate_missing_ingredients:** comparison of menu ingredients with shopping list.
 
-Per registrar el consum de Hermes, el programa utilitza el fitxer JSON de mètriques generat mitjançant `--usage-file`. Quan aquest fitxer conté dades de consum, Python incorpora al span d'Opik els tokens d'entrada, els tokens de sortida i el total. Això permet comparar les operacions realitzades per Qwen amb la inferència de planificació executada mitjançant Hermes.
+To record Hermes consumption, the program uses the metrics JSON file generated by `--usage-file`. When this file contains consumption data, Python adds the input tokens, output tokens, and total to the Opik span. This allows the operations performed by Qwen to be compared with the planning inference executed using Hermes.
 
-**Execució (des de l’arrel del repositori):**
+**Execution (from repository root):**
 
 ```bash
 python AI_Observability/code/src/10_shopping_list_weaviate_opik_hermes.py
 ```
 
-**Prova en aquest ordre:**
+**Test in this order:**
 
-1. «Planifica las cenas de esta semana». Es genera o es completa un menú amb les receptes candidates.
-2. «¿Qué ingredientes me faltan?». Es consulta el menú desat i es mostren els ingredients pendents.
-3. «Añade estos productos». Es recupera `last_shown_products` i, si l'acció s'identifica correctament, Python actualitza la llista.
+1. "Plan this week's dinners". A menu is generated or completed with the candidate recipes.
+2. "What ingredients am I missing?". The saved menu is consulted and the pending ingredients are displayed.
+3. "Add these products". He recovers `last_shown_products` , and if the action is successfully identified, Python updates the list.
 
-Aquestes tres peticions permeten observar la diferència entre generar el menú, consultar informació i modificar la llista. Si Hermes falla o no retorna una selecció aprofitable, el programa pot utilitzar la selecció de reserva de Python. Això no implica que la crida a Hermes hagi funcionat correctament.
+These three requests allow you to observe the difference between generating the menu, consulting information and modifying the list. If Hermes fails or does not return a usable selection, the program can use Python's fallback selection. This does not imply that the call to Hermes has worked properly.
 
-### 8.12. Observabilitat del RAG amb OpenTelemetry i Grafana — `11_shopping_list_weaviate_otel.py`
+### 8.12. Observability of the RAG with OpenTelemetry and Grafana — `11_shopping_list_weaviate_opentelemetry.py`
 
-**Programa complet:** [Obrir `11_shopping_list_weaviate_otel.py`](../code/src/11_shopping_list_weaviate_otel.py)  
-**Snippet:** [Obrir `11_shopping_list_weaviate_otel_snippet.py`](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)  
-**Documentació de referència:**
+**Full program:** [Open `11_shopping_list_weaviate_opentelemetry.py`](../code/src/11_shopping_list_weaviate_opentelemetry.py)  
+**Snippet:** [Open `11_shopping_list_weaviate_otel_snippet.py`](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)  
+**Reference Documentation:**
 
-- [Apartats 6.6–6.7 — OpenTelemetry, traces, spans i atributs del RAG](./06_observability.md#otel-fonaments).
-- [Apartat 6.8 — Instal·lació de Docker, configuració d'OpenTelemetry i execució a macOS, Linux i Windows](./06_observability.md#otel-instal-lacio).
-- [Apartat 6.9 — Creació del dashboard `RAG recetas`, taula de traces, Node Graph i mètriques de tokens](./06_observability.md#otel-dashboard).
+- [Sections 6.6–6.7 — OpenTelemetry, traces, spans and RAG attributes](./06_observalility.md#66-opentelemetry).
+- [Section 6.8 — Installing Docker, Configuring OpenTelemetry, and Running on macOS, Linux, and Windows](./06_observalility.md#68-local-installation-and-connection-with-grafana).
+- [Section 6.9 — Creation of the dashboard `RAG recetas`, trace table, Node Graph and token metrics](./06_observalility.md#69-creation-and-configuration-of-the-grafana-dashboard).
 
-**Què cal observar al snippet:** la inicialització del `TracerProvider`, la creació de spans per als nodes, el registre del consum de tokens i l'exportació de traces a Grafana mitjançant OTLP/HTTP. El snippet és explicatiu, per executar el cas pràctic s'utilitza el programa complet.
+**What to observe in the snippet:** the initialization of the `TracerProvider`, creating spans for nodes, logging token consumption and exporting traces to Grafana via OTLP/HTTP. The snippet is self-explanatory, the full program is used to run the case study.
 
-Aquest exemple parteix de l'assistent de receptes de l'apartat 8.9. Continua utilitzant LangGraph, el model Qwen executat amb Ollama i la col·lecció `Recetas` de Weaviate Cloud. El canvi principal és que, en lloc de registrar l'execució amb Opik, utilitza OpenTelemetry i envia les traces a Tempo, que es poden analitzar des de Grafana.
+This example starts from the recipe assistant in section 8.9. It continues to use LangGraph, the Qwen model run with Ollama, and the collection `Recetas` by Weaviate Cloud. The main change is that instead of logging the run with Opik, it uses OpenTelemetry and sends the traces to Tempo, which can be analyzed from within Grafana.
 
-**Components del codi:**
+**Code Components:**
 
-La configuració inicial crea un proveïdor de traces associat a un nom de servei. `BatchSpanProcessor` agrupa i envia els spans al receptor OTLP/HTTP del contenidor de Grafana:
+The initial configuration creates a trace provider associated with a service name. `BatchSpanProcessor` bundles and sends the spans to the Grafana container's OTLP/HTTP receiver:
 
 ```python
 otel_provider = TracerProvider(
@@ -1550,11 +1550,11 @@ trace.set_tracer_provider(otel_provider)
 tracer = trace.get_tracer("shopping-rag-weaviate-otel")
 ```
 
-L'alternativa `OTEL_CONSOLE_ONLY=1` serveix per inspeccionar els spans per terminal sense Docker. que aparegui al dashboard, utilitzem `OTEL_CONSOLE_ONLY=0`\*\* i enviem les traces a Tempo.
+The alternative `OTEL_CONSOLE_ONLY=1` is for inspecting spans by terminal without Docker. that appears on the dashboard, we use `OTEL_CONSOLE_ONLY=0`\*\* and send the traces to Tempo.
 
-**Nodes de LangGraph:**
+**LangGraph Nodes:**
 
-El decorador `observed_node()` envolta la funció Python de cada node amb un span `langgraph.node.<nom>`. El programa propaga el valor `traceparent` a través de l'estat de LangGraph perquè tots aquests spans es puguin relacionar amb la mateixa execució.
+The decorator `observed_node()` wraps each node's Python function with a span `langgraph.node.<nom>`. The program propagates value `traceparent` through the LangGraph state so that all these spans can be related to the same run.
 
 ```python
 with tracer.start_as_current_span(
@@ -1566,11 +1566,11 @@ with tracer.start_as_current_span(
         span.set_attribute("langgraph.route", str(result.get("action", "other")))
 ```
 
-L'atribut `langgraph.route` permet saber quina acció ha classificat el router, mentre que els spans indiquen quins nodes i eines s'han executat. Per exemple, una petició per afegir ingredients d'una recepta ja consultada pot passar per `add_recipe` i `tool.add_products` sense executar `weaviate_near_text` una altra vegada.
+The attribute `langgraph.route` lets you know what action the router has classified, while spans indicate which nodes and tools have been run. For example, a request to add ingredients from an already consulted recipe can go through `add_recipe` and `tool.add_products` not executed `weaviate_near_text` again.
 
-**Registre de tokens amb Ollama:**
+**Token logging with Ollama:**
 
-La funció `invoke_with_otel_usage()` envolta amb un span les dues possibles crides al model: la classificació de la petició (`ollama.clasificacion`) i la generació de la resposta RAG (`ollama.generacion_rag`). Després de `model.invoke()`, llegeix els comptadors de `usage_metadata` o, si no hi són, els de `response_metadata`.
+The function `invoke_with_otel_usage()` surrounds with a span the two possible calls to the model: the classification of the request (`ollama.clasificacion`) and the generation of the RAG response (`ollama.generacion_rag`). after `model.invoke()`, read the counters of `usage_metadata` or, if they are not there, those of `response_metadata`.
 
 ```python
 answer = model.invoke(messages)
@@ -1590,38 +1590,38 @@ if output_tokens is not None:
     span.set_attribute("gen_ai.usage.output_tokens", int(output_tokens))
 ```
 
-Quan es coneix el total, també es guarden els atributs `gen_ai.usage.total_tokens` i `rag.tokens.total`. Aquest últim s'utilitza en una consulta TraceQL del dashboard. Per facilitar la depuració, el programa continua imprimint el resum:
+When the total is known, the attributes are also saved `gen_ai.usage.total_tokens` and `rag.tokens.total`. The latter is used in a TraceQL query of the dashboard. To facilitate debugging, the program continues to print the summary:
 
 ```text
 [OTEL] Tokens clasificacion: {'input_tokens': ..., 'output_tokens': ..., 'total_tokens': ...}
 ```
 
-Els punts suspensius representen valors que canvien a cada inferència.
+Ellipses represent values that change at each inference.
 
 **Weaviate:**
 
-La funció `weaviate_near_text()` obre un span amb aquest nom al voltant de `collection.query.near_text(...)`, registra la col·lecció i el nombre de candidats recuperats, i permet diferenciar el temps consumit per la cerca vectorial del consumit per Ollama.
+The function `weaviate_near_text()` opens a span with that name around `collection.query.near_text(...)`, records the collection and the number of candidates recovered, and allows to differentiate the time consumed by the vector search from that consumed by Ollama.
 
-**Flux d'execució:**
+**Execution Flow:**
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició sobre receptes"] --> G["LangGraph: langgraph.invoke"]
-    G --> P["process_input: classificació amb Ollama"]
-    P --> R{"Router: acció?"}
+    U["User: Recipe request"] --> G["LangGraph: langgraph.invoke"]
+    G --> P["process_input: classification with Ollama"]
+    P --> R{"Router: Action?"}
 
-    R -->|search_recipe| W["Weaviate: Recetas / near_text"]
-    W --> L["Ollama: resposta RAG"]
-    L --> F["Resposta final"]
+    R -->|search_recipe| W["Weaviate: Recipes / near_text"]
+    W --> L["Call: RAG response"]
+    L --> F["Final response"]
 
-    R -->|add_recipe / add / show| T["Python: nodes i eines"]
+    R -->|add_recipe / add / show| T["Python: Nodes and Tools"]
     T --> F
 
-    G -. "Traces, spans i atributs" .-> OT["OpenTelemetry / OTLP"]
-    OT --> TP["Tempo"]
-    TP --> GR["Grafana: dashboard i Node Graph"]
+    G -. "Traces, spans and attributes" .-> OT["OpenTelemetry / OTLP"]
+    OT --> TP["Time"]
+    TP --> GR["Grafana: dashboard and Node Graph"]
 
-    %% ESTILS
+    %% STYLES
     classDef usuari fill:#E3F2FD,stroke:#1976D2,stroke-width:2px,color:#0D47A1
     classDef langgraph fill:#EDE7F6,stroke:#7B1FA2,stroke-width:2px,color:#4A148C
     classDef llm fill:#FFF3E0,stroke:#F57C00,stroke-width:2px,color:#E65100
@@ -1631,7 +1631,7 @@ flowchart TD
     classDef resposta fill:#F1F8E9,stroke:#689F38,stroke-width:2px,color:#33691E
     classDef observabilitat fill:#F3E5F5,stroke:#8E24AA,stroke-width:2px,color:#6A1B9A
 
-    %% ASSIGNACIÓ DE COLORS
+    %% COLOR ASSIGNMENT
     class U usuari
     class G langgraph
     class P,L llm
@@ -1642,84 +1642,84 @@ flowchart TD
     class OT,TP,GR observabilitat
 ```
 
-<p align="center"><sub>Figura 15. La mateixa aplicació RAG instrumentada amb OpenTelemetry. Les fletxes discontínues representen el flux de dades d'observabilitat.</sub></p>
+<p align="center"><sub>Figure 15. The same RAG application instrumented with OpenTelemetry. The dashed arrows represent the observability data flow.</sub></p>
 
-**Configuració i execució de l'exemple (des de l'arrel del repositori):**
+**Configuring and running the example (from the repository root):**
 
-Abans d'executar el programa, cal seguir l'[apartat 6.8 de `06_observability.md`](./06_observability.md#otel-instal-lacio). Allà es detalla, **pas a pas i per a macOS/Linux i Windows**, com comprovar Docker, crear o reprendre el contenidor `grafana-lgtm` sense esborrar-lo, preparar l'entorn virtual, configurar Ollama i Weaviate mitjançant `.env` i definir les variables d'OpenTelemetry. **No cal repetir `docker run` si el contenidor ja existeix.**
+Before running the program, you must follow [section 6.8 of `06_observalility.md`](./06_observalility.md#68-local-installation-and-connection-with-grafana). It details, **step-by-step and for macOS/Linux and Windows**, how to check Docker, build or resume the container `grafana-lgtm` without deleting it, prepare the virtual environment, configure Ollama and Weaviate using `.env` and define the OpenTelemetry variables. **No need to repeat `docker run` if the container already exists.**
 
-Un cop completada aquesta configuració, es comprova l'accés a la col·lecció `Recetas` i després s'executa l'assistent. Si la comprovació `--check` falla, cal solucionar-la abans d'executar la segona ordre.
+After this configuration is complete, access to the collection is checked `Recetas` and then the wizard runs. If the check `--check` fails, it needs to be fixed before running the second command.
 
 **macOS/Linux (Bash/Zsh):**
 
 ```bash
-python AI_Observability/code/src/11_shopping_list_weaviate_otel.py --check
-python AI_Observability/code/src/11_shopping_list_weaviate_otel.py
+python AI_Observability/code/src/11_shopping_list_weaviate_opentelemetry.py --check
+python AI_Observability/code/src/11_shopping_list_weaviate_opentelemetry.py
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
-python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py --check
-python .\AI_Observability\code\src\11_shopping_list_weaviate_otel.py
+python .\AI_Observability\code\src\11_shopping_list_weaviate_opentelemetry.py --check
+python .\AI_Observability\code\src\11_shopping_list_weaviate_opentelemetry.py
 ```
 
-La configuració de `OTEL_CONSOLE_ONLY=0` i de l'endpoint `http://localhost:4318/v1/traces` es troba al **pas 5 de l'apartat 6.8**. No s'ha de copiar la sintaxi `export` de macOS/Linux a PowerShell: el manual inclou els comandaments correctes per a cada sistema.
+The setting of `OTEL_CONSOLE_ONLY=0` and of the endpoint `http://localhost:4318/v1/traces` is in **step 5 of section 6.8**. The syntax should not be copied `export` macOS/Linux in PowerShell: The manual includes the correct commands for each system.
 
-**Prova en aquest ordre:**
+**Test in this order:**
 
-1. «Recomiéndame recetas con huevos y patatas en menos de 30 minutos». Comprova la ruta de cerca RAG, `weaviate_near_text` i la generació de text amb Ollama.
-2. «Añade los ingredientes de la segunda receta». Comprova la ruta `add_recipe`, l'eina `add_products()` i la reutilització de l'estat `last_recipes`.
-3. «Muéstrame la lista». Comprova la ruta `show`, sense necessitat de fer una nova consulta vectorial.
-4. Escriu `exit` per tancar el programa. OpenTelemetry buida els spans pendents abans d'acabar.
+1. "Recommend recipes with eggs and potatoes in less than 30 minutes". Check the RAG search path, `weaviate_near_text` and text generation with Ollama.
+2. «Add the ingredients of the second recipe». Check the route `add_recipe`, the tool `add_products()` and state reuse `last_recipes`.
+3. «Show me the list». Check the route `show`, without the need to make a new vector query.
+4. Write `exit` to close the program. OpenTelemetry flushes pending spans before terminating.
 
-**Resultats a Grafana:**
+**Results in Grafana:**
 
-Des de `http://localhost:3000` es pot entrar a **Explore → Tempo** i cercar:
+From `http://localhost:3000` can be entered in **Explore → Tempo** and search:
 
 ```traceql
 { resource.service.name = "shopping-rag-weaviate-otel" }
 ```
 
-El dashboard **`RAG recetas`** organitza la informació en quatre zones. Els **passos per crear tots els panells, les consultes TraceQL, el selector `TraceId` i els enllaços de la taula al graf** estan explicats a l'[apartat 6.9](./06_observability.md#otel-dashboard). Aquí es mostra què permet observar cada resultat:
+The dashboard **`RAG recetas`** organizes information into four areas. The **steps to create all the panels, the TraceQL queries, the selector `TraceId` and the links from the table to the graph** are explained in [section 6.9](./06_observalility.md#69-creation-and-configuration-of-the-grafana-dashboard). Here's what each result allows you to observe:
 
-**1. Rendiment general.** Nombre d'execucions, durada mitjana, temps d'Ollama i temps de la cerca semàntica.
+**1. Overall performance.** Number of executions, average duration, Ollama time and semantic search time.
 
-![Dashboard RAG recetas: rendiment de LangGraph, Ollama i Weaviate](./img/grafana_dashboard.png)
+![Dashboard RAG recipes: performance of LangGraph, Ollama and Weaviate](./img/grafana_dashboard.png)
 
-<p align="center"><sub>Figura 16. Rendiment de l'assistent a Grafana.</sub></p>
+<p align="center"><sub>Figure 16. Performance of the assistant in Grafana.</sub></p>
 
-**2. Taula de traces i graf d'una execució.** La taula mostra els identificadors, les hores i les durades. En seleccionar una trace, es pot inspeccionar el graf dels spans executats.
+**2. Table of traces and graph of a run.** The table shows the identifiers, times and durations. By selecting a trace, the graph of executed spans can be inspected.
 
-![Taula de traces i Node Graph al dashboard](./img/grafana_traces&nodes.png)
+![Trace table and Node Graph in the dashboard](./img/grafana_traces&nodes.png)
 
-<p align="center"><sub>Figura 17. Taula de peticions i Node Graph del procés.</sub></p>
+<p align="center"><sub>Figure 17. Table of requests and Node Graph of the process.</sub></p>
 
-**3. Consum de tokens.** Els panels `Input Tokens`, `Output Tokens` i `Total Tokens` mostren el consum acumulat del període seleccionat, obtingut a partir dels atributs dels spans d'Ollama amb `sum_over_time()`.
+**3. Token consumption.** The panels `Input Tokens`, `Output Tokens` and `Total Tokens` show the accumulated consumption of the selected period, obtained from the attributes of the Ollama spans with `sum_over_time()`.
 
-![Consum de tokens al dashboard Grafana](./img/grafana_tokens_usage.png)
+![Token consumption in the Grafana dashboard](./img/grafana_tokens_usage.png)
 
-<p align="center"><sub>Figura 18. Tokens d'entrada, sortida i totals del rang temporal.</sub></p>
+<p align="center"><sub>Figure 18. Entry, exit and total time range tokens.</sub></p>
 
-**Interpretació dels resultats:**
+**Interpretation of results:**
 
-Si la traça correspon a una cerca de receptes, han d'aparèixer els spans de cerca i de generació RAG. Si correspon a afegir ingredients d'una recepta prèviament trobada, és normal que no aparegui `weaviate_near_text`: l'estat ja conserva les receptes. Per tant, el graf permet estudiar quina ruta s'ha executat. No pretén representar tots els camins possibles del diagrama de LangGraph.
+If the trace corresponds to a recipe search, the RAG generation and search spans must appear. If it corresponds to adding ingredients from a previously found recipe, it is normal that it does not appear `weaviate_near_text`: The state already holds the recipes. Therefore, the graph makes it possible to study which route has been executed. It is not intended to represent all possible paths in the LangGraph diagram.
 
-Les mètriques de tokens del dashboard corresponen al **període temporal triat** i no canvien automàticament en seleccionar una trace. La trace concreta es consulta al Node Graph o al detall de Tempo. A diferència d'Opik, que integra la presentació de traces i mètriques a la mateixa plataforma, aquesta alternativa combina un estàndard obert d'instrumentació (**OpenTelemetry**), un backend de traces (**Tempo**) i una interfície de visualització (**Grafana**).
+Dashboard token metrics correspond to the **chosen time period** and do not change automatically when a trace is selected. The specific trace is consulted in the Node Graph or in the Tempo detail. Unlike Opik, which integrates trace and metrics presentation into the same platform, this alternative combines an open instrumentation standard (**OpenTelemetry**), a trace backend (**Tempo**), and a visualization interface (**Grafana**).
 
-Finalment, per **aturar i reprendre la pràctica sense perdre el contenidor**, cal utilitzar `docker stop grafana-lgtm` i `docker start grafana-lgtm`, tal com s'explica al **pas 3 de l'[apartat 6.8](./06_observability.md#otel-instal-lacio)**. No s'ha d'executar `docker run` cada dia. Per a la interpretació detallada de les visualitzacions, les limitacions i la comparació amb Opik, vegeu els **apartats 6.9–6.11 de [`06_observability.md`](./06_observability.md#otel-dashboard)**.
+Finally, to **stop and resume practice without losing the container**, you need to use `docker stop grafana-lgtm` and `docker start grafana-lgtm`, as explained in **step 3 of [section 6.8](./06_observalility.md#68-local-installation-and-connection-with-grafana)**. It should not be run `docker run` every day. For detailed interpretation of visualizations, limitations and comparison with Opik, see **sections 6.9–6.11 of [`06_observalility.md`](./06_observalility.md#69-creation-and-configuration-of-the-grafana-dashboard)**.
 
-### 8.13. Observabilitat del RAG amb LangSmith — `12_shopping_list_weaviate_langsmith.py`
+### 8.13. Observability of RAG with LangSmith — `12_shopping_list_weaviate_langsmith.py`
 
-**Programa complet:** [Obrir `12_shopping_list_weaviate_langsmith.py`](../code/src/12_shopping_list_weaviate_langsmith.py)  
-**Snippet:** [Obrir `12_shopping_list_weaviate_langsmith_snippet.py`](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)  
-**Què cal observar al snippet:** la configuració del projecte, el context `ls.tracing_context()`, el registre automàtic de les inferències, la instrumentació manual de Weaviate i l'enviament dels runs pendents.
+**Full program:** [Open `12_shopping_list_weaviate_langsmith.py`](../code/src/12_shopping_list_weaviate_langsmith.py)  
+**Snippet:** [Open `12_shopping_list_weaviate_langsmith_snippet.py`](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)  
+**What to observe in the snippet:** the project configuration, the context `ls.tracing_context()`, the automatic logging of inferences, the manual instrumentation of Weaviate, and the submission of pending runs.
 
-Aquest exemple parteix de l'assistent de llista de la compra i receptes de l'apartat 8.9, amb LangGraph, Ollama i Weaviate Cloud. No incorpora la planificació setmanal amb Hermes de l'apartat 8.11. La diferència és que substitueix Opik i la instrumentació manual d'OpenTelemetry per LangSmith. S'utilitza una integració per projecte (`LANGSMITH_PROJECT`) amb el servei Cloud, sense necessitat de Docker.
+This example is based on the shopping list and recipe assistant in section 8.9, with LangGraph, Ollama and Weaviate Cloud. It does not incorporate the weekly planning with Hermes in section 8.11. The difference is that it replaces Opik and manual OpenTelemetry instrumentation with LangSmith. One integration per project is used (`LANGSMITH_PROJECT`) with the Cloud service, without the need for Docker.
 
-**Components del codi:**
+**Code Components:**
 
-1. **Configuració i execució del graf.** `load_dotenv()` carrega les credencials i el nom del projecte. La funció `main()` crea `ls.Client()` si el tracing està activat i executa el graf dins del context:
+1. **Graph setup and execution** `load_dotenv()` loads credentials and project name. The function `main()` creates `ls.Client()` if tracing is enabled and runs the graph within the context:
 
 ```python
 with ls.tracing_context(enabled=tracing_enabled, client=client, project_name=PROJECT):
@@ -1730,9 +1730,9 @@ with ls.tracing_context(enabled=tracing_enabled, client=client, project_name=PRO
     )
 ```
 
-El run arrel rep el nom `langgraph.invoke`. Els nodes, el router, les eines decorades amb `@tool` i les crides `ChatOllama` es registren automàticament dins del mateix context. El `thread_id` agrupa peticions de la conversa. No cal afegir decoradors manuals a cada node.
+The root run is named `langgraph.invoke`. The nodes, the router, the tools decorated with `@tool` and the calls `ChatOllama` are automatically registered within the same context. The `thread_id` groups conversation requests. No need to add manual decorators to each node.
 
-2. **Inferències d'Ollama i tokens.** La funció `invoke_with_langsmith_usage()` executa el model original i assigna un nom diferent a cada etapa:
+2. **Ollama's inferences and tokens.** The function `invoke_with_langsmith_usage()` runs the original model and assigns a different name to each stage:
 
 ```python
 answer = model.invoke(messages, config={
@@ -1741,50 +1741,50 @@ answer = model.invoke(messages, config={
 })
 ```
 
-Així es poden identificar `ollama.clasificacion` i `ollama.generacion_rag`. El programa recupera els tokens de `usage_metadata` i, si falten els comptadors d'entrada o sortida, consulta `response_metadata` (`prompt_eval_count` i `eval_count`). Si falta el total i els dos comptadors existeixen, Python els suma. El missatge `[LANGSMITH] Tokens ...` només és un resum de terminal: no crea un segon run LLM ni envia manualment aquests comptadors a LangSmith.
+This is how they can be identified `ollama.clasificacion` and `ollama.generacion_rag`. The program retrieves tokens from `usage_metadata` and if the input or output counters are missing, check `response_metadata` (`prompt_eval_count` and `eval_count`). If the total is missing and both counters exist, Python adds them. the message `[LANGSMITH] Tokens ...` is just a terminal summary - it does not create a second LLM run or manually send these counters to LangSmith.
 
-3. **Instrumentació manual de Weaviate.** La funció `weaviate_near_text()` registra l'operació directa del client mitjançant `ls.trace()` amb `run_type="chain"`. El run rep la col·lecció, la consulta i el límit de minuts. Al final es registra `candidates_retrieved`.
+3. **Weaviate manual instrumentation.** The feature `weaviate_near_text()` registers direct client operation using `ls.trace()` with `run_type="chain"`. The run receives the collection, query, and minute limit. In the end it registers `candidates_retrieved`.
 
 ```python
 with ls.trace("weaviate_near_text", run_type="chain", inputs={
     "collection": COLLECTION, "query": query, "max_minutes": max_minutes,
 }) as run:
-    # El programa complet construeix kwargs amb filtres i target_vector.
+    # The full program builds kwargs with filters and target_vector.
     result = collection.query.near_text(**kwargs)
     if run is not None:
         run.end(outputs={"candidates_retrieved": len(result.objects)})
 ```
 
-L'eina `search_recipes()` conserva el filtratge AND d'ingredients i retorna fins a cinc receptes. Amb `get_current_run_tree()` afegeix metadades sobre candidats recuperats, coincidències retornades i nombre d'ingredients obligatoris. La instrumentació no substitueix la cerca ni la validació de Python.
+The tool `search_recipes()` preserves ingredient AND filtering and returns up to five recipes. with `get_current_run_tree()` adds metadata about retrieved candidates, returned matches, and number of required ingredients. Instrumentation does not replace Python search or validation.
 
-4. **Enviament de les traces.** Al bloc `finally` de cada petició, `wait_for_all_tracers()` i `client.flush()` buiden els registres pendents quan hi ha un client configurat. Això facilita consultar les traces després de la resposta al terminal.
+4. **Sending traces.** On the block `finally` of each request, `wait_for_all_tracers()` and `client.flush()` empty pending logs when there is a configured client. This makes it easy to check the traces after the response in the terminal.
 
-**Intervenció del LLM:**
+**LLM intervention:**
 
-El primer `ChatOllama` interpreta la petició a `process_input_node()` i retorna una classificació JSON. Python valida l'acció i els camps. El router `route_after_input()` selecciona la branca corresponent. Si l'acció és `search_recipe` i es recuperen receptes vàlides, el segon model genera una resposta RAG amb el context proporcionat. Les operacions `add`, `remove`, `replace`, `show` i `add_recipe` no necessiten una segona inferència de generació RAG. LangSmith no decideix la ruta ni genera la resposta.
+The first `ChatOllama` interprets the request to `process_input_node()` and returns a JSON classification. Python validates the action and fields. The router `route_after_input()` selects the corresponding branch. If the action is `search_recipe` and valid recipes are retrieved, the second model generates a RAG response with the context provided. The operations `add`, `remove`, `replace`, `show` and `add_recipe` do not need a second RAG generation inference. LangSmith does not decide the route or generate the response.
 
-**Operacions de Python:**
+**Python Operations:**
 
-Python valida el JSON, executa el router i les eines, recupera receptes de Weaviate, filtra ingredients i temps, guarda `last_recipes` i actualitza `shopping_list`. Quan l'usuari selecciona una recepta anterior, `add_recipe_node()` recupera els ingredients de l'estat i executa `add_products.invoke()` sense tornar a consultar Weaviate. El checkpointer `InMemorySaver` conserva l'estat dins del procés.
+Python validates JSON, runs router and tools, retrieves Weaviate recipes, filters ingredients and time, saves `last_recipes` and update `shopping_list`. When the user selects a previous recipe, `add_recipe_node()` retrieves the state ingredients and executes `add_products.invoke()` without consulting Weaviate again. The checkpoint `InMemorySaver` preserves state within the process.
 
-**Flux d'execució:**
+**Execution Flow:**
 
 ```mermaid
 flowchart TD
-    U["Usuari: petició sobre receptes"] --> G["LangGraph: langgraph.invoke"]
-    G --> P["process_input: classificació amb Ollama"]
-    P --> R{"Router: acció?"}
+    U["User: Recipe request"] --> G["LangGraph: langgraph.invoke"]
+    G --> P["process_input: classification with Ollama"]
+    P --> R{"Router: Action?"}
     R -->|search_recipe| W["Python: search_recipes / Weaviate near_text"]
-    W --> D{"Receptes vàlides?"}
-    D -->|Sí| L["Ollama: generació RAG"]
-    D -->|No| N["Python: cap resultat"]
-    R -->|add / remove / replace / show / add_recipe / other| T["Python: node i eina corresponents"]
-    L --> F["Resposta final"]
+    W --> D{"Valid recipes?"}
+    D -->|Yes| L["Ollama: RAG generation"]
+    D -->|No| N["Python: No results"]
+    R -->|add / remove / replace / show / add_recipe / other| T["Python: corresponding node and tool"]
+    L --> F["Final response"]
     N --> F
     T --> F
-    G -. "Tracing automàtic de nodes, eines i LLM" .-> S["LangSmith SDK"]
-    W -. "Run manual: weaviate_near_text" .-> S
-    S --> M["LangSmith Cloud: Tracing i Monitoring"]
+    G -. "Automatic tracing of nodes, tools and LLM" .-> S["LangSmith SDK"]
+    W -. "Manual run: weaviate_near_text" .-> S
+    S --> M["LangSmith Cloud: Tracing and Monitoring"]
     class U,F entrada
     class G,W servei
     class P,L llm
@@ -1800,24 +1800,24 @@ flowchart TD
     classDef opik fill:#F5F5F5,stroke:#333333,color:#111111
 ```
 
-<p align="center"><sub>Figura 19. Flux de l'assistent RAG i enviament de traces a LangSmith.</sub></p>
+<p align="center"><sub>Figure 19. RAG assistant flow and sending traces to LangSmith.</sub></p>
 
-**Configuració i execució (des de l'arrel del repositori):**
+**Setup and run (from repository root):**
 
-La creació del compte gratuït, la preparació de l'entorn virtual, la configuració del fitxer `.env` i la resolució d'errors estan detallades a l'[apartat 6.11.1 de `06_observability.md`](./06_observability.md#6111-installació-i-configuració). No cal crear un segon agent ni desplegar el programa al núvol.
+Free account creation, virtual environment preparation, file configuration `.env` and error resolution are detailed in [section 6.11.1 of `06_observalility.md`](./06_observalility.md#6111-installation-and-configuration). No need to create a second agent or deploy the program to the cloud.
 
-**1. Dependències:** amb l'entorn virtual activat, si encara no s'han instal·lat les dependències del repositori, executa les ordres següents, comunes a macOS, Linux i Windows:
+**1. Dependencies:** with the virtual environment enabled, if the repository dependencies are not already installed, run the following commands, common to macOS, Linux, and Windows:
 
 ```bash
 python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-LangSmith (`langsmith==0.12.6`) ja està inclòs a `requirements.txt`. No cal instal·lar-lo per separat ni actualitzar les biblioteques si l'entorn ja funciona. Si `pip check` detecta incompatibilitats, cal resoldre-les abans de continuar.
+LangSmith (`langsmith==0.12.6`) is already included in `requirements.txt`. There is no need to install it separately or update the libraries if the environment is already working. If `pip check` detects incompatibilities, they must be resolved before continuing.
 
-**2. Configuració:** comprova que Ollama està en funcionament, que Weaviate Cloud conté la col·lecció `Recetas` i que el `.env` inclou les variables `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OLLAMA_MODEL`, `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY`, `LANGSMITH_ENDPOINT` i `LANGSMITH_PROJECT=shopping-rag-weaviate-langsmith`. L'apartat 6.11.1 conté el bloc complet de configuració i els endpoints de cada regió. No s'han de definir les variables `LANGSMITH_AGENT_ID` ni `LANGSMITH_AGENT_ENVIRONMENT` per a aquest exemple. El `.env` amb les claus reals no s'ha de publicar al repositori.
+**2. Configuration:** check that Ollama is running, that Weaviate Cloud contains the collection `Recetas` and that the `.env` includes the variables `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OLLAMA_MODEL`, `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY`, `LANGSMITH_ENDPOINT` and `LANGSMITH_PROJECT=shopping-rag-weaviate-langsmith`. Section 6.11.1 contains the complete configuration block and the endpoints of each region. Variables should not be defined `LANGSMITH_AGENT_ID` nor `LANGSMITH_AGENT_ENVIRONMENT` for this example. The `.env` with real keys should not be published to the repository.
 
-**3. Execució:** comprova primer la connexió amb Weaviate amb `--check`. Aquesta comprovació no valida Ollama ni LangSmith. Si la col·lecció és accessible, executa l'assistent amb la segona ordre.
+**3. Execution:** first check connection with Weaviate with `--check`. This check does not validate Ollama or LangSmith. If the collection is accessible, run the assistant with the second command.
 
 **macOS/Linux:**
 
@@ -1833,38 +1833,38 @@ python .\AI_Observability\code\src\12_shopping_list_weaviate_langsmith.py --chec
 python .\AI_Observability\code\src\12_shopping_list_weaviate_langsmith.py
 ```
 
-**Prova en una mateixa sessió:**
+**Test in one session:**
 
-| Petició                                       | Acció esperada  | Què cal comprovar?                                                              |
+| Petition | Expected Action | What do you need to check?                                                              |
 | --------------------------------------------- | --------------- | ------------------------------------------------------------------------------- |
-| `Añade leche`                                 | `add`           | Classificació i `add_products`.                                                 |
-| `Recomiéndame recetas con huevos y patatas`   | `search_recipe` | Cerca vectorial, filtre AND i generació si hi ha resultats.                     |
-| `Añade los ingredientes de la primera receta` | `add_recipe`    | Si hi ha una recepta prèvia, reutilització de `last_recipes`, sense nova cerca. |
-| `Muéstrame la lista`                          | `show`          | Execució de `show_products`.                                                    |
-| `Quita la leche`                              | `remove`        | Execució de `remove_products`.                                                  |
+| `Add milk`                                 | `add`           | Classification and `add_products`.                                                 |
+| `Recommend recipes with eggs and potatoes`   | `search_recipe` | Vector search, AND filter and generate if results.                     |
+| `Add the ingredients of the first recipe` | `add_recipe`    | If there is a previous recipe, reuse of `last_recipes`, no new search. |
+| `Show me the list`                          | `show`          | Execution of `show_products`.                                                    |
+| `Remove the milk`                              | `remove`        | Execution of `remove_products`.                                                  |
 
-Escriu `exit` per sortir. `reset` esborra la llista i les últimes receptes de la memòria local, no les traces de LangSmith.
+Write `exit` to exit. `reset` clears list and last recipes from local memory, not LangSmith traces.
 
-**Resultats a LangSmith:**
+**Results in LangSmith:**
 
-![Llistat de les execucions del RAG](./img/langsmith_overview.png)
+![List of RAG executions](./img/langsmith_overview.png)
 
-<p align="center"><sub>Figura 20. Nou traces de l'assistent amb l'acció seleccionada, la latència i els tokens.</sub></p>
+<p align="center"><sub>Figure 20. Nine assistant traces with selected action, latency, and tokens.</sub></p>
 
-A la captura es poden observar les operacions `add`, `remove`, `show`, `search_recipe` i `add_recipe`. Les dues cerques de receptes consumeixen aproximadament 1.267 i 2.386 tokens, mentre que les operacions directes sobre la llista registren entre 823 i 909 tokens en aquestes proves. Aquests resultats depenen de la petició, del context i del rendiment del model.
+In the screenshot you can see the operations `add`, `remove`, `show`, `search_recipe` and `add_recipe`. The two recipe lookups consume approximately 1,267 and 2,386 tokens, while direct operations on the list log between 823 and 909 tokens in these tests. These results depend on the request, context, and model performance.
 
-![Detall d'una execució del RAG](./img/langsmith_trace.png)
+![Detail of a RAG execution](./img/langsmith_trace.png)
 
-<p align="center"><sub>Figura 21. Detall jeràrquic de la cerca de receptes amb ous i patates.</sub></p>
+<p align="center"><sub>Figure 21. Hierarchical detail of the search for recipes with eggs and potatoes.</sub></p>
 
-La petició «Recomiéndame recetas con huevos y patatas» registra una durada total de 8,38 s. La classificació consumeix 847 tokens i la generació RAG, 420 tokens: en total, 1.267 tokens. El router selecciona `search_recipe`, que executa `search_recipes` (2,22 s) i la consulta `weaviate_near_text` (1,29 s, inclosa en el temps de l'eina). A la sortida es pot comprovar `action=search_recipe` i consultar les receptes guardades a `last_recipes`.
+The request "Recommend recipes with eggs and potatoes" records a total duration of 8.38 s. Classification consumes 847 tokens and RAG generation consumes 420 tokens: a total of 1,267 tokens. The router selects `search_recipe`, which executes `search_recipes` (2.22 s) and the query `weaviate_near_text` (1.29s, including tool time). At the exit you can check `action=search_recipe` and consult the recipes saved in `last_recipes`.
 
-![Distribució temporal de l'execució RAG](./img/langsmith_waterfall.png)
+![Time distribution of RAG execution](./img/langsmith_waterfall.png)
 
-<p align="center"><sub>Figura 22. Waterfall de la mateixa cerca: classificació, recuperació de receptes i generació de la resposta.</sub></p>
+<p align="center"><sub>Figure 22. Waterfall of the same search: classification, retrieval of recipes and generation of the answer.</sub></p>
 
-La primera inferència dura 2,79 s i la segona, 3,37 s. El node `search_recipe` dura 5,59 s i inclou tant la recuperació com la generació. Waterfall permet comprovar en quin moment s'executa cada operació sense comptar dues vegades les durades dels runs fills.
+The first inference takes 2.79s and the second 3.37s. The node `search_recipe` takes 5.59s and includes both retrieval and generation. Waterfall allows you to check when each operation is executed without counting the durations of child runs twice.
 
-Per comparar el rendiment global, accedeix a **Monitoring → Analytics**. Les figures 12–14 de l'[apartat 6.13 de `06_observability.md`](./06_observability.md#langsmith-monitoring) mostren el volum i la latència de les traces, les crides a les eines i les execucions dels nodes. Permeten comprovar que una cerca vectorial és més costosa que les operacions directes de Python sobre la llista. L'[apartat 6.12](./06_observability.md#langsmith-traces) explica com interpretar una trace i el Waterfall, l'[apartat 6.14](./06_observability.md#614-comparació-entre-opik-opentelemetry-i-langsmith) compara les tres plataformes.
+To compare overall performance, go to **Monitoring → Analytics**. Figures 12–14 of [section 6.13 of `06_observalility.md`](./06_observalility.md#613-monitoring-and-interpretation-of-the-results) show volume and latency of traces, tool calls, and node executions. They allow checking that a vector search is more expensive than direct Python operations on the list. The [section 6.12](./06_observalility.md#612-analysis-of-traces-and-execution-flow) explains how to interpret a trace and the Waterfall, [section 6.14](./06_observalility.md#614-comparison-between-opik-opentelemetry-and-langsmith) compares the three platforms.
 
-LangSmith pot enviar el contingut dels prompts, les respostes i l'estat al núvol. Cal utilitzar dades de prova i protegir les credencials.
+LangSmith can send prompt content, responses, and status to the cloud. Test data must be used and credentials must be protected.

@@ -1,61 +1,61 @@
 # 7. HERMES
 
-## 7.1. QUÈ ÉS HERMES?
+## 7.1. WHAT IS HERMES?
 
-Hermes Agent és un agent d'IA de codi obert dissenyat per executar tasques de manera autònoma mitjançant l'ús de models de llenguatge (LLM), eines externes i mecanismes de memòria.
+Hermes Agent is an open source AI agent designed to execute tasks autonomously by using language models (LLMs), external tools, and memory mechanisms.
 
-A diferència d'un LLM convencional, que principalment interpreta instruccions i genera respostes, Hermes pot planificar accions, seleccionar eines, executar operacions i analitzar els resultats per completar una tasca.
+Unlike a conventional LLM, which mainly interprets instructions and generates responses, Hermes can plan actions, select tools, execute operations and analyze the results to complete a task.
 
-Per exemple, mentre que un model de llenguatge pot explicar com analitzar un projecte Python, Hermes pot, si disposa dels permisos necessaris, accedir als fitxers del projecte, examinar-ne el codi, executar proves i generar un informe amb els resultats.
+For example, while a language model can explain how to analyze a Python project, Hermes can, if it has the necessary permissions, access the project files, examine the code, run tests, and generate a report with the results.
 
-Hermes no és un model de llenguatge en si mateix, sinó un sistema que utilitza un LLM com a motor de raonament. Pot funcionar amb models allotjats al núvol o amb models executats localment mitjançant plataformes com Ollama.
+Hermes is not a language model itself, but a system that uses an LLM as a reasoning engine. It can work with models hosted in the cloud or with models running locally using platforms like Ollama.
 
-Una de les seves característiques principals és la capacitat de conservar informació entre sessions i crear _skills_ reutilitzables a partir dels procediments que ha utilitzat anteriorment. Això permet millorar progressivament la seva manera d'executar determinades tasques, sense que sigui necessari reentrenar els pesos del model de llenguatge.
+One of its main features is the ability to retain information between sessions and create reusable _skills_ from procedures you've previously used. This makes it possible to progressively improve the way it performs certain tasks, without the need to retrain the language model's weights.
 
-### Diferències amb LangChain i LangGraph
+### Differences with LangChain and LangGraph
 
-Tot i que les tres tecnologies permeten desenvolupar aplicacions basades en agents d'intel·ligència artificial, tenen finalitats i graus de desenvolupament diferents.
+Although all three technologies allow the development of applications based on artificial intelligence agents, they have different purposes and degrees of development.
 
-| **Tecnologia** | **Finalitat**                                           | **Característiques principals**                                                                                                                                   |
+| **Technology** | **Purpose** | **Main Features** |
 | -------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **LangChain**  | Framework per construir aplicacions basades en LLM      | Proporciona components per connectar models amb eines, bases de dades, documents i serveis externs. El desenvolupador programa com s'utilitzen aquests components |
-| **LangGraph**  | Framework per organitzar i controlar el flux d'execució | Permet definir nodes, transicions, condicions i gestionar l'estat de l'aplicació. El desenvolupador controla explícitament el comportament dels agents            |
-| **Hermes**     | Agent d'IA ja implementat per executar tasques          | Incorpora sistemes de planificació, execució d'eines i memòria. Permet delegar tasques sense programar tota l'arquitectura de l'agent des de zero                 |
+| **LangChain** | Framework for building applications based on LLM | It provides components to connect models with external tools, databases, documents, and services. The developer programs how these components are used |
+| **LangGraph** | Framework for organizing and controlling execution flow | Allows you to define nodes, transitions, conditions, and manage application state. The developer explicitly controls the behavior of agents |
+| **Hermes** | AI agent already implemented to execute tasks | It incorporates planning systems, tool execution and memory. It allows you to delegate tasks without programming the entire agent architecture from scratch |
 
-Per tant, mentre que LangChain i LangGraph són eines per construir i controlar aplicacions agentives, Hermes és un agent que ja disposa de moltes d'aquestes capacitats integrades.
+So, while LangChain and LangGraph are tools for building and controlling agentive applications, Hermes is an agent that already has many of these capabilities built-in.
 
-Aquestes tecnologies **no són excloents**, sinó que es poden combinar. Per exemple, en una aplicació desenvolupada amb LangGraph es pot afegir un node que invoqui Hermes per realitzar una tasca específica. En aquest cas, LangGraph continua controlant el flux general de l'aplicació, mentre que Hermes s'encarrega de resoldre la tasca que se li ha delegat.
+These technologies are **not exclusive**, but can be combined. For example, in an application developed with LangGraph you can add a node that invokes Hermes to perform a specific task. In this case, LangGraph continues to control the overall flow of the application, while Hermes takes care of solving the task delegated to it.
 
-## 7.2. QUÈ PERMET FER?
+## 7.2. WHAT DOES IT ALLOW TO DO?
 
-Les principals funcionalitats d'Hermes són:
+The main functions of Hermes are:
 
-- **Execució autònoma de tasques:** pot descompondre una petició complexa en diferents passos i executar-los successivament.
-- **Utilització d'eines:** pot executar ordres de terminal, consultar informació, llegir fitxers i modificar codi, segons les eines i els permisos configurats.
-- **Memòria persistent:** pot conservar informació rellevant entre diferents sessions.
-- **Skills:** permet crear, guardar i reutilitzar procediments per resoldre tasques recurrents.
-- **Integració amb MCP:** pot connectar-se a servidors Model Context Protocol per accedir a eines i serveis externs.
-- **Subagents:** pot delegar parts d'una tasca a altres agents especialitzats.
-- **Automatització:** permet programar tasques que s'executin de manera periòdica.
-- **Integració amb aplicacions:** es pot utilitzar des de la terminal, una aplicació d'escriptori o plataformes de missatgeria.
+- **Autonomous execution of tasks:** can break down a complex request into different steps and execute them sequentially.
+- **Using Tools:** can execute terminal commands, query information, read files, and modify code, depending on the tools and permissions configured.
+- **Persistent Memory:** can retain relevant information between different sessions.
+- **Skills:** allows you to create, save and reuse procedures to solve recurring tasks.
+- **Integration with MCP:** can connect to Model Context Protocol servers to access external tools and services.
+- **Subagents:** can delegate parts of a task to other specialized agents.
+- **Automation:** allows you to schedule tasks to run periodically.
+- **Integration with applications:** can be used from the terminal, a desktop application or messaging platforms.
 
-El funcionament general segueix un procés iteratiu:
+The general operation follows an iterative process:
 
-1. L'usuari introdueix una petició.
-2. Hermes envia la informació al LLM configurat.
-3. El model interpreta la petició i determina les accions necessàries.
-4. Hermes executa les eines seleccionades.
-5. Els resultats es retornen al model perquè els analitzi.
-6. El procés es repeteix, si és necessari, fins a obtenir una resposta final.
+1. The user enters a request.
+2. Hermes sends the information to the configured LLM.
+3. The model interprets the request and determines the necessary actions.
+4. Hermes runs the selected tools.
+5. The results are returned to the model for analysis.
+6. The process is repeated, if necessary, until a final answer is obtained.
 
 ```mermaid
 flowchart LR
-    U["Usuari"] --> H["Hermes Agent"]
-    H --> L["LLM: interpreta i planifica"]
-    L --> T["Hermes executa eines"]
-    T --> R["Resultats de les eines"]
+    U["User"] --> H["Hermes Agent"]
+    H --> L["LLM: interpret and plan"]
+    L --> T["Hermes runs tools"]
+    T --> R["Results of the tools"]
     R --> L
-    L -->|Tasca completada| F["Resposta final"]
+    L -->|Task completed| F["Final response"]
 
     classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
     classDef agent fill:#D5E8E8,stroke:#333333,color:#111111
@@ -72,237 +72,237 @@ flowchart LR
     class F resposta
 ```
 
-<p align="center"><sub>Figura 1. Flux general de funcionament d'Hermes Agent</sub></p>
+<p align="center"><sub>Figure 1. General flow of operation of Hermes Agent</sub></p>
 
-Aquesta arquitectura permet desenvolupar aplicacions en què l'agent no es limita a respondre preguntes, sinó que participa activament en l'execució de les tasques.
+This architecture makes it possible to develop applications in which the agent is not limited to answering questions, but actively participates in the execution of tasks.
 
-## 7.3. INSTAL·LACIÓ
+## 7.3. INSTALLATION
 
-Hermes Agent és compatible amb diferents sistemes operatius, principalment macOS, Linux i Windows. Disposa d'una aplicació d'escriptori amb interfície gràfica i d'una versió de terminal (CLI), especialment útil per integrar-lo amb altres programes.
+Hermes Agent is compatible with different operating systems, mainly macOS, Linux and Windows. It has a desktop application with a graphical interface and a terminal version (CLI), especially useful for integrating it with other programs.
 
-La instal·lació mitjançant terminal permet executar Hermes com una aplicació independent i invocar-lo des de scripts Python sense necessitat de mantenir oberta la interfície gràfica.
+Terminal installation allows Hermes to be run as a standalone application and invoked from Python scripts without the need to keep the GUI open.
 
-### 7.3.1. INSTAL·LACIÓ A macOS
+### 7.3.1. INSTALLATION ON macOS
 
-**Pas 1. Instal·lar Hermes**
+**Step 1. Install Hermes**
 
-Executar al terminal:
+Run in terminal:
 
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
-L'instal·lador descarrega el codi d'Hermes i prepara les dependències necessàries per al seu funcionament.
+The installer downloads the Hermes code and prepares the necessary dependencies for its operation.
 
-La instal·lació estàndard crea el directori del programa a `~/.hermes/hermes-agent/` i l'executable de terminal a `~/.local/bin/hermes`.
+The standard installation creates the program directory a `~/.hermes/hermes-agent/` and the terminal executable a `~/.local/bin/hermes`.
 
-**Pas 2. Configurar el PATH**
+**Step 2. Set the PATH**
 
-Una vegada finalitzada la instal·lació, actualitzar la configuració del terminal:
+Once the installation is complete, update the terminal configuration:
 
 ```bash
 source ~/.zshrc
 ```
 
-Comprovar que Hermes es reconeix correctament:
+Check that Hermes is recognized correctly:
 
 ```bash
 hermes --version
 ```
 
-Si apareix l'error `zsh: command not found: hermes`, incorporar la carpeta de l'executable al `PATH`:
+If the error appears `zsh: command not found: hermes`, incorporate the folder of the executable in the `PATH`:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Per mantenir aquesta configuració en futures sessions:
+To keep this setting in future sessions:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-**Pas 3. Executar Hermes**
+**Step 3. Run Hermes**
 
-Per iniciar l'agent, executar:
+To start the agent, run:
 
 ```bash
 hermes
 ```
 
-S'obrirà la interfície interactiva des de la qual es poden introduir peticions en llenguatge natural.
+This will open the interactive interface from which requests can be entered in natural language.
 
-**Pas 4. Configurar els models de llenguatge**
+**Step 4. Configure Language Models**
 
-Executar:
+Run:
 
 ```bash
 hermes model
 ```
 
-Aquest comandament permet seleccionar un proveïdor de models i configurar-ne les dades de connexió. Hermes pot treballar amb models allotjats al núvol o amb models locals executats mitjançant Ollama. En aquest últim cas, cal seleccionar un model que ja es tingui instal·lat.
+This command allows you to select a model provider and configure its connection data. Hermes can work with models hosted in the cloud or with local models executed through Ollama. In the latter case, you must select a model that is already installed.
 
-Per comprovar els models d'Ollama disponibles:
+To check available Ollama models:
 
 ```bash
 ollama list
 ```
 
-Per gestionar les eines disponibles:
+To manage available tools:
 
 ```bash
 hermes tools
 ```
 
-Per comprovar que la instal·lació i la configuració són correctes:
+To verify that the installation and configuration is correct:
 
 ```bash
-hermes -z "Hola, respon únicament OK"
+hermes -z "Hello, respond with OK only"
 ```
 
-### 7.3.2. INSTAL·LACIÓ A LINUX
+### 7.3.2. INSTALLATION IN LINUX
 
-**Pas 1. Instal·lar Hermes**
+**Step 1. Install Hermes**
 
-Executar al terminal:
+Run in terminal:
 
 ```bash
 curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
-L'instal·lador prepara l'entorn d'Hermes, incloent les versions gestionades de Python, Node.js i altres dependències necessàries.
+The installer prepares the Hermes environment, including managed versions of Python, Node.js, and other required dependencies.
 
-**Pas 2. Configurar el PATH**
+**Step 2. Set the PATH**
 
-Si s'utilitza Bash:
+If using Bash:
 
 ```bash
 source ~/.bashrc
 ```
 
-Si s'utilitza Zsh:
+If using Zsh:
 
 ```bash
 source ~/.zshrc
 ```
 
-Comprovar la instal·lació:
+Check installation:
 
 ```bash
 hermes --version
 ```
 
-Si no es reconeix el comandament, afegir-lo temporalment al `PATH`:
+If the command is not recognized, temporarily add it to the `PATH`:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Per conservar el canvi en Bash:
+To save the change in Bash:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-Per conservar el canvi en Zsh:
+To save the change in Zsh:
 
 ```bash
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
-**Pas 3. Executar Hermes**
+**Step 3. Run Hermes**
 
 ```bash
 hermes
 ```
 
-S'obrirà la interfície interactiva des de la qual es poden introduir peticions en llenguatge natural.
+This will open the interactive interface from which requests can be entered in natural language.
 
-**Pas 4. Configurar els models de llenguatge**
+**Step 4. Configure Language Models**
 
 ```bash
 hermes model
 ```
 
-Aquest comandament permet seleccionar un proveïdor de models i configurar-ne les dades de connexió. Hermes pot treballar amb models al núvol o amb models locals executats mitjançant Ollama.
+This command allows you to select a model provider and configure its connection data. Hermes can work with models in the cloud or with local models run through Ollama.
 
-Per consultar els models d'Ollama instal·lats:
+To check the installed Ollama models:
 
 ```bash
 ollama list
 ```
 
-Per gestionar les eines disponibles:
+To manage available tools:
 
 ```bash
 hermes tools
 ```
 
-Per comprovar la configuració:
+To check the settings:
 
 ```bash
-hermes -z "Hola, respon únicament OK"
+hermes -z "Hello, respond with OK only"
 ```
 
-### 7.3.3. INSTAL·LACIÓ A WINDOWS
+### 7.3.3. INSTALLATION ON WINDOWS
 
-**Pas 1. Instal·lar Hermes**
+**Step 1. Install Hermes**
 
-Executar al PowerShell:
+Run in PowerShell:
 
 ```powershell
 iex (irm https://hermes-agent.nousresearch.com/install.ps1)
 ```
 
-Aquest comandament descarrega i executa l'instal·lador de Windows.
+This command downloads and runs the Windows installer.
 
-El programa s'instal·la habitualment a `%LOCALAPPDATA%\hermes\` i l'executable es configura al directori `%LOCALAPPDATA%\hermes\bin\`.
+The program is usually installed on `%LOCALAPPDATA%\hermes\` and the executable is set to the directory `%LOCALAPPDATA%\hermes\bin\`.
 
-**Pas 2. Configurar el PATH**
+**Step 2. Set the PATH**
 
-Quan finalitzi el procés, tancar PowerShell i obrir una terminal nova perquè s'actualitzi el `PATH`.
+When the process is complete, close PowerShell and open a new terminal to update the `PATH`.
 
-Executar:
+Run:
 
 ```powershell
 hermes --version
 ```
 
-Si Windows reconeix el comandament, la instal·lació s'ha completat correctament.
+If Windows recognizes the command, the installation completed successfully.
 
-**Pas 3. Executar Hermes**
+**Step 3. Run Hermes**
 
 ```powershell
 hermes
 ```
 
-S'obrirà la interfície interactiva des de la qual es poden introduir peticions en llenguatge natural.
+This will open the interactive interface from which requests can be entered in natural language.
 
-**Pas 4. Configurar els models de llenguatge**
+**Step 4. Configure Language Models**
 
 ```powershell
 hermes model
 ```
 
-Aquest comandament permet seleccionar un proveïdor de models i configurar-ne les dades de connexió. Hermes pot treballar amb models al núvol o amb models locals executats mitjançant Ollama.
+This command allows you to select a model provider and configure its connection data. Hermes can work with models in the cloud or with local models run through Ollama.
 
-Per comprovar els models d'Ollama instal·lats:
+To check the installed Ollama models:
 
 ```powershell
 ollama list
 ```
 
-Per gestionar les eines disponibles:
+To manage available tools:
 
 ```powershell
 hermes tools
 ```
 
-Per comprovar la instal·lació i la configuració:
+To check the installation and configuration:
 
 ```powershell
-hermes -z "Hola, respon únicament OK"
+hermes -z "Hello, respond with OK only"
 ```

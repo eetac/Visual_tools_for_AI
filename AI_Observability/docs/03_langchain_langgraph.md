@@ -1,24 +1,24 @@
-## 4. LANGCHAIN I LANGGRAPH
+## 4. LANGCHAIN AND LANGGRAPH
 
-Abans d'analitzar els exemples de Python, és important entendre el paper de LangChain i LangGraph en el desenvolupament d'aplicacions basades en models de llenguatge.
+Before looking at the Python examples, it is important to understand the role of LangChain and LangGraph in developing applications based on language models.
 
 ### 4.1. LANGCHAIN
 
-LangChain és un framework que facilita la integració de models de llenguatge (LLM) amb aplicacions Python i altres recursos externs, com funcions, bases de dades, documents o APIs.
+LangChain is a framework that facilitates the integration of language models (LLM) with Python applications and other external resources, such as functions, databases, documents or APIs.
 
-Permet desenvolupar aplicacions en què el model no es limita a respondre preguntes, sinó que també pot utilitzar eines per obtenir informació o executar determinades operacions.
+Allows you to develop applications in which the model is not limited to answering questions, but can also use tools to obtain information or perform certain operations.
 
-Per exemple, si un usuari pregunta quin temps fa en una ciutat, un LLM sense eines només pot respondre amb els coneixements que té o amb la informació que se li proporciona. En canvi, amb LangChain es pot connectar el model a una funció Python que consulti dades meteorològiques.
+For example, if a user asks what the weather is like in a city, a toolless LLM can only respond with the knowledge it has or the information provided. Instead, with LangChain you can connect the model to a Python function that queries weather data.
 
-Els principals components són:
+The main components are:
 
-- **LLM**: model que interpreta les instruccions i genera respostes. En aquests exemples s'utilitza Qwen, executat localment amb Ollama.
-- **Tools**: funcions o recursos externs que el model pot sol·licitar quan necessita realitzar una operació.
-- **Agent**: sistema que utilitza el LLM per decidir quines eines ha de fer servir per completar una tasca.
-- **Messages**: missatges que representen les instruccions, les preguntes de l'usuari, les respostes del model i els resultats de les eines.
+- **LLM**: Model that interprets instructions and generates responses. These examples use Qwen, running locally with Ollama.
+- **Tools**: External functions or resources that the model can request when it needs to perform an operation.
+- **Agent** - System that the LLM uses to decide which tools to use to complete a task.
+- **Messages** - Messages representing instructions, user questions, model responses, and tool results.
 
-Aplicació en Python
-Per connectar LangChain amb Ollama s'utilitza la classe ChatOllama:
+Application in Python
+To connect LangChain with Ollama the ChatOllama class is used:
 
 ```python
 from langchain_ollama import ChatOllama
@@ -29,31 +29,31 @@ llm = ChatOllama(
 )
 ```
 
-Aquest codi crea un objecte que permet comunicar-se amb Qwen mitjançant el servidor local d'Ollama.
+This code creates an object that allows communication with Qwen via the local Ollama server.
 
-Per enviar una consulta:
+To send an inquiry:
 
 ```python
 response = llm.invoke(
-    "Explica què és un LLM"
+    "Explain what an LLM is"
 )
 print(response.content)
 ```
 
-En aquest cas, LangChain envia la pregunta a Ollama, Ollama executa el model i retorna la resposta generada.
+In this case, LangChain sends the question to Ollama, Ollama runs the model and returns the generated answer.
 
-Quan s'incorporen eines, el funcionament es modifica:
+When tools are embedded, the behavior changes:
 
 ```mermaid
 flowchart TD
-    U["Usuari"] --> A["Agent LangChain"]
-    A --> L["LLM: interpreta la petició"]
-    L --> D{"Cal utilitzar una eina?"}
-    D -->|Sí| P["LangChain executa la funció Python"]
-    P --> R["Resultat de l'eina"]
-    R --> L2["LLM: redacta la resposta"]
+    U["User"] --> A["Agent LangChain"]
+    A --> L["LLM: Interpret the request"]
+    L --> D{"Need to use a tool?"}
+    D -->|Yes| P["LangChain executes Python function"]
+    P --> R["Tool result"]
+    R --> L2["LLM: Compose the answer"]
     D -->|No| L2
-    L2 --> F["Resposta final"]
+    L2 --> F["Final response"]
 
     classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
     classDef agent fill:#D5E8E8,stroke:#333333,color:#111111
@@ -74,42 +74,42 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 1. Flux amb LangChain</sub>
+  <sub>Figure 1. Flow with LangChain</sub>
 </p>
-És important remarcar que el LLM no executa directament el codi Python. El model pot generar una sol·licitud per utilitzar una eina, però és LangChain qui s'encarrega de cridar la funció corresponent.
+It is important to note that the LLM does not directly execute Python code. The model can generate a request to use a tool, but it is LangChain that takes care of calling the corresponding function.
 
 ### 4.2. LANGGRAPH
 
-LangGraph és un framework orientat a construir aplicacions i agents amb fluxos d'execució més estructurats, utilitzant grafs formats per nodes i connexions.
+LangGraph is a framework aimed at building applications and agents with more structured execution flows, using graphs formed by nodes and connections.
 
-Mentre que LangChain facilita la integració de models i eines, LangGraph permet definir explícitament quines operacions s'executen, en quin ordre, com es prenen les decisions i quin estat es conserva.
+While LangChain facilitates the integration of models and tools, LangGraph allows you to explicitly define which operations are executed, in what order, how decisions are made, and what state is preserved.
 
-Els principals components són:
-State (estat): estructura que emmagatzema la informació compartida entre els diferents passos del programa.
-Nodes: funcions Python que realitzen una operació determinada.
-Edges: connexions que indiquen quin node s'executarà després.
-Conditional edges: connexions condicionals que permeten seleccionar diferents camins segons el resultat d'una funció.
-Router: funció que decideix quin camí ha de seguir l'execució.
-Checkpointer: mecanisme que permet conservar l'estat entre diferents execucions del graf.
+The main components are:
+State (state): structure that stores the information shared between the different steps of the program.
+Nodes: Python functions that perform a given operation.
+Edges: Connections that indicate which node will run next.
+Conditional edges: conditional connections that allow different paths to be selected depending on the result of a function.
+Router: Function that decides which path the execution should follow.
+Checkpointer: mechanism that allows the state to be preserved between different executions of the graph.
 
-Exemple de funcionament
-Suposem una aplicació que gestiona una llista de la compra.
+Example of operation
+Consider an application that manages a shopping list.
 
-L'usuari introdueix: afegeix llet a la llista.
-El procés podria ser:
-Usuari → process_input → LLM interpreta la petició → action = "add" → Router → Node add →
-→ Funció Python add_products() → Llista actualitzada → Resposta final
+User enters: Add milk to list.
+The process could be:
+User → process_input → LLM interprets the request → action = "add" → Router → Node add →
+→ Python function add_products() → List updated → Final answer
 
 ```mermaid
 flowchart TD
-    A["Usuari"] --> B["process_input()"]
-    B --> C["LLM interpreta la petició"]
+    A["User"] --> B["process_input()"]
+    B --> C["LLM interprets the request"]
     C --> D["action = add"]
     D --> E["Router"]
     E --> F["Node: add"]
-    F --> G["Funció Python: add_products()"]
-    G --> H["Llista de productes actualitzada"]
-    H --> I["Resposta final"]
+    F --> G["Python function: add_products()"]
+    G --> H["Updated product list"]
+    H --> I["Final response"]
 
     classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
     classDef entrada fill:#D5E8E8,stroke:#333333,color:#111111
@@ -133,13 +133,13 @@ flowchart TD
 ```
 
 <p align="center">
-  <sub>Figura 2. Models instal·lats</sub>
+  <sub>Figure 2. Installed models</sub>
 </p>
 
-En aquest exemple, el LLM interpreta el llenguatge natural i retorna l'acció que considera adequada. Posteriorment, el router de LangGraph llegeix aquesta acció i selecciona el node corresponent. La modificació real de la llista es fa mitjançant una funció Python, no directament amb el LLM.
+In this example, the LLM interprets the natural language and returns the action it deems appropriate. Later, the LangGraph router reads this action and selects the corresponding node. The actual modification of the list is done via a Python function, not directly with the LLM.
 
-Creació d'un graf
-En Python, LangGraph permet definir una estructura com aquesta:
+Creating a graph
+In Python, LangGraph allows you to define a structure like this:
 
 ```python
 builder = StateGraph(ShoppingState)
@@ -160,17 +160,17 @@ builder.add_edge(
 )
 ```
 
-Amb add_conditional_edges() es poden definir connexions condicionals que determinen quin node s'executa segons el resultat del router.
+With add_conditional_edges(), conditional connections can be defined that determine which node is executed based on the result of the router.
 
-Finalment, amb compile() es construeix el graf executable i amb invoke() s'inicia una execució.
+Finally, with compile() the executable graph is built and with invoke() an execution is started.
 
-### 4.3. DIFERÈNCIA ENTRE LANGCHAIN I LANGGRAPH (no són excloents l’un de l’altre)
+### 4.3. DIFFERENCE BETWEEN LANGCHAIN AND LANGGRAPH (they are not mutually exclusive)
 
-Les diferències principals entre LangChain i LangGraph són les següents:
+The main differences between LangChain and LangGraph are as follows:
 
-| LangChain                                   | LangGraph                                               |
+| LangChain | LangGraph |
 | ------------------------------------------- | ------------------------------------------------------- |
-| Connecta models amb eines i altres recursos | Organitza l'execució mitjançant un graf                 |
-| Facilita la creació d'agents                | Permet controlar explícitament nodes i transicions      |
-| Gestiona interaccions amb el LLM            | Gestiona l'estat i el recorregut de l'aplicació         |
-| Permet fer _tool calling_                   | Permet incorporar condicions, bucles i diferents camins |
+| Connect models with tools and other resources | Organize execution using a graph |
+| Facilitates the creation of agents | Allows you to explicitly control nodes and transitions |
+| Manage interactions with the LLM | Manage application state and path |
+| Allows to do _tool calling_ | Allows you to incorporate conditions, loops and different paths |

@@ -1,71 +1,71 @@
-# IA, visualització i observabilitat
+# AI, visualization and observability
 
-Aquest manual presenta els conceptes i les eines utilitzats per construir aplicacions amb models de llenguatge. Els documents segueixen un recorregut des dels fonaments dels LLM fins a la seva execució local, la creació d’agents, la cerca amb RAG, la connexió amb eines mitjançant MCP i l’observabilitat de les aplicacions.
+This manual introduces the concepts and tools used to build applications with language models. The papers follow a journey from the basics of LLMs to their local execution, creating agents, searching with RAG, connecting to tools using MCP, and observability of applications.
 
-## Taula de continguts
+## Table of contents
 
 1. [LLM (Large Language Model)](./docs/01_llm.md)
-2. [Ollama: instal·lació i execució local](./docs/02_ollama.md)
-3. [LangChain i LangGraph](./docs/03_langchain_langgraph.md)
+2. [Ollama: Install and run locally](./docs/02_ollama.md)
+3. [LangChain and LangGraph](./docs/03_langchain_langgraph.md)
 4. [RAG (Retrieval-Augmented Generation)](./docs/04_rag.md)
-5. [Bases de dades vectorials](./docs/04.1_vector_databases.md)
+5. [Vector databases](./docs/04.1_vector_databases.md)
 6. [MCP (Model Context Protocol)](./docs/05_MCP.md)
-7. [Observabilitat amb Opik i Opentelemetry i exemples d’aplicació](./docs/06_observalility.md)
-8. [Hermes](./docs/07_hermes.md) — document pendent de contingut
-9. [Exemples](./docs/08_examples.md)
+7. [Observability with Opik and Opentelemetry and application examples](./docs/06_observalility.md)
+8. [Hermes](./docs/07_hermes.md) — document pending content
+9. [Examples](./docs/08_examples.md)
 
-## Resum dels documents
+## Summary of documents
 
 ### 1. LLM (Large Language Model)
 
-Explica què és un model de llenguatge, quines tasques pot fer i com genera respostes token a token. També presenta les etapes de processament i diferencia l’entrenament de la inferència.
+Explains what a language model is, what tasks it can do, and how it generates token-by-token responses. It also presents the stages of processing and differentiates training from inference.
 
-**Document:** [01_llm.md](./01_llm.md)
+**Document:** [01_llm.md](./docs/01_llm.md)
 
 ### 2. Ollama
 
-Descriu Ollama com a eina per descarregar i executar models de llenguatge localment. Inclou instruccions per instal·lar-lo a macOS, escollir i descarregar models, executar-los i comprovar-ne l’ús de memòria i GPU.
+Describes Ollama as a tool for downloading and running language models locally. It includes instructions for installing it on macOS, choosing and downloading models, running them, and checking their memory and GPU usage.
 
-**Document:** [02_ollama.md](./02_ollama.md)
+**Document:** [02_ollama.md](./docs/02_ollama.md)
 
-### 3. LangChain i LangGraph
+### 3. LangChain and LangGraph
 
-Presenta LangChain per connectar LLM amb eines i recursos, i LangGraph per definir fluxos explícits amb estat, nodes, encaminament i transicions condicionals. Inclou exemples de com una petició en llenguatge natural pot activar funcions Python.
+Introduces LangChain to connect LLM with tools and resources, and LangGraph to define explicit flows with state, nodes, routing, and conditional transitions. Includes examples of how a natural language request can trigger Python functions.
 
-**Document:** [03_langchain_langgraph.md](./03_langchain_langgraph.md)
+**Document:** [03_langchain_langgraph.md](./docs/03_langchain_langgraph.md)
 
 ### 4. RAG (RAG Retrieval-Augmented Generation)
 
-Explica com RAG recupera informació d’una font externa, l’afegeix al context del model i genera una resposta fonamentada en aquesta informació. També introdueix les cerques semàntiques i l’ús de Weaviate com a base de dades vectorial per recuperar receptes.
+Explains how RAG retrieves information from an external source, adds it to the model context, and generates a response based on that information. It also introduces semantic searches and the use of Weaviate as a vector database to retrieve recipes.
 
-**Document:** [04_rag.md](./04_rag.md)
+**Document:** [04_rag.md](./docs/04_rag.md)
 
-### 5. Bases de dades vectorials
+### 5. Vector databases
 
-Explica què són les bases de dades vectorials, com emmagatzemen informació mitjançant embeddings i com permeten fer cerques per similitud semàntica. Presenta Weaviate com a exemple de base de dades vectorial, les seves principals funcionalitats i les diferències entre l'execució local i Weaviate Cloud.
+Explains what vector databases are, how they store information through embeddings and how they allow searches by semantic similarity. It introduces Weaviate as an example vector database, its main functionalities and the differences between local execution and Weaviate Cloud.
 
 **Document:** [04.1_vector_databases.md](./docs/04.1_vector_databases.md)
 
 ### 6. MCP (Model Context Protocol)
 
-Descriu el protocol MCP i la seva arquitectura client-servidor: host, client i servidor. Resumeix les funcionalitats que pot exposar un servidor —eines, recursos i prompts— i el flux de comunicació entre l’aplicació i el servidor.
+Describes the MCP protocol and its client-server architecture: host, client, and server. It summarizes the functionality that a server can expose—tools, resources, and prompts—and the communication flow between the application and the server.
 
-**Document:** [05_MCP.md](./05_MCP.md)
+**Document:** [05_MCP.md](./docs/05_MCP.md)
 
-### 7. Observabilitat amb Opik, Opentelemetry i LangSmith
+### 7. Observability with Opik, Opentelemetry and LangSmith
 
-Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la configuració d'Opentelemetry (+ grafana) i la consulta de logs, dashboards i traces detallades. I el mateix per LangSmith.
+Enter traces, spans, conversations, and metrics like latency, token consumption, and errors. It explains the configuration of Opik and the configuration of Opentelemetry (+ grafana) and the query of logs, dashboards and detailed traces. And the same for LangSmith.
 
-**Document:** [06_observalility.md](./06_observalility.md)
+**Document:** [06_observalility.md](./docs/06_observalility.md)
 
 ### 8. Hermes
 
-El fitxer previst per a aquest tema encara no té contingut. La integració amb Hermes per generar propostes de menús setmanals, validar-les amb Python i utilitzar receptes recuperades de Weaviate es descriu actualment a l’[exemple 10 del document d’observabilitat](./06_observalility.md).
+The file intended for this topic has no content yet. The integration with Hermes to generate weekly menu proposals, validate them with Python, and use recipes retrieved from Weaviate is currently described in [example 10 of the observability document](./docs/06_observalility.md).
 
-**Document:** [07_hermes.md](./07_hermes.md)
+**Document:** [07_hermes.md](./docs/07_hermes.md)
 
-### 9. Exemples
+### 9. Examples
 
-Recull exemples Python d’agents, LangGraph, Weaviate i una planificació setmanal amb Hermes.
+Collect Python examples from agents, LangGraph, Weaviate and a weekly schedule with Hermes.
 
-**Document:** [08_examples.md](./08_examples.md)
+**Document:** [08_examples.md](./docs/08_examples.md)

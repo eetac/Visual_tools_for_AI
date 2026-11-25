@@ -1,22 +1,22 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 03 · Comprovació de la seguretat del vent
-# Fitxer original: ../src/03_my_drone_mission_agent.py
-# Què mostra: eina determinista, crida directa des de Python i ús del LLM.
-# LLM: només intervé per explicar resultats; no selecciona aquesta eina.
-# Python: valida les dades i compara la velocitat amb el límit de seguretat.
-# La decisió safe/unsafe és una regla Python, NO una opinió del LLM.
-# Fragment de lectura: els blocs finals pertanyen a analyse_mission()
-# i answer_question(); no constitueixen un programa executable aïlladament.
+# EXAMPLE 03 · Wind safety check
+# Original file: ../src/03_my_drone_mission_agent.py
+# What it shows: Deterministic tool, direct call from Python and use of LLM.
+# LLM: intervenes only to explain results; do not select this tool.
+# Python: Validate data and compare speed with safety limit.
+# The safe/unsafe decision is a Python rule, NOT an LLM opinion.
+# Read fragment: end blocks belong to analyse_mission()
+# and answer_question(); they do not constitute a stand-alone executable program.
 
 from langchain_ollama import ChatOllama
 from langchain.tools import tool
 
 
-# 1. El model només serveix per explicar resultats o respondre preguntes.
+# 1. The model is only used to explain results or answer questions.
 llm = ChatOllama(model="qwen3.5:9b", temperature=0, reasoning=False)
 
 
-# 2. La comprovació s'implementa amb regles Python.
+# 2. Checking is implemented with Python rules.
 
 @tool
 def check_wind_safety(
@@ -47,7 +47,7 @@ def check_wind_safety(
             ),
         }
 
-    # Regla determinista: el límit també es considera segur.
+    # Deterministic Rule: Boundary is also considered safe.
     wind_safe = (
         wind_speed_kmh <= max_safe_wind_speed_kmh
     )
@@ -66,8 +66,8 @@ def check_wind_safety(
     }
 
 
-# 3. Fragment d'analyse_mission(): PYTHON invoca directament l'eina.
-# No és el LLM qui decideix cridar-la en aquest exemple.
+# 3. Fragment of analyse_mission(): PYTHON invokes the tool directly.
+# It is not the LLM that decides to call it in this example.
 if state.wind_speed_kmh is not None and state.max_safe_wind_speed_kmh is not None:
     wind_result = check_wind_safety.invoke({
         "wind_speed_kmh": state.wind_speed_kmh,
@@ -75,8 +75,8 @@ if state.wind_speed_kmh is not None and state.max_safe_wind_speed_kmh is not Non
     })
 
 
-# 4. Fragment d'answer_question(): el LLM interpreta els resultats ja calculats.
-# system_prompt i user_input es preparen en aquesta funció del codi complet.
+# 4. Fragment of answer_question(): The LLM interprets the already calculated results.
+# system_prompt and user_input are prepared in this full code function.
 response = llm.invoke(
     [("system", system_prompt), ("human", user_input)],
     reasoning=False,

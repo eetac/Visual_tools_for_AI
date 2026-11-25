@@ -1,22 +1,22 @@
-## 2. QUÈ ÉS OLLAMA?
+## 2. WHAT IS OLLAMA?
 
-Ollama és una eina de codi obert que permet descarregar, gestionar i executar LLMs directament en un ordinador. És compatible amb diferents famílies de models, com Qwen, Llama o Gemma i facilita la seva execució sense necessitat de dependre de serveis externs al núvol. Ollama no és un model d'intel·ligència artificial en si mateix, sinó el programari que s'encarrega de carregar els models i gestionar els recursos de càlcul necessaris per executar-los, aprofitant la CPU i, quan és compatible, la GPU de l'ordinador per accelerar la inferència.
+Ollama is an open source tool that allows you to download, manage and run LLMs directly on a computer. It is compatible with different families of models, such as Qwen, Llama or Gemma and facilitates its execution without the need to depend on external cloud services. Ollama is not an AI model per se, but rather the software that loads the models and manages the computing resources needed to run them, leveraging the computer's CPU and, when supported, GPU to speed up inference.
 
-Un dels principals avantatges d'Ollama és que permet executar models d'intel·ligència artificial de manera local, mantenint el control sobre les dades i sense costos per consulta. Un cop descarregats, els models es poden utilitzar sense connexió a Internet per realitzar tasques com generar text, respondre preguntes, analitzar codi o processar imatges, segons les capacitats de cada model. A més, Ollama proporciona una API local que facilita la integració dels models amb aplicacions Python, interfícies gràfiques i frameworks com LangChain o LangGraph, permetent desenvolupar aplicacions i agents d'intel·ligència artificial personalitzats.
+One of the main advantages of Ollama is that it allows you to run artificial intelligence models locally, maintaining control over the data and without costs per query. Once downloaded, the models can be used without an Internet connection to perform tasks such as generating text, answering questions, analyzing code, or processing images, depending on the capabilities of each model. In addition, Ollama provides a local API that facilitates the integration of models with Python applications, graphical interfaces and frameworks such as LangChain or LangGraph, allowing the development of customized artificial intelligence applications and agents.
 
-## 2.1. INSTAL·LACIÓ I ÚS D’OLLAMA A macOS
+## 2.1. INSTALLATION AND USE OF OLLAMA ON macOS
 
-### 2.1.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
+### 2.1.1. CHECKING THE CHARACTERISTICS
 
-Abans d’instal·lar Ollama es pot comprovar el processador i la memòria disponible.
+Before installing Ollama you can check the processor and available memory.
 
-| Sistema operativo    | Comando                                |
+| Operating system | Command |
 | -------------------- | -------------------------------------- |
-| macOS                | `system_profiler SPHardwareDataType`   |
-| Linux                | `sudo dmidecode -t system`             |
+| macOS | `system_profiler SPHardwareDataType`   |
+| Linux | `sudo dmidecode -t system`             |
 | Windows (PowerShell) | `Get-CimInstance Win32_ComputerSystem` |
 
-Des del Terminal:
+From Terminal:
 
 ```bash
 # MacOs
@@ -33,148 +33,148 @@ sudo dmidecode -t system
 Get-CimInstance Win32_ComputerSystem
 ```
 
-Apareixerà informació similar a:
+Information similar to:
 
-| Característica                             | Valor                                            |
+| Feature | Value |
 | ------------------------------------------ | ------------------------------------------------ |
-| Nombre del modelo                          | MacBook Pro                                      |
-| Identificador del modelo                   | Mac16,8                                          |
-| Número de modelo                           | MX2J3Y/A                                         |
-| Chip                                       | Apple M4 Pro                                     |
-| CPU                                        | 14 núcleos (10 de rendimiento y 4 de eficiencia) |
-| Memoria RAM                                | 24 GB                                            |
-| Versión del firmware del sistema           | 20457.1.29                                       |
-| Versión del cargador del sistema operativo | 20457.1.29                                       |
+| Model name | MacBook Pro |
+| Model identifier | Mac16,8 |
+| Model number | MX2J3Y/A |
+| Chip | Apple M4 Pro |
+| CPU | 14 cores (10 performance and 4 efficiency) |
+| RAM memory 24 GB |
+| System firmware version | 20457.1.29 |
+| Operating System Loader Version | 20457.1.29 |
 
 <p align="center">
-  <sub>Figura 2. Informació del mac</sub>
+  <sub>Figure 2. Mac information</sub>
 </p>
 
-En alguns ordinadors Mac amb Apple Silicon (com M1, M2, M3, M4), Ollama pot utilitzar la GPU integrada del xip per accelerar l’execució dels models.
+On some Mac computers with Apple Silicon (such as M1, M2, M3, M4), Ollama can use the chip's integrated GPU to accelerate model execution.
 
-### 2.1.2. INSTAL·LAR OLLAMA
+### 2.1.2. INSTALL OLLAMA
 
-Obrir l’aplicació Terminal i executar:
+Open the Terminal application and run:
 
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-Aquest script descarrega i instal·la Ollama a macOS i afegeix la comanda ollama al sistema.
+This script downloads and installs Ollama on macOS and adds the ollama command to the system.
 
-En acabar, comprovar que s’ha instal·lat correctament:
+When finished, check that it has been installed correctly:
 
 ```bash
 ollama --version
 ```
 
-Hauria d’aparèixer una resposta similar a: ollama version X.X.X
+You should see a response similar to: ollama version X.X.X
 
-Per obrir l’assistent inicial d’Ollama:
+To open the Ollama startup wizard:
 
 ```bash
 ollama
 ```
 
-### 2.1.3. ESCOLLIR UN MODEL
+### 2.1.3. CHOOSE A MODEL
 
-Abans de descarregar un model és important escollir-ne un que s’adapti als recursos disponibles de l’ordinador. Els principals factors a tenir en compte són la memòria disponible del MAC, la mida del model, el context que es vol utilitzar i el tipus de tasca.
+Before downloading a model it is important to choose one that fits the available resources of the computer. The main factors to consider are the available memory of the MAC, the size of the model, the context to be used and the type of task.
 
-Ollama disposa d’una biblioteca de models on es poden consultar les diferents famílies i versions disponibles. Aquesta biblioteca es va actualitzant contínuament amb nous models.
+Ollama has a library of models where you can consult the different families and versions available. This library is continuously updated with new models.
 
-És important saber que mateix model pot tenir mides diferents. Per exemple, qwen3.5:4b i qwen3.5:9b. On la lletra B indica aproximadament el nombre de milers de milions de paràmetres.
+It is important to know that the same model can have different sizes. For example, qwen3.5:4b and qwen3.5:9b. Where the letter B indicates approximately the number of billions of parameters.
 
-En general, que un model sigui més gran indica més capacitat i més raonament, però també més memòria, més consum i menys velocitat. Un model més gran no és necessàriament sempre millor. També depèn de la seva arquitectura, entrenament i especialització.
+In general, a larger model indicates more capacity and more reasoning, but also more memory, more consumption and less speed. A bigger model is not necessarily always better. It also depends on your architecture, training and specialization.
 
-Per mirar la mida aproximada de cada model es pot buscar a la biblioteca d’Ollama. Per exemple, la família Qwen 3.5 disposa actualment de variants com:
+To see the approximate size of each model, you can search in the Ollama library. For example, the Qwen 3.5 family currently has variants such as:
 
-| Model          | Mida aproximada |
+| Model | Approximate size |
 | -------------- | --------------: |
-| `qwen3.5:0.8b` |      1,2–1,3 GB |
-| `qwen3.5:2b`   |      2,7–3,1 GB |
-| `qwen3.5:4b`   |      3,3–4,0 GB |
+| `qwen3.5:0.8b` |      1.2–1.3 GB |
+| `qwen3.5:2b`   |      2.7–3.1 GB |
+| `qwen3.5:4b`   |      3.3–4.0 GB |
 
-La mida del fitxer no correspon exactament a la memòria total que consumirà durant l’execució. També cal memòria per a context, cache, buffers, sistema operatiu…. Per tant, no és recomanable escollir un model que ocupi pràcticament tota la memòria disponible.
+The file size does not exactly correspond to the total memory it will consume during execution. You also need memory for context, cache, buffers, operating system... Therefore, it is not recommended to choose a model that takes up practically all the available memory.
 
-### 2.1.4. DESCARREGAR UN MODEL
+### 2.1.4. DOWNLOAD A MODEL
 
-Un cop escollit el model, es descarrega.
+Once the model is chosen, it is downloaded.
 
-Per descarregar un model (per exemple: qwen3.5:9b):
+To download a model (for example: qwen3.5:9b):
 
 ```bash
-#ollama pull nom_del_model
+#ollama pull model_name
 ollama pull qwen3.5:9b
 ```
 
-Durant la descàrrega es mostrarà el progrés (pulling manifest, pulling …, success).
+Progress will be shown during the download (pulling manifest, pulling …, success).
 
-Es poden instal·lar diversos models. Aquests models queden guardats al disc del Mac. Tenir diversos models instal·lats no significa que tots estiguin ocupant RAM simultàniament. La memòria important es consumeix quan el model està carregat i en execució.
+Multiple models can be installed. These models are saved to disk on the Mac. Having multiple models installed does not mean that they are all taking up RAM at the same time. Significant memory is consumed when the model is loaded and running.
 
-### 2.1.5. COMPROVAR MODELS INSTAL·LATS
+### 2.1.5. CHECK INSTALLED MODELS
 
-Per comprovar els models que es tenen instal·lats:
+To check which models are installed:
 
 ```bash
 ollama list
 ```
 
-Exemple:
+Example:
 
-| NAME       | ID           | SIZE   | MODIFIED      |
+| NAME | ID | SIZE | MODIFIED |
 | ---------- | ------------ | ------ | ------------- |
 | qwen3.5:4b | 7f3251fa6878 | 4.0 GB | 5 minutes ago |
-| gemma3:12b | f4031aab637d | 8.1 GB | 3 weeks ago   |
-| qwen3.5:9b | 56671c2ab938 | 6.6 GB | 3 weeks ago   |
+| gemma3:12b | f4031aab637d | 8.1 GB | 3 weeks ago |
+| qwen3.5:9b | 56671c2ab938 | 6.6GB | 3 weeks ago |
 
 <p align="center">
-  <sub>Figura 3. Models instal·lats</sub>
+  <sub>Figure 3. Installed models</sub>
 </p>
 
-### 2.1.6. EXECUTAR UN MODEL
+### 2.1.6. RUN A MODEL
 
-Per executar el model i iniciar una conversa:
+To run the model and start a conversation:
 
 ```bash
 ollama run qwen3.5:9b
 ```
 
-Llavors, apareixerà >>> i ja es pot iniciar la conersa.
+Then >>> will appear and the conversation can start.
 
-### 2.1.7. COMPROVAR MODELS CARREGATS A MEMÒRIA
+### 2.1.7. CHECK MODELS LOADED TO MEMORY
 
-Per veure quins models estan actualment carrgats i també per mirar si el model és adequat pel nostre mac, en un altre terminal executem:
+To see which models are currently loaded and also to see if the model is suitable for our mac, in another terminal we run:
 
 ```bash
 ollama ps
 ```
 
-Per terminal apareixerà una mena de taula amb informació rellevant:
+A sort of table with relevant information will appear per terminal:
 
-| NAME       | ID           | SIZE   | PROCESSOR | CONTEXT | RUNNER   | UNTIL              |
+| NAME | ID | SIZE | PROCESSOR | CONTEXT | RUNNER | UNTIL |
 | ---------- | ------------ | ------ | --------- | ------- | -------- | ------------------ |
-| qwen3.5:9b | 56671c2ab938 | 7.9 GB | 100% CPU  | 65536   | llamacpp | 4 minutes from now |
+| qwen3.5:9b | 56671c2ab938 | 7.9 GB | 100% CPU | 65536 | llamacpp | 4 minutes from now |
 
 <p align="center">
-  <sub>Figura 4. ollama ps</sub>
+  <sub>Figure 4. ollama ps</sub>
 </p>
 
-El cas ideal és 100% GPU ja que indica que el model està utilitzant completament l’acceleració gràfica.
+The ideal case is 100% GPU as it indicates that the model is fully using graphics acceleration.
 
-També es pot obrir Monitor d’Activitat → Memòria i comprovar la pressió de memòria.
-Si la pressió es manté en verd i el sistema continua funcionant amb fluïdesa, el model és adequat.
-Si la pressió de memòria és groga o vermella, el Mac va molt lent o el model tarda excessivament convé utilitzar un model més petit o reduir el context.
+You can also open Activity Monitor → Memory and check the memory pressure.
+If the pressure remains green and the system continues to run smoothly, the model is suitable.
+If the memory pressure is yellow or red, the Mac is very slow, or the model lags excessively, use a smaller model or reduce the context.
 
-### 2.1.8. PER ATURAR UN MODEL
+### 2.1.8. TO STOP A MODEL
 
-Quan ja no necessitem fer més preguntes a un model, s’escriu: ollama stop qwen3.5:9b
+When we no longer need to ask a model any more questions, it is written: ollama stop qwen3.5:9b
 
-Amb aquesta comanda, aturem el model. És a dir, no s’elimina del disc sinó que es descarrega de memòria, deixa d’utilitzar GPU i allibera recursos.
+With this command, we stop the model. That is, it is not removed from the disk but is unloaded from memory, stops using GPU and frees resources.
 
-Per comprovar que s’ha aturat correctament:
+To check that it stopped correctly:
 
 ```bash
 ollama ps
 ```
 
-(i ha de sortir buit)
+(and should come out empty)

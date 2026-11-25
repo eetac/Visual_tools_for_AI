@@ -1,17 +1,17 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 10 · Ingredients que falten a la llista de compra
-# Fitxer original: ../src/10_shopping_list_weaviate_opik_hermes.py
-# Què mostra: calcular, guardar i afegir els ingredients pendents.
-# LLM: NO intervé en aquesta funció; Hermes ja ha generat el menú.
-# Python: normalitza, evita duplicats i calcula missing / included.
-# Important: "missing" vol dir absent de la LLISTA, no absent del rebost.
-# Fragment de lectura: les accions contextuals i els nodes complets són a src/.
+# EXAMPLE 10 · Ingredients missing from the shopping list
+# Original file: ../src/10_shopping_list_weaviate_opik_hermes.py
+# What it shows: Calculate, save and add pending ingredients.
+# LLM: NOT involved in this function; Hermes has already generated the menu.
+# Python: normalize, avoid duplicates and calculate missing / included.
+# Important: "missing" means absent from the LIST, not absent from the pantry.
+# Read Snippet: Context actions and full nodes are in src/.
 
 @track(name="calculate_missing_ingredients", type="tool", capture_input=False, capture_output=False)
 def calculate_missing_ingredients(plan: dict, shopping_list: list[str]) -> dict:
-    """Compara ingredientesClave con productos YA apuntados en la lista de compra.
+    """Compare key ingredients with YA products listed in the shopping list.
 
-    No estima existencias en la despensa ni cantidades; solo presencia en la lista.
+    He does not estimate stocks in the pantry or quantities; only presence in the list.
     """
     by_key = {}
     listed = {normalize_words(p) for p in shopping_list}
@@ -33,24 +33,24 @@ def calculate_missing_ingredients(plan: dict, shopping_list: list[str]) -> dict:
     return {"missing": missing, "included": included, "total": len(by_key)}
 
 
-# 2. CONSULTA: fragment de missing_ingredients_node().
-# Consultar no modifica shopping_list: només prepara la resposta i guarda
-# els elements mostrats perquè el següent missatge hi pugui fer referència.
+# 2. QUERY: Fragment of missing_ingredients_node().
+# Query does not modify shopping_list - just prepare the response and save
+# the displayed items so that the next message can reference them.
 info = calculate_missing_ingredients(plan, state.get("shopping_list", []))
 last_shown_products = info["missing"].copy()
-# El node retorna aquesta informació a LangGraph:
+# The node returns this information to LangGraph:
 # {"last_shown_products": last_shown_products, "last_context": "missing_ingredients", ...}
 
 
-# 3. ACCIÓ POSTERIOR: fragment d'add_missing_node().
-# El codi original comprova que l'usuari es refereix als productes mostrats
-# i torna a validar quins encara falten abans de cridar l'eina. Si l'usuari
-# demana directament completar el menú, el node usa info["missing"].
+# 3. FOLLOW-UP: Fragment of add_missing_node().
+# The original code verifies that the user refers to the displayed products
+# and revalidate which ones are still missing before calling the tool. If the user
+# directly asks to complete the menu, the node uses info["missing"].
 shown = state.get("last_shown_products", [])
 current_missing = {normalize_words(p) for p in info["missing"]}
 to_add = [p for p in shown if normalize_words(p) in current_missing]
 
-# Només si l'usuari demana afegir-los, el node executa:
+# Only if the user asks to add them, the node executes:
 updated = add_products.invoke({
     "shopping_list": state.get("shopping_list", []),
     "products": to_add,

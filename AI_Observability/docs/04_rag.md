@@ -1,36 +1,36 @@
 ## 4. RAG (RETRIEVAL-AUGMENTED GENERATION)
 
-RAG (Retrieval-Augmented Generation) és una tècnica que permet millorar les respostes d'un model de llenguatge incorporant informació recuperada d'una font externa, com ara una base de dades, documents o altres sistemes d'emmagatzematge.
+RAG (Retrieval-Augmented Generation) is a technique that improves the responses of a language model by incorporating information retrieved from an external source, such as a database, documents, or other storage systems.
 
-Un LLM genera respostes a partir dels coneixements adquirits durant l'entrenament i del context que rep en cada consulta. D’aquesta manera, aquests coneixements poden no incloure informació específica d'una aplicació, documents o dades actualitzades. RAG permet solucionar aquesta limitació proporcionant al model informació rellevant abans de generar la resposta. D'aquesta manera, el LLM pot respondre basant-se en dades que no necessàriament formen part del seu entrenament.
+An LLM generates answers based on the knowledge acquired during training and the context it receives in each query. As such, this knowledge may not include application-specific information, documents or updated data. RAG allows to solve this limitation by providing the model with relevant information before generating the response. In this way, the LLM can respond based on data that is not necessarily part of their training.
 
-### 4.1. FUNCIONAMENT D'UN SISTEMA RAG
+### 4.1. OPERATION OF A RAG SYSTEM
 
-El funcionament d'un sistema RAG es divideix en tres etapes principals: retrieval, augmentation i generation.
+The operation of a RAG system is divided into three main stages: retrieval, augmentation and generation.
 
-1. **Retrieval** (recuperació d'informació):
-   Quan l'usuari introdueix una consulta, el sistema busca informació relacionada amb la petició en una font externa. En sistemes que utilitzen bases de dades vectorials, aquesta cerca pot realitzar-se mitjançant representacions numèriques del contingut (_embeddings_).
+1. **Retrieval** (retrieval of information):
+   When the user enters a query, the system searches for information related to the request from an external source. In systems that use vector databases, this search can be performed using numerical representations of the content (_embeddings_).
 
-   Per exemple, una consulta com «receptes per a un sopar ràpid» pot recuperar receptes descrites com a «plats fàcils de preparar en pocs minuts», encara que les paraules no coincideixin exactament.
+   For example, a query like "recipes for a quick dinner" may retrieve recipes described as "easy dishes to prepare in a few minutes", even if the words are not an exact match.
 
-2. **Augmentation** (ampliació del context):
-   Una vegada recuperada la informació, Python prepara un nou prompt que incorpora tant la pregunta original de l'usuari com les dades obtingudes. El model ja no rep únicament la pregunta, sinó també informació addicional que pot utilitzar per elaborar la resposta.
+2. **Augmentation** (enlargement of the context):
+   Once the information is retrieved, Python prepares a new prompt that incorporates both the user's original question and the data obtained. The model no longer only receives the question, but also additional information that it can use to craft the answer.
 
-3. **Generation** (generació de la resposta):
-   Finalment, el LLM processa el prompt ampliat i genera una resposta en llenguatge natural. En aquesta etapa, el model no necessita conèixer prèviament els documents recuperats. Pot utilitzar-los directament perquè formen part del context proporcionat.
+3. **Generation** (generation of the response):
+   Finally, the LLM processes the extended prompt and generates a natural language response. At this stage, the model does not need to know the retrieved documents beforehand. You can use them directly because they are part of the context provided.
 
-El fet d'utilitzar RAG no garanteix automàticament que totes les respostes siguin correctes, però permet reduir la dependència dels coneixements interns del model i fonamentar les respostes en informació concreta.
+Using RAG does not automatically guarantee that all answers are correct, but it does reduce reliance on model internal knowledge and ground answers on concrete information.
 
-**Flux general del sistema RAG**
+**General RAG System Flow**
 
 ```mermaid
 flowchart LR
-    U["Consulta de l'usuari"] --> R["Retrieval: cerca a Weaviate"]
-    R --> C["Receptes recuperades"]
-    C --> A["Augmentation: prompt amb context"]
+    U["User query"] --> R["Retrieval: Search Weaviate"]
+    R --> C["Recipes retrieved"]
+    C --> A["Augmentation: prompt with context"]
     U --> A
-    A --> G["Generation: inferència del LLM"]
-    G --> F["Resposta basada en dades recuperades"]
+    A --> G["Generation: LLM inference"]
+    G --> F["Response based on retrieved data"]
 
     classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
     classDef retrieval fill:#D5E8E8,stroke:#333333,color:#111111
@@ -48,35 +48,35 @@ flowchart LR
 ```
 
 <p align="center">
-  <sub>Figura 1. Flux general d'un RAG</sub>
+  <sub>Figure 1. General flow of a RAG</sub>
 </p>
 
-### 4.2. BASES DE DADES VECTORIALS I WEAVIATE
+### 4.2. VECTOR DATABASES AND WEAVIATE
 
-La fase de _Retrieval_ necessita una font d'informació que l'aplicació pugui consultar. Una de les opcions és utilitzar una **base de dades vectorial**, que permet emmagatzemar dades i recuperar contingut relacionat semànticament amb una consulta.
+The _Retrieval_ phase needs an information source that the application can query. One option is to use a **vector database**, which allows you to store data and retrieve content that is semantically related to a query.
 
-En els exemples del projecte s'utilitza **Weaviate**, desplegat mitjançant **Weaviate Cloud**, amb una col·lecció anomenada `Recetas`. Python recupera les receptes amb operacions com `near_text()` i, quan cal, comprova condicions addicionals com el temps de preparació o els ingredients obligatoris.
+The project examples use **Weaviate**, deployed via **Weaviate Cloud**, with a collection named `Recetas`. Python retrieves recipes with operations such as `near_text()` and, where necessary, check additional conditions such as preparation time or required ingredients.
 
-Per evitar repetir explicacions en diversos capítols, la descripció detallada de les bases de dades vectorials es troba en un document específic:
+To avoid repeating explanations in several chapters, the detailed description of vector databases is in a specific document:
 
-**[Consultar: Bases de dades vectorials — Weaviate, Cloud, Docker i PostgreSQL amb pgvector](04.1_bbdd.md)**
+**[See: Vector Databases — Weaviate, Cloud, Docker and PostgreSQL with pgvector](04.1_vector_databases.md)**
 
-En aquest document complementari s'expliquen:
+This supplementary document explains:
 
-- Què són els **embeddings** i com funciona la cerca per similitud.
-- Com s'organitza la informació a Weaviate i què fa `near_text()`.
-- Les diferències entre **Weaviate Cloud** i **Weaviate on-premise amb Docker**.
-- L'alternativa **PostgreSQL amb pgvector**, amb exemples de consultes SQL.
-- Una comparació per saber quan pot ser convenient utilitzar cada tecnologia.
+- What are **embeddings** and how similarity search works.
+- How information is organized in Weaviate and what it does `near_text()`.
+- The differences between **Weaviate Cloud** and **Weaviate on-premise with Docker**.
+- The **PostgreSQL with pgvector** alternative, with sample SQL queries.
+- A comparison to know when it might be convenient to use each technology.
 
-La implementació concreta de les consultes, els filtres i la generació de respostes RAG es mostra a **[08_examples.md](08_examples.md)**, amb enllaços al codi Python i als _snippets_ corresponents.
+The concrete implementation of RAG queries, filters, and response generation is shown in **[08_examples.md](08_examples.md)**, with links to the corresponding Python code and _snippets_.
 
-### 4.3. APLICACIONS I AVANTATGES DE RAG
+### 4.3. APPLICATIONS AND ADVANTAGES OF RAG
 
-RAG permet desenvolupar assistents que utilitzen informació específica sense necessitat d'entrenar un nou model. Aquesta arquitectura és especialment útil en aplicacions que requereixen consultar documentació tècnica, manuals, bases de dades internes, normatives o altres fonts d'informació. També permet actualitzar les dades disponibles modificant el contingut de la base de dades, sense haver de modificar els paràmetres del LLM.
+RAG allows you to develop wizards that use specific information without the need to train a new model. This architecture is particularly useful in applications that require consulting technical documentation, manuals, internal databases, regulations or other sources of information. It also allows you to update the available data by modifying the content of the database, without having to modify the parameters of the LLM.
 
-La qualitat del sistema depèn tant de la capacitat del model per interpretar les dades com de la rellevància i la qualitat de la informació recuperada.
+The quality of the system depends as much on the model's ability to interpret the data as on the relevance and quality of the information retrieved.
 
-En el projecte de receptes, això significa que el LLM no inventa les receptes que s'han de mostrar, sinó que rep una selecció de resultats recuperats de Weaviate i genera una explicació a partir d'aquesta informació.El programa també pot aplicar validacions amb Python per comprovar que les receptes compleixin els requisits de l'usuari.
+In the recipe project, this means that the LLM does not invent the recipes to be displayed, but receives a selection of results retrieved from Weaviate and generates an explanation based on this information. The program can also apply Python validations to check that the recipes meet the user's requirements.
 
-> **Idea clau:** la base de dades recupera informació, Python la prepara i valida, i el LLM la utilitza per generar la resposta. Pots consultar el funcionament de la base de dades a [04.1_bbdd.md](04.1_bbdd.md) i veure el codi real a [08_examples.md](08_examples.md).
+> **Key idea:** the database retrieves information, Python prepares and validates it, and the LLM uses it to generate the response. You can consult the operation of the database at [04.1_vector_databases.md](04.1_vector_databases.md) and see the actual code in [08_examples.md](08_examples.md).

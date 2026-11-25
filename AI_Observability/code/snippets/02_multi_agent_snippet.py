@@ -1,18 +1,18 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 02 · Delegació a un subagent de vols
-# Fitxer original: ../src/02_multi_agent.py
-# Què mostra: dos subagents, una eina de delegació i el supervisor.
-# LLM supervisor: pot triar aquesta eina segons la petició de l'usuari.
-# Python: invoca el subagent i extreu el contingut de la seva resposta.
-# Fragment de lectura: get_weather, calculate_flight_time i ask_weather_agent
-# es defineixen al fitxer complet. Aquí se'n mostra la connexió.
+# EXAMPLE 02 · Delegation to a flight sub-agent
+# Original file: ../src/02_multi_agent.py
+# What it shows: Two subagents, a delegation tool, and the supervisor.
+# LLM supervisor: You can choose this tool according to the user's request.
+# Python: Invoke the subagent and extract the contents of its response.
+# Reading fragment: get_weather, calculate_flight_time and ask_weather_agent
+# are defined in the full file. Here is the connection.
 
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_ollama import ChatOllama
 
 
-# 1. Tots els agents fan servir el MATEIX model, amb diferents instruccions.
+# 1. All agents use the SAME model, with different instructions.
 llm = ChatOllama(model="qwen3.5:9b", temperature=0)
 
 weather_agent = create_agent(
@@ -34,17 +34,17 @@ flight_agent = create_agent(
 )
 
 
-# 2. El supervisor no executa calculate_flight_time directament:
-# crida una eina que delega la feina a flight_agent.
+# 2. Supervisor does not execute calculate_flight_time directly:
+# calls a tool that delegates the work to flight_agent.
 
 @tool
 def ask_flight_agent(query: str) -> str:
     """Delegate drone flight-time calculations to the flight specialist agent."""
 
     print("\n[SUBAGENT CALLED] flight_agent")
-    print(f"[SUBAGENT INPUT] {query}")
+    print(f"[INPUT SUBAGENT] {query}")
 
-    # La consulta es converteix en un missatge per al subagent.
+    # The query is converted to a message for the subagent.
     result = flight_agent.invoke(
         {
             "messages": [
@@ -59,7 +59,7 @@ def ask_flight_agent(query: str) -> str:
     return result["messages"][-1].content
 
 
-# 3. El supervisor pot cridar ask_weather_agent o ask_flight_agent.
+# 3. Supervisor can call ask_weather_agent or ask_flight_agent.
 supervisor_agent = create_agent(
     model=llm,
     tools=[ask_weather_agent, ask_flight_agent],
@@ -73,7 +73,7 @@ supervisor_agent = create_agent(
 )
 
 
-# 4. La consulta inicia el supervisor, que pot delegar les dues tasques.
+# 4. The query is initiated by the supervisor, who can delegate both tasks.
 result = supervisor_agent.invoke({
     "messages": [{
         "role": "user",

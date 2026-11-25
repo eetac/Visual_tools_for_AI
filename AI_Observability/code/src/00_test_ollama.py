@@ -6,6 +6,6 @@ llm = ChatOllama(
     temperature=0,
 )
 
-response = llm.invoke("Explícame qué es LangChain en dos frases.")
+response = llm.invoke("Explain to me what LangChain is in two sentences.")
 
 print(response.content)

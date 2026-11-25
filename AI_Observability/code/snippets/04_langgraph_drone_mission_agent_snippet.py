@@ -1,16 +1,16 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 04 · Router de LangGraph per a la missió del dron
-# Fitxer original: ../src/04_langgraph_drone_mission_agent.py
-# Què mostra: el router, la creació del graf i la seva execució.
-# LLM: pot haver interpretat la petició en un node anterior.
-# Python: aquest router aplica condicions fixes; NO consulta el LLM.
-# Fragment de lectura: els nodes i DroneMissionState es defineixen al codi complet.
+# EXAMPLE 04 · LangGraph router for drone mission
+# Original file: ../src/04_langgraph_drone_mission_agent.py
+# What it shows: the router, the creation of the graph and its execution.
+# LLM: The request may have been interpreted on a previous node.
+# Python: This router applies fixed conditions; DO NOT refer to the LLM.
+# Read Snippet: Nodes and DroneMissionState are defined in full code.
 
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 
 
-# 1. ROUTER: selecciona el següent node amb regles Python.
+# 1. ROUTER: Select next node with Python rules.
 
 def route_after_input(
     state: DroneMissionState,
@@ -29,7 +29,7 @@ def route_after_input(
     if state.get("run_wind", False):
         return "wind"
 
-    # Per comprovar la bateria es necessita un vol calculat correctament.
+    # A correctly calculated flight is required to check the battery.
     if (
         state.get("run_battery", False)
         and state.get("flight_result") is not None
@@ -40,7 +40,7 @@ def route_after_input(
     return "report"
 
 
-# 2. CONSTRUCCIÓ: LangGraph connecta funcions Python amb transicions.
+# 2. BUILD: LangGraph connects Python functions to transitions.
 builder = StateGraph(DroneMissionState)
 
 builder.add_node("process_input", process_input_node)
@@ -71,10 +71,10 @@ for node in ("final_report", "show_trace", "answer_question"):
     builder.add_edge(node, END)
 
 
-# 3. MEMÒRIA I EXECUCIÓ: l'estat es manté per thread_id.
+# 3. MEMORY AND EXECUTION: State is maintained by thread_id.
 memory = InMemorySaver()
 drone_mission_graph = builder.compile(checkpointer=memory)
 config = {"configurable": {"thread_id": "drone-mission-session"}}
 
-# Fragment de main(): executar el graf no equival a invocar sempre el LLM.
+# Fragment of main(): running the graph is not equivalent to always invoking the LLM.
 result = drone_mission_graph.invoke({"user_input": user_input}, config=config)

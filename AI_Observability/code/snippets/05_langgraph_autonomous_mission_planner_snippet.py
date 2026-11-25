@@ -1,17 +1,17 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 05 · Decisió de replanificació de la missió
-# Fitxer original: ../src/05_langgraph_autonomous_mission_planner.py
-# Què mostra: com la validació condueix a replanificar o informar.
-# LLM: pot intervenir en altres nodes per interpretar o explicar la missió.
-# Python: el router envia una missió NOT FEASIBLE a replan; la resta, a report.
-# Fragment de lectura: el graf real té més nodes i transicions;
-# aquest fragment selecciona la part que diferencia l'exemple 05 del 04.
+# EXAMPLE 05 · Mission replanning decision
+# Original file: ../src/05_langgraph_autonomous_mission_planner.py
+# What it shows: How validation leads to replanning or reporting.
+# LLM: May intervene in other nodes to interpret or explain the mission.
+# Python: Router sends NOT FEASIBLE mission to replan; the rest, to report.
+# Reading Snippet: The real graph has more nodes and transitions;
+# this snippet selects the part that differentiates example 05 from 04.
 
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 
 
-# 1. ROUTER: la viabilitat no la decideix el LLM, sinó Python.
+# 1. ROUTER: Viability is not decided by the LLM, but by Python.
 
 def route_after_evaluation(
     state: AutonomousMissionState,
@@ -22,7 +22,7 @@ def route_after_evaluation(
     return "report"
 
 
-# 2. CREACIÓ DEL GRAF: cada node és una funció Python real.
+# 2. BUILDING THE GRAPH: Each node is an actual Python function.
 builder = StateGraph(AutonomousMissionState)
 builder.add_node("process_input", process_input_node)
 builder.add_node("mission_planner", mission_planner_node)
@@ -37,7 +37,7 @@ builder.add_node("answer_question", answer_question_node)
 
 builder.add_edge(START, "process_input")
 
-# 3. TRANSICIÓ CLAU: després d'avaluar, replanificar o informar.
+# 3. KEY TRANSITION: After assessing, replanning or reporting.
 builder.add_conditional_edges("evaluate_plan", route_after_evaluation, {
     "replan": "replanner",
     "report": "final_report",
@@ -45,9 +45,9 @@ builder.add_conditional_edges("evaluate_plan", route_after_evaluation, {
 builder.add_edge("replanner", "final_report")
 builder.add_edge("final_report", END)
 
-# IMPORTANT: s'han omès les transicions entre process_input, el planificador,
-# les comprovacions i evaluate_plan. Consulteu el codi complet per veure-les.
+# IMPORTANT: Skipped transitions between process_input, the scheduler,
+# the checks and evaluate_plan. Check the full code to see them.
 
-# 4. MEMÒRIA: LangGraph conserva l'estat per sessió.
+# 4. MEMORY: LangGraph retains state per session.
 memory = InMemorySaver()
 autonomous_mission_graph = builder.compile(checkpointer=memory)

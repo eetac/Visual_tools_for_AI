@@ -1,19 +1,19 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 11 · Observabilitat del RAG amb OpenTelemetry i Grafana
-# Fitxer original: ../src/11_shopping_list_weaviate_otel.py
-# Què mostra: instrumentació de LangGraph, registre de tokens i enviament de traces a Grafana.
-# LLM: Ollama classifica les peticions i genera respostes RAG, registrant el consum de tokens.
-# Python: configura OpenTelemetry, crea spans per als nodes i registra les decisions del router.
-# OpenTelemetry: recull traces, durades, atributs i tokens de les diferents operacions.
-# Grafana: permet visualitzar les execucions, els nodes recorreguts i les mètriques de consum.
-# El flux de dades d'observabilitat es realitza mitjançant OTLP/HTTP cap a Tempo.
-# Fragment de lectura: els imports, la configuració completa i les funcions auxiliars es troben al fitxer original.
-# El bloc final correspon a main() i mostra com es registra una execució de LangGraph.
-# La configuració de Docker i del dashboard s'explica a 06_observability.md.
-# El snippet és explicatiu i no és executable de manera independent.
+# EXAMPLE 11 · Observability of the RAG with OpenTelemetry and Grafana
+# Original file: ../src/11_shopping_list_weaviate_opentelemetry.py
+# What it shows: LangGraph instrumentation, logging tokens and sending traces to Grafana.
+# LLM: Ollama classifies requests and generates RAG responses, recording token consumption.
+# Python: configure OpenTelemetry, create spans for nodes and log router decisions.
+# OpenTelemetry: collects traces, durations, attributes and tokens of the different operations.
+# Grafana: allows you to view executions, nodes traversed and consumption metrics.
+# Observability data flow is performed via OTLP/HTTP to Tempo.
+# Read Snippet: Amounts, full configuration, and auxiliary functions are in the original file.
+# The final block corresponds to main() and shows how a LangGraph execution is registered.
+# Docker and dashboard configuration is explained in 06_observalility.md.
+# The snippet is self explanatory and not standalone executable.
 
 
-# 1. Inicialització de la instrumentació (imports al programa complet).
+# 1. Instrumentation initialization (amounts to full program).
 otel_provider = TracerProvider(
     resource=Resource.create({"service.name": "shopping-rag-weaviate-otel"}),
     sampler=ParentBased(ALWAYS_ON),
@@ -27,7 +27,7 @@ trace.set_tracer_provider(otel_provider)
 tracer = trace.get_tracer("shopping-rag-weaviate-otel")
 
 
-# 2. Una inferència amb els tokens associats al seu span.
+# 2. An inference with the tokens associated with its span.
 def invoke_with_otel_usage(model, messages, etapa: str):
     with tracer.start_as_current_span(f"ollama.{etapa}") as span:
         span.set_attribute("gen_ai.provider.name", "ollama")
@@ -43,8 +43,8 @@ def invoke_with_otel_usage(model, messages, etapa: str):
         return answer
 
 
-# 3. El node del graf és un span; la decisió es registra com a atribut.
-# La implementació completa inclou propagació de traceparent entre nodes.
+# 3. The graph node is a span; the decision is recorded as an attribute.
+# The full implementation includes traceparent propagation between nodes.
 def observed_node(name, fn):
     @wraps(fn)
     def wrapped(state):
@@ -58,8 +58,8 @@ def observed_node(name, fn):
     return wrapped
 
 
-# 4. El span principal envolta una consulta completa de l'usuari.
-# Dins del main() real, 'shopping_graph', 'user_input' i 'config' ja existeixen.
+# 4. The parent span wraps around a complete user query.
+# Inside the actual main(), 'shopping_graph', 'user_input' and 'config' already exist.
 #
 # with tracer.start_as_current_span("langgraph.invoke"):
 #     carrier = {}

@@ -1,28 +1,28 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 07 · Router i node add de LangGraph
-# Fitxer original: ../src/07_shopping_list_langgraph.py
-# Què mostra: la crida al LLM, router, nodes, construcció i execució del graf.
-# LLM: en un pas anterior pot haver classificat la petició com a add/remove/etc.
-# Python: route_after_input retorna el nom del node; add_node crida l'eina real.
-# Fragment de lectura: els nodes i el prompt complet són a code/src/.
+# EXAMPLE 07 · Router and add node of LangGraph
+# Original file: ../src/07_shopping_list_langgraph.py
+# What it shows: The call to the LLM, router, nodes, graph construction and execution.
+# LLM: In a previous step you may have classified the request as add/remove/etc.
+# Python: route_after_input return node name; add_node calls the actual tool.
+# Read Snippet: Nodes and full prompt are in code/src/.
 
 from langchain_ollama import ChatOllama
 from langgraph.graph import START, END, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 
 
-# 1. MODEL: Qwen interpreta l'usuari i retorna una acció en JSON.
+# 1. MODEL: Qwen interprets the user and returns an action in JSON.
 llm = ChatOllama(model="qwen3.5:9b", temperature=0, format="json", reasoning=False)
 
-# Fragment de process_input_node(): system_prompt és definit dins del node.
+# Fragment of process_input_node(): system_prompt is defined inside the node.
 response = llm.invoke([
     ("system", system_prompt),
     ("human", state["user_input"]),
 ])
-# Python transforma aquest JSON en els camps de ShoppingState.
+# Python transforms this JSON into ShoppingState fields.
 
 
-# 2. ROUTER: ja NO pregunta al LLM; només llegeix state["action"].
+# 2. ROUTER: NO longer asks the LLM; just read state["action"].
 
 def route_after_input(state: ShoppingState) -> Literal["add", "remove", "replace", "show", "other"]:
     action = state.get("action", "other")
@@ -31,7 +31,7 @@ def route_after_input(state: ShoppingState) -> Literal["add", "remove", "replace
 
 
 def add_node(state: ShoppingState) -> dict:
-    # El node executa la funció; el router anterior només ha triat el camí.
+    # The node executes the function; the previous router only chose the path.
     print("[NODE] add")
     return add_products.invoke({
         "shopping_list": state.get("shopping_list", []),
@@ -40,7 +40,7 @@ def add_node(state: ShoppingState) -> dict:
     })
 
 
-# 4. CREACIÓ DEL GRAF: connectar cada node amb el router.
+# 4. CREATION OF THE GRAPH: connect each node to the router.
 builder = StateGraph(ShoppingState)
 builder.add_node("process_input", process_input_node)
 builder.add_node("add", add_node)
@@ -58,7 +58,7 @@ for name in ("add", "remove", "replace", "show", "other"):
     builder.add_edge(name, END)
 
 
-# 5. COMPILACIÓ I EXECUCIÓ amb memòria per conversa.
+# 5. COMPILATION AND EXECUTION with memory per conversation.
 memory = InMemorySaver()
 shopping_graph = builder.compile(checkpointer=memory)
 config = {"configurable": {"thread_id": "shopping-session"}}

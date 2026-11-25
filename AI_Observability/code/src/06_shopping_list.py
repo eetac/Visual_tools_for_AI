@@ -28,11 +28,11 @@ def add_product(product: str) -> str:
     print(f"[TOOL] add_product({product})")
 
     if product in shopping_list:
-        return f"{product} ya está en la lista."
+        return f"{product} is already listed."
 
     shopping_list.append(product)
 
-    return f"He añadido {product}."
+    return f"I have added {product}."
 
 
 @tool
@@ -44,11 +44,11 @@ def remove_product(product: str) -> str:
     print(f"[TOOL] remove_product({product})")
 
     if product not in shopping_list:
-        return f"{product} no está en la lista."
+        return f"{product} is not listed."
 
     shopping_list.remove(product)
 
-    return f"He eliminado {product}."
+    return f"I have deleted {product}."
 
 
 @tool
@@ -61,10 +61,10 @@ def replace_product(old_product: str, new_product: str) -> str:
     print(f"[TOOL] replace_product({old_product}, {new_product})")
 
     if old_product not in shopping_list:
-        return f"{old_product} no está en la lista."
+        return f"{old_product} is not listed."
 
     if old_product == new_product:
-        return "El producto ya es el solicitado."
+        return "The product is already the one requested."
 
     if new_product in shopping_list:
         shopping_list.remove(old_product)
@@ -72,7 +72,7 @@ def replace_product(old_product: str, new_product: str) -> str:
         index = shopping_list.index(old_product)
         shopping_list[index] = new_product
 
-    return f"He sustituido {old_product} por {new_product}."
+    return f"I have replaced {old_product} with {new_product}."
 
 
 @tool
@@ -82,7 +82,7 @@ def show_list() -> str:
     print("[TOOL] show_list()")
 
     if not shopping_list:
-        return "La lista de la compra está vacía."
+        return "The shopping list is empty."
 
     return ", ".join(shopping_list)
 
@@ -126,7 +126,7 @@ agent = create_agent(
         "When showing the list, report only products returned "
         "by show_list. Never invent products. "
 
-        "Always answer in Spanish. "
+        "Always answer in English. "
         "Be concise."
     ),
 )

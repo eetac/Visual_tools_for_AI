@@ -1,23 +1,23 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 06 · Eina per afegir productes a la llista
-# Fitxer original: ../src/06_shopping_list.py
-# Què mostra: crear el model, definir l'eina i connectar-la amb l'agent.
-# LLM: interpreta la petició i pot triar l'eina add_product.
-# Python: comprova duplicats i actualitza la llista; el LLM no la modifica directament.
-# Fragment de lectura: remove_product, replace_product, show_list i el prompt
-# complet són al fitxer original; el snippet en resumeix la configuració.
+# EXAMPLE 06 · Tool to add products to the list
+# Original file: ../src/06_shopping_list.py
+# What it shows: Create the model, define the tool, and connect it to the agent.
+# LLM: Interprets the request and can choose the tool add_product.
+# Python: check for duplicates and update list; the LLM does not modify it directly.
+# Reading Fragment: remove_product, replace_product, show_list and the prompt
+# are in the original file; the snippet summarizes its configuration.
 
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_ollama import ChatOllama
 
 
-# 1. MODEL I ESTAT PYTHON
+# 1. PYTHON MODEL AND STATUS
 llm = ChatOllama(model="qwen3.5:9b", temperature=0)
 shopping_list = []
 
 
-# 2. EINA: el LLM la pot seleccionar, però Python modifica la llista.
+# 2. TOOL: LLM can select it, but Python modifies the list.
 
 def normalize_product(product: str) -> str:
     return product.strip().lower()
@@ -32,28 +32,28 @@ def add_product(product: str) -> str:
     print(f"[TOOL] add_product({product})")
 
     if product in shopping_list:
-        return f"{product} ya está en la lista."
+        return f"{product} is already on the list."
 
     shopping_list.append(product)
 
-    return f"He añadido {product}."
+    return f"I added {product}."
 
 
-# 3. AGENT: quatre eines disponibles per a la gestió de la llista.
-# El system_prompt complet inclou traducció al castellà i correccions.
+# 3. AGENT: Four tools available for list management.
+# The complete system_prompt includes Spanish translation and corrections.
 agent = create_agent(
     model=llm,
     tools=[add_product, remove_product, replace_product, show_list],
     system_prompt=(
         "You are a shopping list assistant. "
         "Always use the provided tools to add, remove, replace or show products. "
-        "Always answer in Spanish."
+        "Always answer in English."
     ),
 )
 
 
-# 4. EXECUCIÓ I MEMÒRIA CONVERSACIONAL (fragment del bucle principal).
-# messages inclou l'historial de la conversa, no només l'últim missatge.
+# 4. EXECUTION AND CONVERSATIONAL MEMORY (main loop fragment).
+# messages includes the conversation history, not just the last message.
 messages.append({"role": "user", "content": user_input})
 result = agent.invoke({"messages": messages})
 messages = result["messages"]

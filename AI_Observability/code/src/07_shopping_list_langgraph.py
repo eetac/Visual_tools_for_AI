@@ -39,16 +39,16 @@ def add_products(shopping_list: list[str], products: list[str], last_product: st
 
     for product in products:
         if product in new_list:
-            messages.append(f"{product} ya esta en la lista.")
+            messages.append(f"{product} is already on the list.")
         else:
             new_list.append(product)
             last_product = product
-            messages.append(f"Añadido: {product}.")
+            messages.append(f"Added: {product}.")
 
     return {
         "shopping_list": new_list,
         "last_product": last_product,
-        "response": " ".join(messages) or "No has indicado ningún producto.",
+        "response": " ".join(messages) or "You have not specified any products.",
     }
 
 
@@ -65,14 +65,14 @@ def remove_products(shopping_list: list[str], products: list[str], last_product:
             new_list.remove(product)
             if last_product == product:
                 last_product = ""
-            messages.append(f"Eliminado: {product}.")
+            messages.append(f"Removed: {product}.")
         else:
-            messages.append(f"{product} no esta en la lista.")
+            messages.append(f"{product} is not on the list.")
 
     return {
         "shopping_list": new_list,
         "last_product": last_product,
-        "response": " ".join(messages) or "No has indicado ningún producto.",
+        "response": " ".join(messages) or "You have not specified any products.",
     }
 
 
@@ -84,18 +84,18 @@ def replace_product(shopping_list: list[str], old_product: str, new_product: str
     new_list = shopping_list.copy()
 
     if not old_product or not new_product:
-        response = "Indica qué producto quieres sustituir y por cuál."
+        response = "Indicate which product you want to replace and with which one."
     elif old_product not in new_list:
-        response = f"{old_product} no esta en la lista."
+        response = f"{old_product} is not on the list."
     elif old_product == new_product:
-        response = f"Ya tienes {new_product} en la lista."
+        response = f"You already have {new_product} in the list."
     else:
         index = new_list.index(old_product)
         new_list.remove(old_product)
         if new_product not in new_list:
             new_list.insert(index, new_product)
         last_product = new_product
-        response = f"He sustituido {old_product} por {new_product}."
+        response = f"I have replaced {old_product} with {new_product}."
 
     return {"shopping_list": new_list, "last_product": last_product, "response": response}
 
@@ -104,7 +104,7 @@ def replace_product(shopping_list: list[str], old_product: str, new_product: str
 def show_products(shopping_list: list[str]) -> str:
     """Show the current shopping list."""
     print("[TOOL EXECUTED] show_products")
-    return "Lista de la compra: " + (", ".join(shopping_list) if shopping_list else "vacía")
+    return "Shopping list: " + (", ".join(shopping_list) if shopping_list else "empty")
 
 
 # 4. Nodes
@@ -112,32 +112,32 @@ def process_input_node(state: ShoppingState) -> dict:
     print("[NODE] process_input")
 
     system_prompt = f"""
-            Eres un asistente de lista de la compra.
-            Analiza el mensaje y devuelve SOLO un objeto JSON con estas claves:
+            You are a shopping list assistant.
+            Parses the message and returns ONLY a JSON object with these keys:
             "action", "products", "old_product", "new_product".
 
-            - action: "add", "remove", "replace", "show" u "other".
-            - products: lista de productos (para add o remove); si no se usan, [].
-            - old_product y new_product: textos (para replace); si no se usan, "".
-            - TODOS los nombres de productos en el JSON DEBEN estar en ESPANOL.
-            - Traduce tu mismo cualquier producto escrito en otro idioma.
-            - No uses nombres ingleses en los valores del JSON, aunque el usuario los use.
-            - Conserva detalles importantes: "leche de soja", "sin lactosa", etc.
-            - Para eliminar o sustituir, usa el nombre EXACTO que figura en la lista actual.
-            - Si el usuario se corrige ("pero queria leche de soja"), usa replace
-            y toma como producto anterior el ultimo anadido, si corresponde.
-            - Si solicita varios productos para anadir, incluyelos todos en products.
-            - No inventes operaciones ni productos.
+            - action: "add", "remove", "replace", "show" or "other".
+            - products: list of products (to add or remove); if not used, [].
+            - old_product and new_product: texts (to replace); if not used, "".
+            - ALL product names in the JSON MUST be in SPANISH.
+            - Translate yourself any product written in another language.
+            - Do not use English names in JSON values, even if the user uses them.
+            - Keep important details: "soy milk", "lactose free", etc.
+            - To delete or replace, use the EXACT name in the current list.
+            - If the user corrects himself ("but he wanted soy milk"), use replace
+            and takes the last added product as the previous product, if applicable.
+            - If you request multiple products to add, include them all in products.
+            - Do not invent operations or products.
 
-            Ejemplos:
+            Examples:
             "add milk" -> {{"action":"add","products":["leche"],"old_product":"","new_product":""}}
             "add butter and eggs" -> {{"action":"add","products":["mantequilla","huevos"],"old_product":"","new_product":""}}
-            "quita leche" -> {{"action":"remove","products":["leche"],"old_product":"","new_product":""}}
-            "pero leche de soja" -> {{"action":"replace","products":[],"old_product":"leche","new_product":"leche de soja"}}
-            "que tengo que comprar" -> {{"action":"show","products":[],"old_product":"","new_product":""}}
+            "remove milk" -> {{"action":"remove","products":["leche"],"old_product":"","new_product":""}}
+            "but soy milk" -> {{"action":"replace","products":[],"old_product":"leche","new_product":"leche de soja"}}
+            "what should I buy" -> {{"action":"show","products":[],"old_product":"","new_product":""}}
 
-            Lista actual: {state.get('shopping_list', [])}
-            Ultimo producto anadido: {state.get('last_product', '')}
+            Current list: {state.get('shopping_list', [])}
+            Last product added: {state.get('last_product', '')}
             """
 
     response = llm.invoke([
@@ -148,9 +148,9 @@ def process_input_node(state: ShoppingState) -> dict:
     try:
         decision = json.loads(response.content)
         if not isinstance(decision, dict):
-            raise ValueError("JSON incorrecto")
+            raise ValueError("Bad JSON")
     except (ValueError, TypeError):
-        return {"action": "other", "response": "No he entendido la petición."}
+        return {"action": "other", "response": "I did not understand the request."}
 
     action = decision.get("action", "other")
     if action not in ("add", "remove", "replace", "show", "other"):
@@ -222,7 +222,7 @@ def show_node(state: ShoppingState) -> dict:
 
 def other_node(state: ShoppingState) -> dict:
     print("[NODE] other")
-    return {"response": state.get("response") or "Puedo añadir, quitar, sustituir y mostrar productos."}
+    return {"response": state.get("response") or "I can add, remove, replace and display products."}
 
 
 # 5. Graph
@@ -265,7 +265,7 @@ config = {"configurable": {"thread_id": THREAD_ID}}
 # 6. Main
 def main() -> None:
     print("LangGraph Shopping List Assistant")
-    print("Escribe 'reset' para borrar la lista o 'exit' para salir.\n")
+    print("Type 'reset' to clear the list or 'exit' to exit.\n")
 
     while True:
         try:
@@ -282,7 +282,7 @@ def main() -> None:
 
         if user_input.lower() == "reset":
             memory.delete_thread(THREAD_ID)
-            print("AGENT: Lista borrada.\n")
+            print("AGENT: List deleted.\n")
             continue
 
         print("\n[LANGGRAPH] Running graph...")
@@ -294,7 +294,7 @@ def main() -> None:
             continue
 
         print("AGENT:", result["response"])
-        print("[DEBUG] Lista real:", result.get("shopping_list", []), "\n")
+        print("[DEBUG] Actual list:", result.get("shopping_list", []), "\n")
 
 
 if __name__ == "__main__":

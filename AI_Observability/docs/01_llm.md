@@ -1,23 +1,23 @@
 ## 1. LLM (LARGE LANGUAGE MODEL)
 
-Un LLM (Large Language Model) és un model d’intel·ligència artificial entrenat amb grans quantitats de dades per aprendre patrons del llenguatge i generar respostes a partir d’una entrada proporcionada per l’usuari.
+An LLM (Large Language Model) is an artificial intelligence model trained with large amounts of data to learn language patterns and generate responses based on input provided by the user.
 
-Aquests models poden realitzar diferents tipus de tasques, com ara respondre preguntes, generar i resumir text, traduir contingut, analitzar i generar codi, entre d’altres. Alguns exemples de famílies de LLM són Qwen, Gemma, Llama, Mistral, DeepSeek...
+These models can perform different types of tasks, such as answering questions, generating and summarizing text, translating content, parsing and generating code, among others. Some examples of LLM families are Qwen, Gemma, Llama, Mistral, DeepSeek...
 
-El funcionament d’un LLM es basa en la generació de text token a token. Un token pot correspondre a una paraula, una part d’una paraula o un símbol. A partir del text introduït i del context disponible, el model calcula quin és el següent token més adequat i repeteix aquest procés fins a construir la resposta completa.
+The operation of an LLM is based on token-by-token text generation. A token can correspond to a word, part of a word or a symbol. Based on the input text and available context, the model calculates the next most appropriate token and repeats this process until the complete response is constructed.
 
-### 1.1. FUNCIONAMENT D’UN LLM
+### 1.1. OPERATION OF An LLM
 
-El següent esquema representa com un LLM processa una pregunta i genera una resposta, des del moment en què l'usuari introdueix el text fins que el model acaba de respondre.
+The following diagram represents how an LLM processes a question and generates an answer, from the time the user enters the text until the model finishes answering.
 
 ```mermaid
 flowchart LR
-    A["Entrada de l'usuari"] --> B["Tokenització"]
-    B --> C["Processament mitjançant LLM"]
-    C --> D["Generació de la resposta"]
-    D --> E["Ha finalitzat?"]
+    A["User input"] --> B["Tokenization"]
+    B --> C["Processing vian LLM"]
+    C --> D["Generating the response"]
+    D --> E["Finished?"]
     E -->|No| B
-    E -->|Sí| F["Resposta completa"]
+    E -->|Yes| F["Complete response"]
 
     classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
     classDef token fill:#D5E8E8,stroke:#333333,color:#111111
@@ -35,38 +35,38 @@ flowchart LR
 ```
 
 <p align="center">
-  <sub>Figura 1. Esquema funcionament LLM</sub>
+  <sub>Figure 1. LLM operation diagram</sub>
 </p>
 
-1. Entrada de l’usuari: l'usuari introdueix una pregunta o instrucció (prompt). Aquesta entrada pot incloure una pregunta, instruccions, codi o informació addicional. El model utilitzarà tant aquesta entrada com el context disponible de la conversa per generar una resposta.
+1. User input: The user enters a question or instruction (prompt). This entry may include a question, instructions, code, or additional information. The model will use both this input and the available conversation context to generate a response.
 
-2. Tokenització: un LLM no processa directament les paraules tal com les llegim nosaltres. Primer utilitza un tokenitzador, que transforma el text en unitats més petites anomenades tokens. Un token pot representar una paraula completa, una part d'una paraula, un número o un símbol. La divisió real depèn del tokenitzador utilitzat per cada model. Posteriorment, aquests identificadors es transformen en representacions numèriques (vectors) que poden ser processades per la xarxa neuronal.
+2. Tokenization: An LLM does not directly process words as we read them. It first uses a tokenizer, which transforms the text into smaller units called tokens. A token can represent a whole word, part of a word, a number, or a symbol. The actual split depends on the tokenizer used by each model. Subsequently, these identifiers are transformed into numerical representations (vectors) that can be processed by the neural network.
 
-3. Processament mitjançant LLM: aquesta és la part principal del funcionament. El model rep els tokens i els processa mitjançant la seva xarxa neuronal.
+3. Processing by LLM: This is the main part of the operation. The model receives the tokens and processes them using its neural network.
 
-   Durant aquest processament utilitza diferents elements:
-   - **Paràmetres**: valors numèrics apresos durant l'entrenament que permeten identificar patrons i relacions entre conceptes.
-   - **Context**: informació de la pregunta, de la conversa anterior i dels tokens generats fins al moment.
-   - **Mecanismes d'atenció**: permeten relacionar diferents parts de la seqüència per interpretar-ne el significat.
+   During this processing it uses different elements:
+   - **Parameters**: Numerical values learned during training that allow patterns and relationships between concepts to be identified.
+   - **Context**: Information about the question, the previous conversation, and the tokens generated so far.
+   - **Attention Mechanisms**: allow different parts of the sequence to be related to interpret its meaning.
 
-   Per exemple, quan el model rep la pregunta “Què és la fotosíntesi?”, pot relacionar el concepte de fotosíntesi amb els coneixements apresos durant l'entrenament sobre les plantes, la llum solar i la transformació d'energia.
+   For example, when the model receives the question “What is photosynthesis?”, it can relate the concept of photosynthesis to the knowledge learned during training about plants, sunlight, and energy transformation.
 
-   A partir d'aquesta informació, el model calcula una distribució de probabilitats dels possibles tokens següents.
+   Based on this information, the model calculates a probability distribution of the following possible tokens.
 
-4. Generació de la resposta: el model selecciona un token a partir de les probabilitats calculades i de l'estratègia de generació configurada.
+4. Response generation: The model selects a token based on the calculated probabilities and the configured generation strategy.
 
-   Per exemple, podria començar generant: La. Després, torna a processar la seqüència tenint en compte els tokens que acaba de generar: La fotosíntesi. I continuar amb: La fotosíntesi és. Fins a construir una resposta completa, com ara: La fotosíntesi és el procés mitjançant el qual les plantes, les algues i alguns microorganismes transformen l'energia de la llum en energia química.
+   For example, it could start by generating: Photosynthesis. It then reprocesses the sequence taking into account the tokens it just generated: Photosynthesis is. It can then continue with: Photosynthesis is the process. Until constructing a complete answer, such as: Photosynthesis is the process by which plants, algae, and some microorganisms transform light energy into chemical energy.
 
-   Per tant, el model no genera tota la resposta de cop, sinó que la construeix progressivament, token a token.
+   Therefore, the model does not generate the entire response at once, but builds it up incrementally, token by token.
 
-5. Finalització: després de generar cada token, el procés continua fins que es compleix alguna condició de finalització.
+5. Termination: After each token is generated, the process continues until some termination condition is met.
 
-### 1.2. INFERÈNCIA
+### 1.2. INFERENCE
 
-Tot aquest procés rep el nom d'inferència. La inferència consisteix a utilitzar un model que ja ha estat entrenat per processar una entrada i generar una resposta.
+This whole process is called inference. Inference involves using a model that has already been trained to process an input and generate a response.
 
-És important diferenciar-la de l'entrenament. Les definicions són les següents:
-Entrenament: procés durant el qual el model aprèn patrons a partir de grans quantitats de dades i s'ajusten els seus paràmetres.
-Inferència: procés durant el qual el model utilitza els paràmetres apresos per generar respostes a noves consultes.
+It is important to differentiate it from training. The definitions are as follows:
+Training: The process during which the model learns patterns from large amounts of data and its parameters are adjusted.
+Inference: Process during which the model uses learned parameters to generate answers to new queries.
 
-Quan s'executa un model com Qwen mitjançant Ollama, el sistema està realitzant inferència local. Això significa que el model utilitza els recursos de càlcul de l'ordinador per generar respostes, sense tornar-se a entrenar ni modificar els seus paràmetres amb cada consulta.
+When running a model like Qwen using Ollama, the system is performing local inference. This means that the model uses the computer's computing resources to generate answers, without retraining itself or changing its parameters with each query.

@@ -1,35 +1,35 @@
 ## 5. MCP SERVER (MODEL CONTEXT PROTOCOL)
 
-MCP (Model Context Protocol) és un protocol obert i estandarditzat que permet connectar aplicacions d'intel·ligència artificial amb eines, fonts de dades i serveis externs. Habitualment, un LLM genera respostes a partir de la informació proporcionada en el prompt i dels coneixements adquirits durant el seu entrenament. Tanmateix, el model no pot accedir directament als fitxers d'un ordinador, consultar una base de dades o executar determinades operacions si l'aplicació no li proporciona els mecanismes necessaris.
+MCP (Model Context Protocol) is an open and standardized protocol that allows artificial intelligence applications to connect with external tools, data sources and services. Usually, an LLM generates answers based on the information provided in the prompt and the knowledge acquired during its training. However, the model cannot directly access files on a computer, query a database, or perform certain operations if the application does not provide the necessary mechanisms.
 
-MCP facilita aquesta integració mitjançant una arquitectura de comunicació estandarditzada entre aplicacions i servidors que ofereixen diferents funcionalitats.
+MCP facilitates this integration through a standardized communication architecture between applications and servers that offer different functionalities.
 
-Per exemple, mitjançant MCP es podria connectar un assistent basat en un LLM amb:
-El sistema de fitxers local, per llegir documents o consultar directoris.
-Una base de dades, per recuperar informació emmagatzemada.
-Una API externa, per obtenir dades d'un servei.
-Un repositori de codi, per consultar fitxers i informació d'un projecte.
-Una aplicació que executi funcions Python específiques.
+For example, through MCP you could connect an LLM-based assistant with:
+The local file system, for reading documents or consulting directories.
+A database, to retrieve stored information.
+An external API, to get data from a service.
+A code repository, to consult files and project information.
+An application that executes specific Python functions.
 
-Un dels principals avantatges és que les eines es poden desenvolupar independentment de l'aplicació que utilitza el LLM. D'aquesta manera, un mateix servidor MCP pot ser utilitzat per diferents aplicacions compatibles.
+One of the main advantages is that the tools can be developed independently of the application using the LLM. In this way, the same MCP server can be used by different compatible applications.
 
-### 5.1. ARQUITECTURA MCP
+### 5.1. MCP ARCHITECTURE
 
-MCP utilitza una arquitectura client-servidor formada per tres components principals:
+MCP uses a client-server architecture consisting of three main components:
 MCP Host
 MCP Client
 MCP Server
 
 1. MCP Host:
-   és l'aplicació principal que necessita accedir a funcionalitats externes. El host gestiona l'experiència de l'usuari, la integració amb els models de llenguatge i les connexions amb els servidors MCP. Per exemple, un editor de codi amb assistent d'intel·ligència artificial pot actuar com a MCP Host.
+   is the main application that needs to access external functionality. The host manages the user experience, integration with language models, and connections to MCP servers. For example, a code editor with an AI assistant can act as an MCP Host.
 
 2. MCP Client:
-   és el component que estableix i gestiona la comunicació amb un servidor MCP. Les seves responsabilitats principals són establir la connexió, descobrir les funcionalitats que ofereix el servidor, enviar sol·licituds i rebre els resultats. Normalment, el host crea un client MCP per a cada connexió amb un servidor.
+   is the component that establishes and manages communication with an MCP server. Its main responsibilities are to establish the connection, discover the functionalities offered by the server, send requests and receive the results. Typically, the host creates an MCP client for each connection to a server.
 
 3. MCP Server:
-   és el programa que proporciona les funcionalitats a través del protocol. El servidor pot executar funcions Python, consultar bases de dades, accedir a fitxers o comunicar-se amb altres serveis.
+   is the program that provides the functionalities through the protocol. The server can run Python functions, query databases, access files, or communicate with other services.
 
-El servidor no necessita incorporar un LLM. Pot limitar-se a oferir funcions que posteriorment seran utilitzades per altres aplicacions. Per exemple, un servidor MCP especialitzat en fitxers podria exposar les operacions list_files() i read_file(). Quan el client sol·licita executar list_files(), és el servidor qui executa la funció corresponent i retorna el resultat.
+The server does not need to embed an LLM. It can limit itself to providing functions that will later be used by other applications. For example, a file-specialized MCP server might expose the list_files() and read_file() operations. When the client requests to execute list_files(), it is the server that executes the corresponding function and returns the result.
 
 ```mermaid
 flowchart LR
@@ -55,17 +55,17 @@ flowchart LR
 ```
 
 <p align="center">
-  <sub>Figura 1. Arquitectura MCP</sub>
+  <sub>Figure 1. MCP architecture</sub>
 </p>
 
-### 5.2. FUNCIONALITATS D'UN MCP SERVER
+### 5.2. FUNCTIONALITIES OF AN MCP SERVER
 
-Un servidor MCP pot proporcionar diferents tipus de funcionalitats. Les tres primitives principals són Tools, Resources i Prompts.
+An MCP server can provide different types of functionality. The three main primitives are Tools, Resources, and Prompts.
 
 1. Tools:
-   són funcions executables que el servidor posa a disposició dels clients. Permeten realitzar operacions concretes, com consultar una API, executar un càlcul o modificar informació.
+   are executable functions that the server makes available to clients. They allow specific operations to be performed, such as querying an API, executing a calculation or modifying information.
 
-Per exemple, un servidor podria exposar la funció següent:
+For example, a server could expose the following function:
 
 ```python
 @mcp.tool()
@@ -77,22 +77,22 @@ def calculate_flight_time(
     return (distance_km / speed_kmh) * 60
 ```
 
-Aquesta funció rep una distància i una velocitat, i retorna el temps de vol en minuts. El decorador @mcp.tool() registra la funció com una eina del servidor.
+This function receives a distance and a speed, and returns the flight time in minutes. The @mcp.tool() decorator registers the function as a server tool.
 
-D'aquesta manera, quan un client MCP consulta les eines disponibles, pot descobrir calculate_flight_time(), els arguments que necessita i la seva descripció. Si posteriorment sol·licita executar-la, el servidor realitza el càlcul amb Python i retorna el resultat.
+This way, when an MCP client queries the available tools, it can discover calculate_flight_time(), the arguments it needs and their description. If you later request to run it, the server performs the calculation with Python and returns the result.
 
-El LLM no executa directament la fórmula. El model pot sol·licitar que s'utilitzi l'eina, però el càlcul real és responsabilitat del servidor.
+The LLM does not execute the formula directly. The model may request that the tool be used, but the actual computation is the responsibility of the server.
 
 2. Resources:
-   permeten proporcionar informació que una aplicació pot llegir i incorporar al seu context. A diferència de les tools, que representen operacions executables, els resources estan orientats a exposar contingut.
+   allow you to provide information that an application can read and incorporate into its context. Unlike tools, which represent executable operations, resources are oriented to expose content.
 
-   Per exemple, un servidor podria proporcionar el contingut d'un document o informació sobre la configuració d'un sistema.
+   For example, a server could provide the contents of a document or information about a system configuration.
 
 3. Prompts:
-   són plantilles reutilitzables que permeten estructurar les instruccions proporcionades a un model.
+   are reusable templates that allow you to structure the instructions provided to a model.
 
 ```python
-Per exemple:
+# For example:
 @mcp.prompt()
 def explain_code(language: str) -> str:
     """Generate a prompt to explain code."""
@@ -102,15 +102,15 @@ def explain_code(language: str) -> str:
     )
 ```
 
-El servidor proporciona la plantilla, però no executa necessàriament cap inferència. El client pot recuperar el prompt i utilitzar-lo posteriorment en una interacció amb un LLM.
+The server provides the template, but does not necessarily run any inference. The client can retrieve the prompt and use it later in an interaction with an LLM.
 
-### 5.3. COMUNICACIÓ ENTRE CLIENT I SERVIDOR
+### 5.3. COMMUNICATION BETWEEN CLIENT AND SERVER
 
-MCP utilitza missatges estructurats basats en JSON-RPC 2.0 per intercanviar sol·licituds, respostes i notificacions. El protocol defineix els mecanismes necessaris perquè un client pugui descobrir les capacitats d'un servidor i utilitzar-les.
+MCP uses structured messages based on JSON-RPC 2.0 to exchange requests, responses, and notifications. The protocol defines the necessary mechanisms for a client to discover the capabilities of a server and use them.
 
-Per exemple, un client pot sol·licitar la llista d'eines disponibles mitjançant l'operació tools/list. Si vol executar una eina concreta, utilitza tools/call, proporcionant-ne el nom i els arguments.
+For example, a client can request the list of available tools using the tools/list operation. If you want to run a specific tool, use tools/call, providing its name and arguments.
 
-Una sol·licitud per calcular un temps de vol (amb la tool anteriorment descrita) podria tenir una estructura equivalent a:
+A request to calculate a flight time (with the tool described above) could have a structure equivalent to:
 
 ```json
 {
@@ -127,48 +127,48 @@ Una sol·licitud per calcular un temps de vol (amb la tool anteriorment descrita
 }
 ```
 
-El servidor interpreta la sol·licitud, valida els arguments i executa la funció Python. En aquest cas, el resultat seria un temps de vol de 18 minuts. Posteriorment, el servidor retorna el resultat al client mitjançant una resposta estructurada del protocol.
+The server interprets the request, validates the arguments, and executes the Python function. In this case, the result would be a flight time of 18 minutes. The server then returns the result to the client using a structured protocol response.
 
-La biblioteca MCP s'encarrega de la comunicació, la serialització de les dades i la validació dels arguments.
+The MCP library handles communication, data serialization, and argument validation.
 
-Hi ha diferents mecanismes de transport: stdio, streamable HTTP.
-| **Transport** | **Descripció** |
+There are different transport mechanisms: stdio, streamable HTTP.
+| **Transport** | **Description** |
 |---|---|
-| **stdio (Standard Input/Output)** | S'utilitza principalment quan el servidor s'executa localment. El client inicia el servidor com un procés i es comunica amb ell mitjançant l'entrada i la sortida estàndard. Permet connectar aplicacions amb eines locals sense necessitat d'obrir un port de xarxa. |
-| **Streamable HTTP** | Permet establir comunicació amb un servidor a través d'HTTP. És especialment útil quan el servidor es troba en una altra màquina o s'ha desplegat com un servei accessible per xarxa. Facilita que diferents clients es puguin comunicar amb un servidor remot. |
+| **stdio (Standard Input/Output)** | It is mainly used when the server is running locally. The client starts the server as a process and communicates with it using standard input and output. It allows applications to connect with local tools without opening a network port. |
+| **Streamable HTTP** | Allows establishing communication with a server via HTTP. It is especially useful when the server is on another machine or has been deployed as a network-accessible service. It makes it easy for different clients to communicate with a remote server. |
 
-La selecció del transport no modifica la finalitat de les eines: el servidor continua proporcionant les mateixes operacions, però canvia el mecanisme utilitzat per comunicar-se amb els clients.
+Selecting the transport does not change the purpose of the tools: the server continues to provide the same operations, but changes the mechanism used to communicate with clients.
 
-La selecció del transport no modifica la finalitat de les eines: el servidor continua proporcionant les mateixes operacions, però canvia el mecanisme utilitzat per comunicar-se amb els clients.
+Selecting the transport does not change the purpose of the tools: the server continues to provide the same operations, but changes the mechanism used to communicate with clients.
 
-### 5.4. FUNCIONAMENT I FLUX D’EXECUCIÓ
+### 5.4. OPERATION AND FLOW OF EXECUTION
 
-Per entendre com funciona MCP, suposem una aplicació amb un LLM que disposa d'un servidor MCP amb una eina per calcular temps de vol (la que s’ha vist anteriorment).
+To understand how MCP works, let's assume an application with an LLM that has an MCP server with a flight-time tool (the one seen earlier).
 
-L'usuari introdueix: “¿Cuánto tardaría un dron en recorrer 12 km a 40 km/h?”
+The user enters: “How long would it take a drone to travel 12 km at 40 km/h?”
 
-En una aplicació en què el LLM disposa de les eines del servidor, el funcionament podria ser el següent:
+In an application where the LLM has the server tools, the operation could be as follows:
 
-1. Entrada de l'usuari: l'usuari introdueix la pregunta a l'aplicació principal (MCP Host).
-2. Disponibilitat de les eines: el client MCP es connecta al servidor i consulta les eines disponibles. Aquesta operació pot haver-se realitzat prèviament i no és necessari repetir-la a cada pregunta.
-3. Interpretació del LLM: l'aplicació proporciona al model la pregunta i la descripció de les eines disponibles. El LLM interpreta que necessita calcular un temps de vol i pot generar una sol·licitud per utilitzar calculate_flight_time().
-4. Sol·licitud al MCP Client: l'aplicació rep la decisió del model i demana al client MCP que executi l'eina, proporcionant els arguments distance_km=12 i speed_kmh=40.
-5. Comunicació MCP: el client envia la sol·licitud al servidor mitjançant el protocol.
-6. Execució al servidor: el MCP Server executa la funció Python calculate_flight_time() i obté un resultat de 18 minuts.
-7. Retorn del resultat: el servidor retorna el resultat al client MCP, que el proporciona a l'aplicació principal.
-8. Resposta del LLM: l'aplicació pot enviar el resultat al model perquè generi una explicació en llenguatge natural.
-9. Resposta final: l'aplicació mostra la resposta a l'usuari.
+1. User input: The user enters the question in the main application (MCP Host).
+2. Tools availability: The MCP client connects to the server and queries the available tools. This operation may have been performed previously and it is not necessary to repeat it for each question.
+3. Interpretation of the LLM: The application provides the model with the question and the description of the available tools. The LLM interprets that it needs to calculate a flight time and can generate a request to use calculate_flight_time().
+4. Request to MCP Client: The application receives the model decision and requests the MCP client to run the tool, providing the arguments distance_km=12 and speed_kmh=40.
+5. MCP Communication: The client sends the request to the server using the protocol.
+6. Execution on the server: The MCP Server executes the Python function calculate_flight_time() and gets a result of 18 minutes.
+7. Returning the result: The server returns the result to the MCP client, which provides it to the main application.
+8. LLM Response: The application can send the result to the model to generate a natural language explanation.
+9. Final Response: The application displays the response to the user.
 
 ```mermaid
 
 flowchart LR
-    U["Usuari"] --> L1["LLM"]
+    U["User"] --> L1["LLM"]
     L1 --> C1["MCP Client"]
     C1 --> S["MCP Server"]
-    S --> T["Eina Python"]
+    S --> T["Python tool"]
     T --> C2["MCP Client"]
     C2 --> L2["LLM"]
-    L2 --> F["Resposta final"]
+    L2 --> F["Final response"]
 
     classDef usuari fill:#D6EAF8,stroke:#333333,color:#111111
     classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
@@ -184,16 +184,16 @@ flowchart LR
 ```
 
 <p align="center">
-  <sub>Figura 2. Flux d’execució d’una petició amb MCP i LLM</sub>
+  <sub>Figure 2. Execution flow of a request with MCP and LLM</sub>
 </p>
 
-| **Component**                | **Funció**                                                             |
+| **Component** | **Function** |
 | ---------------------------- | ---------------------------------------------------------------------- |
-| **LLM (petició)**            | Interpreta la pregunta i decideix utilitzar una eina del servidor MCP. |
-| **MCP Client (sol·licitud)** | Envia la sol·licitud amb els arguments al servidor.                    |
-| **MCP Server**               | Rep la sol·licitud i executa l'eina corresponent.                      |
-| **Eina Python**              | Realitza l'operació i retorna el resultat.                             |
-| **MCP Client (resposta)**    | Rep el resultat del servidor i el proporciona a l'aplicació.           |
-| **LLM (resposta)**           | Utilitza el resultat per generar una resposta final.                   |
+| **LLM (request)** | Interpret the question and decide to use an MCP server tool. |
+| **MCP Client (Request)** | Send the request with the arguments to the server.                    |
+| **MCP Server** | It receives the request and runs the corresponding tool.                      |
+| **Python Tool** | Performs the operation and returns the result.                             |
+| **MCP Client (response)** | It receives the result from the server and provides it to the application.           |
+| **LLM (answer)** | Use the result to generate a final answer.                   |
 
-Aquest esquema mostra que el LLM intervé per interpretar la petició i, quan l'aplicació ho permet, decidir quina eina utilitzar. En canvi, el client MCP s'encarrega de la comunicació i el servidor executa la funció.
+This diagram shows that the LLM steps in to interpret the request and, when the application allows it, decide which tool to use. Instead, the MCP client handles the communication and the server executes the function.

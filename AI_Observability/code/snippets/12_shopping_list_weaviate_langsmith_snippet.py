@@ -1,19 +1,19 @@
 # pyright: reportUndefinedVariable=false
-# EXEMPLE 12: Observabilitat del RAG amb LangSmith
-# Fitxer original: ../src/12_shopping_list_weaviate_langsmith.py
-# Què mostra: tracing natiu de LangGraph i Ollama, tokens i run manual de Weaviate.
-# LLM: Ollama classifica la petició i genera la resposta RAG amb receptes recuperades.
-# Python: configura el projecte, executa el graf, consulta Weaviate i llegeix els tokens.
-# LangSmith: registra automàticament els nodes, el router, les eines i les inferències.
-# Fragment de lectura: els imports, constants i funcions auxiliars són al fitxer original.
-# Els blocs comentats pertanyen a search_recipes() i main(); el snippet no és executable sol.
+# EXAMPLE 12: Observability of the RAG with LangSmith
+# Original file: ../src/12_shopping_list_weaviate_langsmith.py
+# What it shows: LangGraph and Ollama native tracing, tokens and Weaviate manual run.
+# LLM: Ollama classifies the request and generates the RAG response with retrieved recipes.
+# Python: Set up the project, run the graph, query Weaviate and read the tokens.
+# LangSmith: Automatically registers nodes, router, tools and inferences.
+# Read Snippet: Amounts, constants and helper functions are in the original file.
+# Commented blocks belong to search_recipes() and main(); the snippet is not executable by itself.
 
-# 1. Configuració de Langsmith del projecte 
+# 1. LangSmith project setup
 load_dotenv()
 PROJECT = os.getenv("LANGSMITH_PROJECT", "shopping-rag-weaviate-langsmith").strip() or "shopping-rag-weaviate-langsmith"
 
-# 2. Inferència instrumentada automàticament per LangChain
-# El run_name identifica l'etapa. Els tokens es mostren també a la terminal.
+# 2. Inference automatically instrumented by LangChain
+# The run_name identifies the stage. Tokens are also displayed in the terminal.
 def invoke_with_langsmith_usage(model, messages, etapa: str):
     answer = model.invoke(messages, config={
         "run_name": f"ollama.{etapa}",
@@ -32,13 +32,13 @@ def invoke_with_langsmith_usage(model, messages, etapa: str):
         total_tokens = int(input_tokens) + int(output_tokens)
     shown_usage = {"input_tokens": input_tokens, "output_tokens": output_tokens,
                    "total_tokens": total_tokens}
-    print(f"[LANGSMITH] Tokens {etapa}: {shown_usage if any(v is not None for v in shown_usage.values()) else 'no disponibles'}")
+    print(f"[LANGSMITH] Tokens {etapa}: {shown_usage if any(v is not None for v in shown_usage.values()) else 'not available'}")
     return answer
 
 
-# 3. Instrumentació manual de la cerca directa a Weaviate
+# 3. Manually instrumenting direct search in Weaviate
 def weaviate_near_text(collection, query: str, max_minutes: int):
-    """Consulta vectorial; registra cantidad de candidatos obtenidos."""
+    """Vector query; records the number of candidates obtained."""
     with ls.trace("weaviate_near_text", run_type="chain", inputs={
         "collection": COLLECTION, "query": query, "max_minutes": max_minutes,
     }) as run:
@@ -53,8 +53,8 @@ def weaviate_near_text(collection, query: str, max_minutes: int):
         return result
 
 
-# 4. Metadades de search_recipes()
-# Els comptadors es registren després de filtrar els ingredients.
+# 4. Metadata of search_recipes()
+# Counters are logged after filtering ingredients.
 # run = get_current_run_tree()
 # if run is not None:
 #     run.add_metadata({
@@ -64,9 +64,9 @@ def weaviate_near_text(collection, query: str, max_minutes: int):
 #     })
 # return matches
 
-# 5. CONNEXIÓ AMB LANGGRAPH
-# El context registra el run arrel, els nodes, el router i les crides filles.
-# El programa complet valida la clau i evita barrejar projecte i agent.
+# 5. CONNECTION WITH LANGGRAPH
+# The context records the root run, nodes, router, and child calls.
+# The full program validates the key and avoids mixing project and agent.
 # tracing_enabled = os.getenv("LANGSMITH_TRACING", "true").strip().lower() in ("true", "1")
 # client = ls.Client() if tracing_enabled else None
 # try:
