@@ -1,6 +1,6 @@
 # 8. EXEMPLES D’ÚS EN PROGRAMES DE PYTHON
 
-Aquest apartat reuneix **onze exemples progressius (del `00` al `10`)** per entendre com s'integren Python, Ollama, LangChain, LangGraph, Weaviate, Opik i Hermes. L'objectiu és veure què fa cada programa, en quin punt intervé un LLM, què executa Python i com es connecten els components.
+Aquest apartat reuneix **tretze exemples progressius (del `00` al `12`)** per entendre com s'integren Python, Ollama, LangChain, LangGraph, Weaviate, Opik, Hermes, OpenTelemetry amb Grafana i LangSmith. L'objectiu és veure què fa cada programa, en quin punt intervé un LLM, què executa Python i com es connecten els components.
 
 ## 8.0. Com utilitzar aquests exemples
 
@@ -10,7 +10,7 @@ Cada exemple inclou:
 2. **Snippet:** un fragment de [`code/snippets/`](../code/snippets/) que destaca les peces necessàries per entendre l'exemple: configuració → eina o node → connexió amb l'agent o el graf → execució. Alguns fragments mostren el recorregut complet. Altres ometen funcions auxiliars o part de les connexions. **Per executar els exemples, cal fer servir els programes de `code/src/`.**
 3. **Explicació i flux:** el paper del LLM i de Python, un diagrama del flux d'execució i el comandament d'execució.
 
-> **Com executar-los:** tots els comandaments `python` d'aquest document es llancen **des de l'arrel del repositori `Visual_tools_for_AI`**, amb l'entorn virtual activat i les dependències instal·lades. Cal tenir Ollama disponible i haver descarregat el model que utilitza cada exemple. Els programes que incorporen Weaviate, Opik o Hermes requereixen, a més, la configuració corresponent.
+> **Com executar-los:** tots els comandaments `python` d'aquest document es llancen **des de l'arrel del repositori `Visual_tools_for_AI`**, amb l'entorn virtual activat i les dependències instal·lades. Cal tenir Ollama disponible i haver descarregat el model que utilitza cada exemple. Els programes que incorporen Weaviate, Opik, Hermes, OpenTelemetry amb Grafana o LangSmith requereixen, a més, la configuració corresponent. Les dependències de Python s’instal·len amb `python -m pip install -r requirements.txt`.
 
 ### Accés directe al codi i als snippets
 
@@ -27,6 +27,8 @@ Cada exemple inclou:
 | **8.9 · 08**  | Cerca semàntica i RAG amb Weaviate         | [Codi complet](../code/src/08_shopping_list_weaviate.py)               | [Snippet](../code/snippets/08_shopping_list_weaviate_snippet.py)                                                                                              |
 | **8.10 · 09** | Traces i tokens amb Opik                   | [Codi complet](../code/src/09_shopping_list_weaviate_opik.py)          | [Snippet](../code/snippets/09_shopping_list_weaviate_opik_snippet.py)                                                                                         |
 | **8.11 · 10** | Integració d'Hermes                        | [Codi complet](../code/src/10_shopping_list_weaviate_opik_hermes.py)   | [Hermes CLI](../code/snippets/10_shopping_list_weaviate_opik_hermes_snippet.py) · [Ingredients](../code/snippets/10_calculate_missing_ingredients_snippet.py) |
+| **8.12 · 11** | Observabilitat amb OpenTelemetry i Grafana | [Codi complet](../code/src/11_shopping_list_weaviate_otel.py)          | [Snippet](../code/snippets/11_shopping_list_weaviate_otel_snippet.py)                                                                                         |
+| **8.13 · 12** | Observabilitat amb LangSmith               | [Codi complet](../code/src/12_shopping_list_weaviate_langsmith.py)     | [Snippet](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)                                                                                    |
 
 ---
 
@@ -1706,3 +1708,163 @@ Si la traça correspon a una cerca de receptes, han d'aparèixer els spans de ce
 Les mètriques de tokens del dashboard corresponen al **període temporal triat** i no canvien automàticament en seleccionar una trace. La trace concreta es consulta al Node Graph o al detall de Tempo. A diferència d'Opik, que integra la presentació de traces i mètriques a la mateixa plataforma, aquesta alternativa combina un estàndard obert d'instrumentació (**OpenTelemetry**), un backend de traces (**Tempo**) i una interfície de visualització (**Grafana**).
 
 Finalment, per **aturar i reprendre la pràctica sense perdre el contenidor**, cal utilitzar `docker stop grafana-lgtm` i `docker start grafana-lgtm`, tal com s'explica al **pas 3 de l'[apartat 6.8](./06_observability.md#otel-instal-lacio)**. No s'ha d'executar `docker run` cada dia. Per a la interpretació detallada de les visualitzacions, les limitacions i la comparació amb Opik, vegeu els **apartats 6.9–6.11 de [`06_observability.md`](./06_observability.md#otel-dashboard)**.
+
+### 8.13. Observabilitat del RAG amb LangSmith — `12_shopping_list_weaviate_langsmith.py`
+
+**Programa complet:** [Obrir `12_shopping_list_weaviate_langsmith.py`](../code/src/12_shopping_list_weaviate_langsmith.py)  
+**Snippet:** [Obrir `12_shopping_list_weaviate_langsmith_snippet.py`](../code/snippets/12_shopping_list_weaviate_langsmith_snippet.py)  
+**Què cal observar al snippet:** la configuració del projecte, el context `ls.tracing_context()`, el registre automàtic de les inferències, la instrumentació manual de Weaviate i l'enviament dels runs pendents.
+
+Aquest exemple parteix de l'assistent de llista de la compra i receptes de l'apartat 8.9, amb LangGraph, Ollama i Weaviate Cloud. No incorpora la planificació setmanal amb Hermes de l'apartat 8.11. La diferència és que substitueix Opik i la instrumentació manual d'OpenTelemetry per LangSmith. S'utilitza una integració per projecte (`LANGSMITH_PROJECT`) amb el servei Cloud, sense necessitat de Docker.
+
+**Components del codi:**
+
+1. **Configuració i execució del graf.** `load_dotenv()` carrega les credencials i el nom del projecte. La funció `main()` crea `ls.Client()` si el tracing està activat i executa el graf dins del context:
+
+```python
+with ls.tracing_context(enabled=tracing_enabled, client=client, project_name=PROJECT):
+    result = shopping_graph.invoke(
+        {"user_input": user_input},
+        config={**config, "run_name": "langgraph.invoke",
+                "metadata": {"thread_id": THREAD_ID, "collection": COLLECTION}},
+    )
+```
+
+El run arrel rep el nom `langgraph.invoke`. Els nodes, el router, les eines decorades amb `@tool` i les crides `ChatOllama` es registren automàticament dins del mateix context. El `thread_id` agrupa peticions de la conversa. No cal afegir decoradors manuals a cada node.
+
+2. **Inferències d'Ollama i tokens.** La funció `invoke_with_langsmith_usage()` executa el model original i assigna un nom diferent a cada etapa:
+
+```python
+answer = model.invoke(messages, config={
+    "run_name": f"ollama.{etapa}",
+    "metadata": {"llm.etapa": etapa},
+})
+```
+
+Així es poden identificar `ollama.clasificacion` i `ollama.generacion_rag`. El programa recupera els tokens de `usage_metadata` i, si falten els comptadors d'entrada o sortida, consulta `response_metadata` (`prompt_eval_count` i `eval_count`). Si falta el total i els dos comptadors existeixen, Python els suma. El missatge `[LANGSMITH] Tokens ...` només és un resum de terminal: no crea un segon run LLM ni envia manualment aquests comptadors a LangSmith.
+
+3. **Instrumentació manual de Weaviate.** La funció `weaviate_near_text()` registra l'operació directa del client mitjançant `ls.trace()` amb `run_type="chain"`. El run rep la col·lecció, la consulta i el límit de minuts. Al final es registra `candidates_retrieved`.
+
+```python
+with ls.trace("weaviate_near_text", run_type="chain", inputs={
+    "collection": COLLECTION, "query": query, "max_minutes": max_minutes,
+}) as run:
+    # El programa complet construeix kwargs amb filtres i target_vector.
+    result = collection.query.near_text(**kwargs)
+    if run is not None:
+        run.end(outputs={"candidates_retrieved": len(result.objects)})
+```
+
+L'eina `search_recipes()` conserva el filtratge AND d'ingredients i retorna fins a cinc receptes. Amb `get_current_run_tree()` afegeix metadades sobre candidats recuperats, coincidències retornades i nombre d'ingredients obligatoris. La instrumentació no substitueix la cerca ni la validació de Python.
+
+4. **Enviament de les traces.** Al bloc `finally` de cada petició, `wait_for_all_tracers()` i `client.flush()` buiden els registres pendents quan hi ha un client configurat. Això facilita consultar les traces després de la resposta al terminal.
+
+**Intervenció del LLM:**
+
+El primer `ChatOllama` interpreta la petició a `process_input_node()` i retorna una classificació JSON. Python valida l'acció i els camps. El router `route_after_input()` selecciona la branca corresponent. Si l'acció és `search_recipe` i es recuperen receptes vàlides, el segon model genera una resposta RAG amb el context proporcionat. Les operacions `add`, `remove`, `replace`, `show` i `add_recipe` no necessiten una segona inferència de generació RAG. LangSmith no decideix la ruta ni genera la resposta.
+
+**Operacions de Python:**
+
+Python valida el JSON, executa el router i les eines, recupera receptes de Weaviate, filtra ingredients i temps, guarda `last_recipes` i actualitza `shopping_list`. Quan l'usuari selecciona una recepta anterior, `add_recipe_node()` recupera els ingredients de l'estat i executa `add_products.invoke()` sense tornar a consultar Weaviate. El checkpointer `InMemorySaver` conserva l'estat dins del procés.
+
+**Flux d'execució:**
+
+```mermaid
+flowchart TD
+    U["Usuari: petició sobre receptes"] --> G["LangGraph: langgraph.invoke"]
+    G --> P["process_input: classificació amb Ollama"]
+    P --> R{"Router: acció?"}
+    R -->|search_recipe| W["Python: search_recipes / Weaviate near_text"]
+    W --> D{"Receptes vàlides?"}
+    D -->|Sí| L["Ollama: generació RAG"]
+    D -->|No| N["Python: cap resultat"]
+    R -->|add / remove / replace / show / add_recipe / other| T["Python: node i eina corresponents"]
+    L --> F["Resposta final"]
+    N --> F
+    T --> F
+    G -. "Tracing automàtic de nodes, eines i LLM" .-> S["LangSmith SDK"]
+    W -. "Run manual: weaviate_near_text" .-> S
+    S --> M["LangSmith Cloud: Tracing i Monitoring"]
+    class U,F entrada
+    class G,W servei
+    class P,L llm
+    class R,D decisio
+    class N,T python
+    class S,M opik
+    classDef entrada fill:#D6EAF8,stroke:#333333,color:#111111
+    classDef llm fill:#FFF2CC,stroke:#333333,color:#111111
+    classDef python fill:#D9EAD3,stroke:#333333,color:#111111
+    classDef decisio fill:#F4CCCC,stroke:#333333,color:#111111
+    classDef servei fill:#EADCF8,stroke:#333333,color:#111111
+    classDef agent fill:#FCE5CD,stroke:#333333,color:#111111
+    classDef opik fill:#F5F5F5,stroke:#333333,color:#111111
+```
+
+<p align="center"><sub>Figura 19. Flux de l'assistent RAG i enviament de traces a LangSmith.</sub></p>
+
+**Configuració i execució (des de l'arrel del repositori):**
+
+La creació del compte gratuït, la preparació de l'entorn virtual, la configuració del fitxer `.env` i la resolució d'errors estan detallades a l'[apartat 6.11.1 de `06_observability.md`](./06_observability.md#6111-installació-i-configuració). No cal crear un segon agent ni desplegar el programa al núvol.
+
+**1. Dependències:** amb l'entorn virtual activat, si encara no s'han instal·lat les dependències del repositori, executa les ordres següents, comunes a macOS, Linux i Windows:
+
+```bash
+python -m pip install -r requirements.txt
+python -m pip check
+```
+
+LangSmith (`langsmith==0.12.6`) ja està inclòs a `requirements.txt`. No cal instal·lar-lo per separat ni actualitzar les biblioteques si l'entorn ja funciona. Si `pip check` detecta incompatibilitats, cal resoldre-les abans de continuar.
+
+**2. Configuració:** comprova que Ollama està en funcionament, que Weaviate Cloud conté la col·lecció `Recetas` i que el `.env` inclou les variables `WEAVIATE_URL`, `WEAVIATE_API_KEY`, `OLLAMA_MODEL`, `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY`, `LANGSMITH_ENDPOINT` i `LANGSMITH_PROJECT=shopping-rag-weaviate-langsmith`. L'apartat 6.11.1 conté el bloc complet de configuració i els endpoints de cada regió. No s'han de definir les variables `LANGSMITH_AGENT_ID` ni `LANGSMITH_AGENT_ENVIRONMENT` per a aquest exemple. El `.env` amb les claus reals no s'ha de publicar al repositori.
+
+**3. Execució:** comprova primer la connexió amb Weaviate amb `--check`. Aquesta comprovació no valida Ollama ni LangSmith. Si la col·lecció és accessible, executa l'assistent amb la segona ordre.
+
+**macOS/Linux:**
+
+```bash
+python AI_Observability/code/src/12_shopping_list_weaviate_langsmith.py --check
+python AI_Observability/code/src/12_shopping_list_weaviate_langsmith.py
+```
+
+**Windows (PowerShell):**
+
+```powershell
+python .\AI_Observability\code\src\12_shopping_list_weaviate_langsmith.py --check
+python .\AI_Observability\code\src\12_shopping_list_weaviate_langsmith.py
+```
+
+**Prova en una mateixa sessió:**
+
+| Petició                                       | Acció esperada  | Què cal comprovar?                                                              |
+| --------------------------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `Añade leche`                                 | `add`           | Classificació i `add_products`.                                                 |
+| `Recomiéndame recetas con huevos y patatas`   | `search_recipe` | Cerca vectorial, filtre AND i generació si hi ha resultats.                     |
+| `Añade los ingredientes de la primera receta` | `add_recipe`    | Si hi ha una recepta prèvia, reutilització de `last_recipes`, sense nova cerca. |
+| `Muéstrame la lista`                          | `show`          | Execució de `show_products`.                                                    |
+| `Quita la leche`                              | `remove`        | Execució de `remove_products`.                                                  |
+
+Escriu `exit` per sortir. `reset` esborra la llista i les últimes receptes de la memòria local, no les traces de LangSmith.
+
+**Resultats a LangSmith:**
+
+![Llistat de les execucions del RAG](./img/langsmith_overview.png)
+
+<p align="center"><sub>Figura 20. Nou traces de l'assistent amb l'acció seleccionada, la latència i els tokens.</sub></p>
+
+A la captura es poden observar les operacions `add`, `remove`, `show`, `search_recipe` i `add_recipe`. Les dues cerques de receptes consumeixen aproximadament 1.267 i 2.386 tokens, mentre que les operacions directes sobre la llista registren entre 823 i 909 tokens en aquestes proves. Aquests resultats depenen de la petició, del context i del rendiment del model.
+
+![Detall d'una execució del RAG](./img/langsmith_trace.png)
+
+<p align="center"><sub>Figura 21. Detall jeràrquic de la cerca de receptes amb ous i patates.</sub></p>
+
+La petició «Recomiéndame recetas con huevos y patatas» registra una durada total de 8,38 s. La classificació consumeix 847 tokens i la generació RAG, 420 tokens: en total, 1.267 tokens. El router selecciona `search_recipe`, que executa `search_recipes` (2,22 s) i la consulta `weaviate_near_text` (1,29 s, inclosa en el temps de l'eina). A la sortida es pot comprovar `action=search_recipe` i consultar les receptes guardades a `last_recipes`.
+
+![Distribució temporal de l'execució RAG](./img/langsmith_waterfall.png)
+
+<p align="center"><sub>Figura 22. Waterfall de la mateixa cerca: classificació, recuperació de receptes i generació de la resposta.</sub></p>
+
+La primera inferència dura 2,79 s i la segona, 3,37 s. El node `search_recipe` dura 5,59 s i inclou tant la recuperació com la generació. Waterfall permet comprovar en quin moment s'executa cada operació sense comptar dues vegades les durades dels runs fills.
+
+Per comparar el rendiment global, accedeix a **Monitoring → Analytics**. Les figures 12–14 de l'[apartat 6.13 de `06_observability.md`](./06_observability.md#langsmith-monitoring) mostren el volum i la latència de les traces, les crides a les eines i les execucions dels nodes. Permeten comprovar que una cerca vectorial és més costosa que les operacions directes de Python sobre la llista. L'[apartat 6.12](./06_observability.md#langsmith-traces) explica com interpretar una trace i el Waterfall, l'[apartat 6.14](./06_observability.md#614-comparació-entre-opik-opentelemetry-i-langsmith) compara les tres plataformes.
+
+LangSmith pot enviar el contingut dels prompts, les respostes i l'estat al núvol. Cal utilitzar dades de prova i protegir les credencials.
