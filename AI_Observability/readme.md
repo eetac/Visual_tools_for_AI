@@ -52,9 +52,9 @@ Descriu el protocol MCP i la seva arquitectura client-servidor: host, client i s
 
 **Document:** [05_MCP.md](./05_MCP.md)
 
-### 7. Observabilitat amb Opik i Opentelemetry
+### 7. Observabilitat amb Opik, Opentelemetry i LangSmith
 
-Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la configuració d'Opentelemetry (+ grafana) i la consulta de logs, dashboards i traces detallades.
+Introdueix traces, spans, converses i mètriques com la latència, el consum de tokens i els errors. Explica la configuració d’Opik i la configuració d'Opentelemetry (+ grafana) i la consulta de logs, dashboards i traces detallades. I el mateix per LangSmith.
 
 **Document:** [06_observalility.md](./06_observalility.md)
 
