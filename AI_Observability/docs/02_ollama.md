@@ -4,16 +4,16 @@ Ollama is an open source tool that allows you to download, manage and run LLMs d
 
 One of the main advantages of Ollama is that it allows you to run artificial intelligence models locally, maintaining control over the data and without costs per query. Once downloaded, the models can be used without an Internet connection to perform tasks such as generating text, answering questions, analyzing code, or processing images, depending on the capabilities of each model. In addition, Ollama provides a local API that facilitates the integration of models with Python applications, graphical interfaces and frameworks such as LangChain or LangGraph, allowing the development of customized artificial intelligence applications and agents.
 
-## 2.1. INSTALLATION AND USE OF OLLAMA ON macOS
+## 2.1. INSTALLATION AND USE OF OLLAMA
 
 ### 2.1.1. CHECKING THE CHARACTERISTICS
 
 Before installing Ollama you can check the processor and available memory.
 
-| Operating system | Command |
+| Operating system     | Command                                |
 | -------------------- | -------------------------------------- |
-| macOS | `system_profiler SPHardwareDataType`   |
-| Linux | `sudo dmidecode -t system`             |
+| macOS                | `system_profiler SPHardwareDataType`   |
+| Linux                | `sudo dmidecode -t system`             |
 | Windows (PowerShell) | `Get-CimInstance Win32_ComputerSystem` |
 
 From Terminal:
@@ -35,16 +35,16 @@ Get-CimInstance Win32_ComputerSystem
 
 Information similar to:
 
-| Feature | Value |
-| ------------------------------------------ | ------------------------------------------------ |
-| Model name | MacBook Pro |
-| Model identifier | Mac16,8 |
-| Model number | MX2J3Y/A |
-| Chip | Apple M4 Pro |
-| CPU | 14 cores (10 performance and 4 efficiency) |
-| RAM memory 24 GB |
-| System firmware version | 20457.1.29 |
-| Operating System Loader Version | 20457.1.29 |
+| Feature                         | Value                                      |
+| ------------------------------- | ------------------------------------------ |
+| Model name                      | MacBook Pro                                |
+| Model identifier                | Mac16,8                                    |
+| Model number                    | MX2J3Y/A                                   |
+| Chip                            | Apple M4 Pro                               |
+| CPU                             | 14 cores (10 performance and 4 efficiency) |
+| RAM memory 24 GB                |
+| System firmware version         | 20457.1.29                                 |
+| Operating System Loader Version | 20457.1.29                                 |
 
 <p align="center">
   <sub>Figure 2. Mac information</sub>
@@ -88,11 +88,11 @@ In general, a larger model indicates more capacity and more reasoning, but also 
 
 To see the approximate size of each model, you can search in the Ollama library. For example, the Qwen 3.5 family currently has variants such as:
 
-| Model | Approximate size |
-| -------------- | --------------: |
-| `qwen3.5:0.8b` |      1.2–1.3 GB |
-| `qwen3.5:2b`   |      2.7–3.1 GB |
-| `qwen3.5:4b`   |      3.3–4.0 GB |
+| Model          | Approximate size |
+| -------------- | ---------------: |
+| `qwen3.5:0.8b` |       1.2–1.3 GB |
+| `qwen3.5:2b`   |       2.7–3.1 GB |
+| `qwen3.5:4b`   |       3.3–4.0 GB |
 
 The file size does not exactly correspond to the total memory it will consume during execution. You also need memory for context, cache, buffers, operating system... Therefore, it is not recommended to choose a model that takes up practically all the available memory.
 
@@ -121,11 +121,11 @@ ollama list
 
 Example:
 
-| NAME | ID | SIZE | MODIFIED |
+| NAME       | ID           | SIZE   | MODIFIED      |
 | ---------- | ------------ | ------ | ------------- |
 | qwen3.5:4b | 7f3251fa6878 | 4.0 GB | 5 minutes ago |
-| gemma3:12b | f4031aab637d | 8.1 GB | 3 weeks ago |
-| qwen3.5:9b | 56671c2ab938 | 6.6GB | 3 weeks ago |
+| gemma3:12b | f4031aab637d | 8.1 GB | 3 weeks ago   |
+| qwen3.5:9b | 56671c2ab938 | 6.6GB  | 3 weeks ago   |
 
 <p align="center">
   <sub>Figure 3. Installed models</sub>
@@ -151,9 +151,9 @@ ollama ps
 
 A sort of table with relevant information will appear per terminal:
 
-| NAME | ID | SIZE | PROCESSOR | CONTEXT | RUNNER | UNTIL |
+| NAME       | ID           | SIZE   | PROCESSOR | CONTEXT | RUNNER   | UNTIL              |
 | ---------- | ------------ | ------ | --------- | ------- | -------- | ------------------ |
-| qwen3.5:9b | 56671c2ab938 | 7.9 GB | 100% CPU | 65536 | llamacpp | 4 minutes from now |
+| qwen3.5:9b | 56671c2ab938 | 7.9 GB | 100% CPU  | 65536   | llamacpp | 4 minutes from now |
 
 <p align="center">
   <sub>Figure 4. ollama ps</sub>

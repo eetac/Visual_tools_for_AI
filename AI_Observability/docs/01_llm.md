@@ -6,7 +6,7 @@ These models can perform different types of tasks, such as answering questions, 
 
 The operation of an LLM is based on token-by-token text generation. A token can correspond to a word, part of a word or a symbol. Based on the input text and available context, the model calculates the next most appropriate token and repeats this process until the complete response is constructed.
 
-### 1.1. OPERATION OF An LLM
+### 1.1. OPERATION OF AN LLM
 
 The following diagram represents how an LLM processes a question and generates an answer, from the time the user enters the text until the model finishes answering.
 

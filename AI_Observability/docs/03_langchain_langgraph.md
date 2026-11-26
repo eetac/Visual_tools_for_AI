@@ -1,8 +1,8 @@
-## 4. LANGCHAIN AND LANGGRAPH
+## 3. LANGCHAIN AND LANGGRAPH
 
 Before looking at the Python examples, it is important to understand the role of LangChain and LangGraph in developing applications based on language models.
 
-### 4.1. LANGCHAIN
+### 3.1. LANGCHAIN
 
 LangChain is a framework that facilitates the integration of language models (LLM) with Python applications and other external resources, such as functions, databases, documents or APIs.
 
@@ -78,7 +78,7 @@ flowchart TD
 </p>
 It is important to note that the LLM does not directly execute Python code. The model can generate a request to use a tool, but it is LangChain that takes care of calling the corresponding function.
 
-### 4.2. LANGGRAPH
+### 3.2. LANGGRAPH
 
 LangGraph is a framework aimed at building applications and agents with more structured execution flows, using graphs formed by nodes and connections.
 
@@ -164,13 +164,13 @@ With add_conditional_edges(), conditional connections can be defined that determ
 
 Finally, with compile() the executable graph is built and with invoke() an execution is started.
 
-### 4.3. DIFFERENCE BETWEEN LANGCHAIN AND LANGGRAPH (they are not mutually exclusive)
+### 3.3. DIFFERENCE BETWEEN LANGCHAIN AND LANGGRAPH (they are not mutually exclusive)
 
 The main differences between LangChain and LangGraph are as follows:
 
-| LangChain | LangGraph |
-| ------------------------------------------- | ------------------------------------------------------- |
-| Connect models with tools and other resources | Organize execution using a graph |
-| Facilitates the creation of agents | Allows you to explicitly control nodes and transitions |
-| Manage interactions with the LLM | Manage application state and path |
-| Allows to do _tool calling_ | Allows you to incorporate conditions, loops and different paths |
+| LangChain                                     | LangGraph                                                       |
+| --------------------------------------------- | --------------------------------------------------------------- |
+| Connect models with tools and other resources | Organize execution using a graph                                |
+| Facilitates the creation of agents            | Allows you to explicitly control nodes and transitions          |
+| Manage interactions with the LLM              | Manage application state and path                               |
+| Allows to do _tool calling_                   | Allows you to incorporate conditions, loops and different paths |
