@@ -1,8 +1,8 @@
-## 4. LANGCHAIN I LANGGRAPH
+## 3. LANGCHAIN I LANGGRAPH
 
 Abans d'analitzar els exemples de Python, és important entendre el paper de LangChain i LangGraph en el desenvolupament d'aplicacions basades en models de llenguatge.
 
-### 4.1. LANGCHAIN
+### 3.1. LANGCHAIN
 
 LangChain és un framework que facilita la integració de models de llenguatge (LLM) amb aplicacions Python i altres recursos externs, com funcions, bases de dades, documents o APIs.
 
@@ -78,7 +78,7 @@ flowchart TD
 </p>
 És important remarcar que el LLM no executa directament el codi Python. El model pot generar una sol·licitud per utilitzar una eina, però és LangChain qui s'encarrega de cridar la funció corresponent.
 
-### 4.2. LANGGRAPH
+### 3.2. LANGGRAPH
 
 LangGraph és un framework orientat a construir aplicacions i agents amb fluxos d'execució més estructurats, utilitzant grafs formats per nodes i connexions.
 
@@ -164,7 +164,7 @@ Amb add_conditional_edges() es poden definir connexions condicionals que determi
 
 Finalment, amb compile() es construeix el graf executable i amb invoke() s'inicia una execució.
 
-### 4.3. DIFERÈNCIA ENTRE LANGCHAIN I LANGGRAPH (no són excloents l’un de l’altre)
+### 3.3. DIFERÈNCIA ENTRE LANGCHAIN I LANGGRAPH (no són excloents l’un de l’altre)
 
 Les diferències principals entre LangChain i LangGraph són les següents:
 

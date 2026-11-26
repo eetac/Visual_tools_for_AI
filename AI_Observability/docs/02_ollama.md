@@ -4,7 +4,7 @@ Ollama és una eina de codi obert que permet descarregar, gestionar i executar L
 
 Un dels principals avantatges d'Ollama és que permet executar models d'intel·ligència artificial de manera local, mantenint el control sobre les dades i sense costos per consulta. Un cop descarregats, els models es poden utilitzar sense connexió a Internet per realitzar tasques com generar text, respondre preguntes, analitzar codi o processar imatges, segons les capacitats de cada model. A més, Ollama proporciona una API local que facilita la integració dels models amb aplicacions Python, interfícies gràfiques i frameworks com LangChain o LangGraph, permetent desenvolupar aplicacions i agents d'intel·ligència artificial personalitzats.
 
-## 2.1. INSTAL·LACIÓ I ÚS D’OLLAMA A macOS
+## 2.1. INSTAL·LACIÓ I ÚS D’OLLAMA
 
 ### 2.1.1. COMPROVACIÓ DE LES CARACTERÍSTIQUES
 
